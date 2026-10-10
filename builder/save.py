@@ -2,7 +2,8 @@
 
 1. builder.lib.workflow.check: problems stop the save (warnings are printed).
 2. A dry run on Freya (POST ?dryRun=true).
-3. freya.save_workflow: create the first time, then update in place and publish.
+3. freya.save_workflow: create the first time, then update in place and publish; a workflow id that
+   no longer exists on Freya is created again, and a new workflow is saved twice (see `save`).
 4. Read the saved workflow back and compare nodes and tools with what was sent (the platform
    drops misplaced fields silently).
 Prints the workflow and agent ids as the last line (JSON). Exit code 0 only when saved.
@@ -28,6 +29,25 @@ def shape(wf: dict) -> dict:
     return out
 
 
+def save(slot: str, wf: dict) -> dict:
+    """freya.save_workflow, plus two gaps it leaves: a slot whose workflow no longer exists on Freya (404)
+    is created again, and a new workflow is saved once more, so that its agent gets the event's model
+    (the update path sets it; a chat turn does not start without it)."""
+    try:
+        saved = freya.save_workflow(slot, wf, state_file=str(STATE_FILE))
+    except RuntimeError as error:
+        state = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else {}
+        if slot not in state or " -> 404:" not in str(error):
+            raise
+        print("stale workflow id for", slot, "(not found on Freya): creating a new workflow")
+        state.pop(slot)
+        STATE_FILE.write_text(json.dumps(state, indent=1))
+        saved = freya.save_workflow(slot, wf, state_file=str(STATE_FILE))
+    if "version" not in saved:
+        saved = freya.save_workflow(slot, wf, state_file=str(STATE_FILE))
+    return saved
+
+
 def main() -> int:
     slot, path, variables = sys.argv[1], pathlib.Path(sys.argv[2]), tuple(sys.argv[3].split(","))
     wf = json.loads(path.read_text(encoding="utf-8"))
@@ -44,7 +64,7 @@ def main() -> int:
         print("dry run FAILED:", str(error)[:1500])
         return 1
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    saved = freya.save_workflow(slot, wf, state_file=str(STATE_FILE))
+    saved = save(slot, wf)
     back = freya.api("GET", "/api/v2/workflow/" + saved["workflow_id"], workspaceId=freya.workspace_id())["workflow"]["workflow"]
     sent, kept = shape(wf), shape(back)
     for key in sent:

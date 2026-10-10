@@ -55,7 +55,11 @@ write the prompts, and assemble the workflow.
 - Prompts: the system prompt holds the identity, tone, hard rules that hold in every step, and
   `{{date_facts}}`. It must say: obey the `what_to_do_next` field of every tool result; after every
   tool result speak or call the next tool; never say something is recorded unless the tool result
-  says it worked. Each node's task message covers only that step: its rules from the brief, with
+  says it worked. The judge reads the word the brief uses for a successful write (its "saved" word)
+  literally: it must not appear in any turn before the write succeeds, the opening included. Where the
+  brief does not dictate the exact words, say other things with another form (if the saved word were
+  "logged", the opening would say "we log this call", not "this call is logged"; a failure, "I could not
+  log it"). Each node's task message covers only that step: its rules from the brief, with
   every sentence the brief makes mandatory quoted exactly, and which tool to call when. Never name
   other nodes or describe routing in a task message.
 - End the call with the end_call tool: the assistant says the closing phrase, which triggers it.
@@ -111,9 +115,16 @@ wf.check(workflow, CALL_VARIABLES)    # [] or problems; builder.save runs it too
 The model must read every date decision, never work it out. When the brief says what to do with a
 day that is not a business day (offer the next one, or the previous one), give each deadline date
 `"shifts"` in that direction and put `{deadline_shifts}` at the end of the product line: a day guide,
-one line per day up to a week past that product's deadline ("the 26th = Monday 26 October ...: holiday,
-not a business day -> use ... instead", "... AFTER the latest date"). Tell the model in the task message
-to look up every day the customer names in the product's day guide and follow it.
+one line per day up to a week past that product's deadline ("the 7th = Monday 7 January ...: holiday,
+not a business day -> use ... instead", "... AFTER the latest date"). In the task message, write the date
+rule as separate if-then lines keyed on the guide's own words, not as one paragraph (one paragraph was
+measured to fail: the model offered the deadline for a holiday before it):
+"Whenever the customer names a day, first find that day in the product's day guide, then:
+ - the guide says "can be used": accept it.
+ - the guide says weekend or holiday "-> use X instead": say it is not a business day and offer X. Do NOT offer the deadline.
+ - the guide says "AFTER the latest date": <the brief's rule for a day after the deadline>.
+ Use <the brief's sentence for a day after the deadline> only for a day the guide marks AFTER."
+Fill in the brief's own rules; when the brief gives other handling for one of these cases, its rule wins.
 
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it

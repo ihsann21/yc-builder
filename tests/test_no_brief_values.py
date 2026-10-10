@@ -86,3 +86,22 @@ def test_no_single_word_value_from_a_brief_as_a_string_constant(brief_tokens):
             if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in single:
                 hits.append((path.relative_to(ROOT).as_posix(), node.lineno, node.value))
     assert hits == []
+
+
+def test_no_brief_date_in_words(kit):
+    """A brief's dates also as spoken in prompts: '26 October', 'October 26'."""
+    import datetime
+    texts = "\n".join((kit / "briefs" / name).read_text(encoding="utf-8") for name in ("brief-a.md", "brief-b.md"))
+    forms = set()
+    for iso in set(re.findall(r"\b\d{4}-\d{2}-\d{2}\b", texts)):
+        day = datetime.date.fromisoformat(iso)
+        month = day.strftime("%B")
+        forms.update({str(day.day) + " " + month, month + " " + str(day.day)})
+    assert "26 October" in forms                                                      # the extraction works
+    hits = []
+    for path in builder_files():
+        text = path.read_text(encoding="utf-8")
+        for form in forms:
+            if re.search(r"(?<![0-9])" + re.escape(form) + r"(?![0-9])", text):
+                hits.append((path.relative_to(ROOT).as_posix(), form))
+    assert hits == []
