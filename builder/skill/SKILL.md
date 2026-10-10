@@ -98,6 +98,8 @@ hooks.post_hook(TOOL, rules=[{"when": [[F, "true"|"false"|"missing"|"present"|"e
                 "say": TEXT, "set": {"bb_identity": "verified"}}], messages={"ok", "retry", "give_up",
                 "error", "default": TEXT}, ok_when=[[F, "true"], ...], key_field=F, retries=N,
                 fail_mark=[F, False], log_fields=[F])
+#   message placeholders: {key} {tries} {retries_left} {adjusted} {open:TOOL:TOOL} (products not yet
+#   written by any of those tools, or "none") and any response field or variable
 closing.close_hook(outcome_field=F, reason_field=F, outcomes={OUTCOME: [REASONS] or []},
                    rules=[{"if": [[FACT, OP, V]], "outcome": O, "reason": R | {"fact": FACT, "map": {...}}
                           | {"first_logged": "TOOL.FIELD", "skip": [...]} | {"model": True}}, {"keep_model": True}],
@@ -151,6 +153,17 @@ Track every write tool with a post hook (`ok_when` from the tool's success field
 too (the pre hook records the request the post hook and the close hook read). Retries: what the
 brief allows after a failed write. The hook messages are the next step the brief prescribes after
 that result, including any sentence the customer must hear.
+
+The end of a call with several steps left (record the agreed promises, then write per-product
+records such as notes, then the goodbye) is where the model drops tool calls: it says goodbye and
+the remaining calls never happen (measured). So in every message that can come before the end, put
+the tool calls still due first and the words to the customer last, never the other way round, and
+name the products still due with `{open:<tool>:<tool>...}` (products none of those tools has
+written yet, or "none"), e.g. "Products with neither a promise nor a <record>: {open:<promise tool>:<record tool>}.
+If that is not none, call <record tool> for each of them now, before you say anything. Then ...".
+Respect the brief's exceptions (a call that ends in a transfer may forbid such records).
+Give the end_call tool a description that it is only for after the closing phrase, never while an
+agreed promise is not yet read back and recorded or a required record is missing.
 
 ## Template: WORK/gen.py
 

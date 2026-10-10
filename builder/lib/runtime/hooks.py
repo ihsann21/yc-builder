@@ -423,6 +423,15 @@ def clean_entry(value):
     return as_text(value).replace(",", " ").replace(":", " ")
 
 
+def open_items(state, tools):
+    """The products (bb_products, in order) that none of `tools` has written yet, or 'none'."""
+    done = []
+    for tool in tools:
+        done = done + split_csv(state.get("bb_done__" + tool))
+    items = [item for item in split_csv(state.get("bb_products")) if item not in done]
+    return ", ".join(items) if items else "none"
+
+
 def record_failure(state, tool, key, cfg):
     """Count a failed write for this key. Returns how many times it has failed."""
     counter = "bb_fail__" + tool + "__" + var_key(key or "-")
@@ -507,6 +516,8 @@ def run_post(state, result, cfg):
                 return left if left > 0 else 0
             if name == "adjusted":
                 return adjusted
+            if name.startswith("open:"):
+                return open_items(state, name[5:].split(":"))
             value = lookup(data, name) if isinstance(data, dict) else None
             return lookup(state, name) if value is None else value
 

@@ -72,8 +72,9 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
                rule whose conditions all hold on the response data decides the message and sets
                variables (e.g. an identity state the routes read). ops: see OPS.
     messages   templates: "ok", "retry", "give_up" (tracked writes), "error" (no usable response),
-               "default" (no rule matched). Placeholders: {key} {tries} {retries_left} {adjusted}
-               and any response field or variable name.
+               "default" (no rule matched). Placeholders: {key} {tries} {retries_left} {adjusted},
+               {open:<tool>:<tool>...} (the products in bb_products, in order, that none of those tools
+               has written yet, or "none") and any response field or variable name.
     ok_when    conditions that mean a write succeeded; giving it turns tracking on.
     retries    how many more attempts the brief allows after a failed write (message 'retry' until
                they are used up, then 'give_up').

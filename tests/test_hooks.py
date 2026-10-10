@@ -309,3 +309,19 @@ def test_callback_pre_matches_the_kit(kit, time):
     state, body = pre({}, {"date": "2026-10-15T00:00", "time": time},
                       normalize={"date": {"kind": "date"}, "time": {"kind": "time"}})
     assert body == k["body"]
+
+
+def test_open_placeholder_lists_products_no_listed_tool_has_written():
+    msgs = {"ok": "Still open: {open:book:mark}.", "retry": "r", "give_up": "Open: {open:book:mark}."}
+    cfg = dict(WRITE, messages=msgs)
+    state = {"bb_products": "a1,a2,a3", "bb_done__mark": "a3", "bb_key__book": "a1"}
+    state, result = post(state, {"done": "true", "ref": "r"}, **cfg)
+    assert result["data"]["what_to_do_next"] == "Still open: a2."
+    state["bb_key__book"] = "a2"
+    state, _ = post(state, {"done": False}, **cfg)
+    state, result = post(state, {"done": False}, **cfg)                 # a2 failed out: it still needs a note
+    assert result["data"]["what_to_do_next"] == "Open: a2."
+    state["bb_done__mark"] = "a3,a2"
+    state["bb_key__book"] = "a3"
+    state, result = post(state, {"done": "true", "ref": "r"}, **cfg)
+    assert result["data"]["what_to_do_next"] == "Still open: none."
