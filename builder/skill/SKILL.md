@@ -156,7 +156,12 @@ only: after attempt 1 is refused, stop for this product." / "After attempt N is 
 product."), and tell the model to check that product's own line before each offer, never another
 product's count. Then write the brief's own counting rule in if-then form: what uses an attempt (an
 offer, a question, the opening question or not), whether a refusal given before the agent reached a
-product uses one, and what happens when they are used up. Do not assume another brief's answer.
+product uses one, and what happens when they are used up. Do not assume another brief's answer. One
+case the model gets wrong unless told (measured): when the brief says each product starts at its first
+attempt (or does not say that a refusal before the agent reached the product uses one), a product the
+customer refused up front still gets all its attempts; write: "A product the customer refused before
+you reached it still gets its attempts: your first message about it is its attempt 1 offer. Never end a
+product as refused before its listed attempts are used."
 
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
