@@ -185,7 +185,15 @@ correct themselves. Every task message that collects an answer for a tool says: 
 pieces over several turns, put the pieces together and call the tool once with the complete answer; if a
 part is missing, ask only for that part. If the customer corrects a part, use the corrected part. Never
 ask for the whole answer again because it came in pieces." (measured: an agent asked six times for the
-full date in one sentence and ended the call unverified).
+full date in one sentence and ended the call unverified). The same for amounts: a number that may be
+the start of a larger one ("twelve", "5") is a piece; ask for the rest before you judge it.
+
+A ban alone does not hold; give the model the sentence to say instead. When the brief says the agent
+proposes every amount and never asks the customer for one, the negotiation task message must say what
+comes right after a date is agreed: "Can you pay the full past-due amount of <amount> on <date>?" (or the
+brief's own next offer), and that the agent never asks the customer how much they will pay (measured:
+with the ban only, the agent asked "how much of the 540.00 will you be paying?", the customer said
+"five hundred", and 500.00 was recorded instead of 540.00).
 
 The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
 retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced
