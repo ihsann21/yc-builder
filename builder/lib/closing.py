@@ -14,6 +14,7 @@ from builder.lib.hooks import OPS, check_fields
 
 FACT = re.compile(r"^(count|gave_up|logged|all_logged|last|var|model):(.+)$")
 NEEDS_FIELD = ("logged", "all_logged", "last")
+NUMBER_FACTS = ("count", "gave_up", "logged")     # these facts are counts
 
 
 def close_hook(*, outcome_field: str, reason_field: str, outcomes: dict[str, list[str]], rules: list[dict],
@@ -71,6 +72,10 @@ def check_rule(rule: dict, outcomes: dict) -> None:
         if not isinstance(cond, (list, tuple)) or len(cond) not in (2, 3) or cond[1] not in OPS:
             raise ValueError("condition " + repr(cond) + " must be [fact, op] or [fact, op, value]")
         check_fact(cond[0])
+        kind = str(cond[0]).split(":", 1)[0]
+        if kind in NUMBER_FACTS and cond[1] in ("present", "missing", "true", "false"):
+            raise ValueError("condition " + repr(cond) + ": " + kind + ": is a number (0 when nothing happened), so '"
+                             + cond[1] + "' is always or never true; compare it, e.g. [" + repr(cond[0]) + ", \"gte\", 1]")
     source = rule.get("reason")
     if isinstance(source, str) or source is None:
         check_choice(rule.get("outcome"), source or "", outcomes, "rule " + repr(rule))

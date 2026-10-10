@@ -173,3 +173,17 @@ def test_a_reason_shared_by_two_outcomes_does_not_pick_one():
     outcomes = {"a": ["x"], "b": ["x"], "c": []}
     assert rt.read_model("", "x", outcomes) == {"outcome": "", "reason": "x"}
     assert rt.read_model("a/x", "", outcomes) == {"outcome": "a", "reason": "x"}
+
+
+@pytest.mark.parametrize("op", ["present", "missing", "true", "false"])
+def test_number_facts_refuse_presence_operators(op):
+    from builder.lib import closing as cl
+    with pytest.raises(ValueError, match="is a number"):
+        cl.close_hook(outcome_field="result", reason_field="why", outcomes={"lost": ["gone"], "won": []},
+                      rules=[{"if": [["gave_up:book", op]], "outcome": "lost", "reason": "gone"}],
+                      default={"outcome": "won"})
+
+
+def test_a_gave_up_count_of_zero_does_not_fire():
+    body = close({}, "", "", rules=[{"if": [["gave_up:book", "gte", 1]], "outcome": "nobody", "reason": "gone"}])
+    assert body["result"] != "nobody"
