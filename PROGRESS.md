@@ -194,3 +194,7 @@ C ajanı (`049521c6…`) `dev/cases/brief-c-cases.json`, `--reps 3`: **2/3** (ko
 ## 11 Ekim, 00:02–00:10: Brief D v2 ve yeniden build
 
 Kökteki `brief-d.md` 23:49'da Codex tarafından güncellenmiş (14,9 KB → 17,5 KB): kural 37 (ilk hatadan sonra tekrar onay istemeden bir kez daha dene, en çok iki `create_promise`), kural 32 (zor durumda ek teklif yok), kural 30/31 (deneme sayımı), 42/15 (insan isteği ret sayılmaz) netleştirildi; "48–59 yalnız ifadeyi sınırlar, 1–47'yi değiştirmez" öncelik paragrafı eklendi. Yani v2, ilk D ölçümünde bulunan iki gerçek hatanın (PUB-05, PUB-10) konusunu brief'te çözüyor. `dev/mutations/brief-d-v2.md` olarak saklandı; `brief-d.md` (v1, belirsiz hali) duruyor. Girdi değiştiği için slot koruması yeni slot açtı: `brief-d-518c5c` (workflow `6c07ec04-0b22-4c33-ae99-0dd2746ec093`, agent `41001003-4faf-421f-bb87-7f1002e8a258`, v2; build 190 sn, $1,04, 15 tur; build retry ve "yasaklayan kural kazanır" skill kurallarıyla, `end_call`/birebir cümle kuralından önce). Not: v2 sonucu, skill düzeltmesinin katkısını brief'in netleştirmesinden ayırmaz; v1'in yeni skill'le ölçümü bunu ayırır.
+
+## 11 Ekim, 00:17: Brief D v2, A vakaları: 10/10
+
+D v2 ajanı (`41001003…`, yeni skill: aynı turda retry, yasaklayan kural kazanır) `--brief A --reps 3`: **10/10** (koşular 10, 10, 10; 636 sn; `dev/out/q-D2-A-reps3.out`). İlk D build'inin 1. tekrarındaki PUB-05 (zor durumda teklif) ve PUB-10 (retry yok) kapandı. Katkı ayrılamıyor: brief v2 bu iki konuyu netleştirdi, skill de değişti. Ayırmak için D v1'in yeni skill'le ölçümü kuyrukta.
