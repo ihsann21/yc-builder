@@ -2,6 +2,13 @@
 
 Freya × YC "Build the Builder" hackathon (10–11 Oct 2026). Design: `build_the_builder_final_plan.md`. Organizer kit: `build-the-builder-v3/build-the-builder/`.
 
+## Start of every session (read before doing anything)
+
+1. `PROGRESS.md`, in full: current state, measurements, lessons, decisions and the next task. **Its "Kararlar" section overrides the plan** where they disagree (the plan predates the kit; we chose path B, a kit-style agent builder with our skills and a tested helper library).
+2. `build_the_builder_final_plan.md` (~2,000 lines). Read in full, in order, at least: section 0 (labels), 1, 2.5–2.8 (task, site, kickoff meeting, kit: the authoritative facts), 4.2, 8.2–8.4, 9.6, 11.4, 13, 17.4. Then any other section the current task touches. Search is not a substitute for reading.
+3. The kit files the task touches: `README.md`, `briefs/brief-a.md`, `briefs/brief-b.md`, `docs/*.md`, `tools/openapi.json`, `tools/run_cases.py`, `tools/score.py`, `freya.py`. For the helper-library work also `out/gen_brief_a.py`, `out/gen_brief_b.py` and `out/*.workflow.json` (written by the kit's example builder; they passed A 10/10 and B 2/3 with 3 reps).
+4. Say in one line which of these you read before starting.
+
 ## Progress log (always)
 
 - Keep `PROGRESS.md` up to date. After every notable step (a measurement, a decision, a new file or module, a fix, a lesson, an answer from the organizers), add a short dated paragraph at the end, in Turkish, in the existing style. Update its "Kararlar", "Açık sorular" and "Sıradaki" sections when they change.

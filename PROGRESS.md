@@ -33,6 +33,10 @@ Kit'in örnek builder'ı (`examples/agent_builder.py`, Claude Agent SDK, model `
 4. Dashboard testinde `customer_id` yoktu; banka `404 unknown customer_id` döndü, ajan bunu "doğum tarihi yanlış" diye müşteriye söyledi. Tool hatası ile yanlış cevap ayrılmalı (kancada `ok:false/error` ≠ `verified:false`).
 5. Kit builder'ı `cat env.sh` çalıştırdı; Freya ve takım anahtarı trace'e (`traces/20261010-152917.jsonl`) girdi. Bizim builder `env.sh` okumayacak, trace'te anahtar olmayacak, commit öncesi `fak_` taraması yapılacak.
 
+## 10 Ekim, 16:25: oturum devri
+
+`PROGRESS.md` ve repo kökünde `CLAUDE.md` açıldı. `CLAUDE.md` yeni oturumun okuma sırasını (önce bu dosya, sonra planın ilgili bölümleri, sonra kit) ve sert kuralları içeriyor. Yan etki: kit builder'ı kit klasöründe çalışırken üst klasördeki `CLAUDE.md`'yi de yükleyebilir; bizim `build.py` ayar kaynaklarını boş vererek bundan yalıtılacak.
+
 ## Kararlar
 
 - **Yol B (karma):** kit'in ajan tabanlı builder'ı temel; üstüne bizim skill'lerimiz ve test edilmiş yardımcı kod parçalarımız (tarih ve iş günü, ürün başına son tarih ve geri okuma, deneme sayaçları, deterministik `close_call` sonucu, "sırada ne var" kancaları). Planın ağır kısımları (AgentSpec, iki sağlayıcı, τ vekil benchmark) kullanılmıyor; plan akşam sadeleştirilecek.
@@ -51,7 +55,7 @@ Kit'in örnek builder'ı (`examples/agent_builder.py`, Claude Agent SDK, model `
 
 ## Sıradaki
 
-1. Kit builder'ının iki üretici betiğini ve workflow'larını okuyup ortak çekirdeği çıkarmak.
+1. **Ortak çekirdeği çıkarmak (yeni oturumun ilk işi).** Kit builder'ı her koşuda workflow'u kuran Python betiğini sıfırdan yazıyor: `out/gen_brief_a.py` (32 KB) ve `out/gen_brief_b.py` (35 KB); ürettikleri `out/brief-a.workflow.json` ve `out/brief-b.workflow.json`. Betiklerde iki tür kod karışık: brief'e özgü değerler (tatiller, bantlar, zorunlu cümleler; gizli brief'te değişir, brief'ten okunmalı) ve mekanizmalar (tatili atlayarak n'inci iş günü, OpenAPI'den tool tanımı, `get_account` sonucunu doğru değişkenden okuma, "sırada ne var" post-kancası, `close_call` sonucunu durumdan belirleme, ürün başına son tarih ve geri okuma). İş: iki betiği yan yana okuyup mekanizmaları bulmak, bir kez düzgün yazıp birim testiyle `builder/lib/` altına almak (örn. `dates.py`, `tools.py`, `hooks.py`, `closing.py`) ve brief'e özgü hiçbir değer taşımadıklarını doğrulamak. Amaç: builder gizli brief'te yalnız brief'i okumaya odaklansın, tesisatı yeniden yazmasın (A koşusundaki 5/10 hatası tam bu tesisattan çıktı).
 2. `builder/` iskeleti: `build.py` (tek komut, 25 dk sınırı, temiz trace, export), skill'ler, yardımcı kitaplık.
 3. Gizli brief provası: test cevaplarına erişimi olmayan builder + ham malzeme biçiminde Brief A. Stil testleri (`--style pieces`, `in_words`).
 4. Akşam: planı yeni yola göre sadeleştirmek.
