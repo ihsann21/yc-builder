@@ -169,3 +169,21 @@ def test_deadline_shifts_placeholder():
     shifts = {"bb_shifts__limit_soft": "SOFT SHIFTS", "bb_shifts__limit_hard": "HARD SHIFTS"}
     state = run(dict(shifts, accounts=ITEMS), line="{id} {deadline_shifts} {shifts:limit_soft}")
     assert state["account_facts"].splitlines()[1:] == ["a1 SOFT SHIFTS SOFT SHIFTS", "a2 HARD SHIFTS SOFT SHIFTS"]
+
+
+def test_computed_floor_percent_min_and_cap():
+    types = {"store_card": {"name": "card", "floor_percent": 10, "floor_min": 15, "floor_label": "ten percent"},
+             "loan": {"name": "loan", "floor_percent": 12.5, "floor_label": "an eighth"}}
+    items = [{"ref": "a1", "kind": "store_card", "owed": 120.5, "overdue": 3},     # 12.05 -> raised to 15
+             {"ref": "a2", "kind": "loan", "owed": "300.04", "overdue": 40},     # 37.505 -> 37.51 (half up)
+             {"ref": "a3", "kind": "store_card", "owed": 9, "overdue": 3}]       # min 15 > owed -> 9
+    state = run({"accounts": items}, types=types, line="{id} {floor} {floor_label}")
+    assert state["account_facts"].splitlines()[1:] == ["a1 15.00 ten percent", "a2 37.51 an eighth", "a3 9.00 ten percent"]
+    assert state["bb_floor__a2"] == 37.51
+
+
+@pytest.mark.parametrize("bad", [{"floor_percent": 0}, {"floor_percent": 150}, {"floor_percent": "10"},
+                                 {"floor_min": -1}, {"floor_min": True}])
+def test_computed_floor_options_are_checked(bad):
+    with pytest.raises(ValueError):
+        code(types={"loan": dict({"name": "loan"}, **bad)})

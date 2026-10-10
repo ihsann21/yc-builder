@@ -85,7 +85,8 @@ calc.dates_code(calendar={"workdays": [0, 1, 2, 3, 4], "holidays": ["YYYY-MM-DD"
 calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, MAPPED_VAR),
                    list_field=..., id_field=..., type_field=..., amount_field=..., days_field=...,
                    item_fields=[every item field], types={TYPE: {"name": "...{field:F}...",
-                   "floor_field": F, "floor_label": TEXT}}, bands=[{"name", "min", "max", "deadline": DATE_NAME,
+                   "floor_field": F, "floor_label": TEXT}}   # or, with no floor field:
+                   #   "floor_percent": P (of the full amount), "floor_min": N (computed floor never above full), bands=[{"name", "min", "max", "deadline": DATE_NAME,
                    "attempts": N, "offers": TEMPLATE}], line=TEMPLATE, header="...{count}...",
                    known_dates=(...DATE_NAMEs))
 #   placeholders: {id} {name} {full} {floor} {floor_label} {days} {band} {deadline} {deadline_spoken}

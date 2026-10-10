@@ -91,7 +91,10 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
 
     sources      variables that may hold the list (see product_sources); a scan of the table follows.
     *_field      field names of the response items, from the tool API file; item_fields lists them all.
-    types        per type value: {"name": template, "floor_field": item field, "floor_label": text}.
+    types        per type value: {"name": template, "floor_field": item field, "floor_label": text,
+                 optional "floor_percent": percent of the full amount when there is no floor field (rounded
+                 half up to the cent), optional "floor_min": that floor is never below it}. A computed
+                 floor is never above the full amount; a floor field is used as it is.
     bands        [{"name", "min", "max", "deadline": named date of dates_code, "attempts", "offers": template}],
                  matched on band_field (days_field by default), inclusive, first match wins.
     line, header templates for the facts text; header may use {count}.
@@ -116,6 +119,12 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
     for tcfg in type_list:
         if tcfg.get("floor_field") and tcfg["floor_field"] not in fields:
             raise ValueError("floor_field " + repr(tcfg["floor_field"]) + " is not in item_fields")
+        for key, low, high in (("floor_percent", 0, 100), ("floor_min", 0, None)):
+            value = tcfg.get(key)
+            if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))
+                                      or value <= low or (high is not None and value > high)):
+                raise ValueError(key + " must be a number above " + str(low)
+                                 + (" and at most " + str(high) if high else "") + ": " + repr(value))
     check_bands(bands, known_dates)
     templates = [line, header] + [t.get("name", "") for t in type_list] + [b.get("offers", "") for b in bands]
     for template in templates:

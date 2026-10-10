@@ -93,14 +93,32 @@ def pick_band(item, cfg):
     return nearest
 
 
+def type_floor(item, tcfg, full):
+    """The floor of an item: its floor field as it is; else a percent of the full amount rounded half up to
+    the cent and/or floor_min, never above the full amount. None when it cannot be worked out."""
+    if tcfg.get("floor_field"):
+        return item.get(tcfg.get("floor_field"))
+    whole = to_float(full)
+    percent = to_float(tcfg.get("floor_percent"))
+    least = to_float(tcfg.get("floor_min"))
+    floor = None
+    if whole is not None and percent is not None:
+        floor = int(whole * percent + 0.5) / 100.0
+    if least is not None and (floor is None or floor < least):
+        floor = least
+    if floor is not None and whole is not None and floor > whole:
+        floor = whole
+    return floor
+
+
 def item_values(item, cfg, state):
     """(values, get): the placeholder values of one item and a getter for templates."""
     ptype = as_text(item.get(cfg["type_field"])) if cfg.get("type_field") else ""
     tcfg = cfg.get("types", dict()).get(ptype) or cfg.get("default_type") or dict()
     band = pick_band(item, cfg) or dict()
     deadline = band.get("deadline")
-    floor = item.get(tcfg.get("floor_field")) if tcfg.get("floor_field") else None
     full = item.get(cfg["amount_field"])
+    floor = type_floor(item, tcfg, full)
     values = dict()
     values["id"] = as_text(item.get(cfg["id_field"]))
     values["type"] = ptype
