@@ -1,0 +1,4 @@
+env.sh
+.freya-agents.json
+traces/
+results/

@@ -1,7 +1,7 @@
 # Build the Builder — Birleşik Final Plan
 
 **Freya × Y Combinator hackathonu · 10 Ekim 13:00 – 11 Ekim 23:00 (İstanbul) · tamamen çevrim içi**
-Sürüm 1.3 · 10 Ekim 2026 · İhsan'ın iki planının birleşimi + 8 Ekim'de yapılan kaynak doğrulaması + benchmark hata analizleri + 10 Ekim organizatör e-postası
+Sürüm 1.5 · 10 Ekim 2026 · İhsan'ın iki planının birleşimi + 8 Ekim'de yapılan kaynak doğrulaması + benchmark hata analizleri + 10 Ekim organizatör e-postası + 10 Ekim challenge sayfası ve kickoff toplantısı + kit v3
 
 > **Tek cümle:** Builder bir derleyicidir. Görev metnini ve tool'ları alır; politikayı **birebir** taşıyan, LLM gerektirmeyen bir V0 ajanı ilk saniyede yayınlar; üstüne kaynağa alıntıyla bağlı bir AgentSpec katmanı derler; adayları ölçer ve en iyisini teslim eder. Puanın çoğu, hackathon boyunca pratik benchmark'ta ölçerek sertleştirdiğimiz, görevden bağımsız iskeletten gelecek.
 
@@ -18,10 +18,12 @@ Etiketler Plan B'deki gibi:
 - **[ÇIKARIM]** — mühendislik yargısı.
 - **[SPEKÜLASYON]** — kanıtı zayıf tahmin; Day 1'in ilk saatinde doğrulanacak.
 
-Freya'ya dair her şey **public dokümantasyondan** geliyor ve hiçbiri elle doğrulanamadı: ajan platformuna şu an erişimimiz yok (Bölüm 12.1). Hackathon için ayrı bir API ya da kısıtlı bir erişim de verilebilir. Platformu elle denemeden hiçbir alanın davranışına güvenmeyin.
+Freya'ya dair her şey **public dokümantasyondan** geliyor ve hiçbiri elle doğrulanamadı: ajan platformuna şu an erişimimiz yok (Bölüm 12.1). Hackathon için ayrı bir API ya da kısıtlı bir erişim de verilebilir. Platformu elle denemeden hiçbir alanın davranışına güvenmeyin. **v1.4:** Hackathon'un kendi Freya kaynakları kit'te: workflow biçimi, tool ve kod düğümleri ve builder'ın gerek duyduğu API çağrıları `docs/` altında, istemci `freya.py`'de (Bölüm 2.7). Bölüm 2.1, 8.1, 8.2 ve Ek B public dokümana dayanıyor; kit'le çeliştikleri her yerde kit kazanır. **v1.5:** kit okundu (Bölüm 2.8); Ek B kit'e göre yeniden yazıldı, Bölüm 8.1–8.4'e kit karşılıkları eklendi.
 
 **Sürüm notları**
 
+- **1.5 (10 Ekim, öğleden sonra).** Kit v3'ün (`build-the-builder-v3/`) 16 dosyasının tamamı işlendi. Yeni: Bölüm 2.8 (kit: platform ve API, workflow modeli, pratik banka ve ölçüm, brief'ler, plana etkisi); Bölüm 9.6'da `SILENT_TURN`, `ROUTE_NOT_FIRED`, `STALE_VERSION`; Bölüm 10.2'de E1', E13–E15; Bölüm 13'te 23–24. sorular; Bölüm 14'te yeni riskler. Yeniden yazılan: Ek B. Güncellenen: derleme hedefinin workflow karşılıkları (Bölüm 8.1–8.4); gizli brief'te build anı simülasyonu büyük olasılıkla yok, ağırlık offline'a (Bölüm 5.3, 9.2, 12.5); mutasyon ölçümünün sınırı (Bölüm 10.4); ajan modeli `experimental-5`, süre sınırı 420 sn (Bölüm 2.2, 11.1); komut satırı ve ortam değişkenleri (Bölüm 11.4); Bölüm 13'ün yanıtları; checklist; coding agent brifingi; Kaynaklar. Geri kalan metin 1.4 ile aynıdır.
+- **1.4 (10 Ekim, öğleden sonra).** Challenge sayfası (altı sekme ve görselleri: Overview, Data, Evaluation, Submit, Leaderboard, Rules) ve kickoff toplantısının dökümü işlendi. Yeni: Bölüm 2.7 (sayfada ve toplantıda yazanlar, plana etkisi; depodaki kit v3'ün README sürüm notları); Bölüm 13'te yanıt sütunu ve 19–22. sorular; Bölüm 8.4'te `calc` şablonu; Bölüm 9.6'da `ATTEMPT_COUNT_MISMATCH`; Bölüm 14'te yeni riskler. Güncellenen: telefon ajanı bir Freya workflow'u (Bölüm 1.1, 1.3, 2.1, 5.1, 5.4, 8.1–8.4); H2 doğrulandı (Bölüm 2.2); teslim ve değerlendirme akışı artık olgu (Bölüm 2.5); mod metin, ajan modeli sabit (Bölüm 4.1, 8.3, 10.2, 11.1); builder'a brief başına 30 dakika ve workspace başına tek simülasyon (Bölüm 5.3, 9.2, 10, 12); workspace başına 10 workflow (Bölüm 5.4, 11.4); komut satırı ve trace sözleşmesi (Bölüm 11.4); probe yasağı (Bölüm 12.1, 12.2, 17.4, Ek B); Day 2 takvimi gizli brief penceresine göre (Bölüm 12.4); checklist (Bölüm 16); coding agent brifingi (Bölüm 17.4); Ek C; Kaynaklar. Geri kalan metin 1.3 ile aynıdır.
 - **1.3 (10 Ekim, sabah).** Organizatör e-postası (10 Ekim, 00:16) işlendi: görev bir bankanın giden tahsilat araması; T = Cumartesi 13:00, D = Pazar 23:00. Yeni: Bölüm 2.6 (e-postada yazanlar ve plana etkisi), Bölüm 13'te 17. ve 18. sorular, "Cumartesi, 13:00'ten önce" checklist grubu. Güncellenen: saat karşılıkları (Kısaltmalar, Bölüm 12–12.4); H1–H3 olasılıkları (Bölüm 2.2); teslim akışı tablosu (Bölüm 2.5); derlenen metinlerde "caller" → "customer" ve V0 `role` cümlesi (Bölüm 5.4, 8.3); T+0–1 bloğu (Bölüm 12.2); coding agent brifinginin ilk paragrafı (Bölüm 17.4). Geri kalan metin 1.2 ile aynıdır; Ek A gelen arama örneği olarak kaldı.
 - **1.2 (8 Ekim, gece).** Yeni: Bölüm 17 (benchmark'ların hata analizleri ve coding agent brifingi), Bölüm 2.5 (teslim ve değerlendirme akışı tahmini), Bölüm 11.4 (komut satırı sözleşmesi), Ek C (builder production'da). Genişleyen: Bölüm 10.4 (public benchmark'larla vekil ölçüm), Bölüm 9.1 (test kotası, gereksinim türleri, dal kapsamı). Düzeltilen: τ^τ-bench referansının bir tavan olduğu; τ-Voice ve τ-Knowledge rakamlarının güncel sıralamadaki karşılığı (Bölüm 2.3). Değişikliklerin özeti Bölüm 1.2'nin 4. maddesinde.
 - **1.1 (8 Ekim, akşam).** Ajan platformuna hackathon öncesinde erişim olmadığı görüldü; hazırlık planı buna göre yeniden kuruldu (Bölüm 12.1).
@@ -32,22 +34,23 @@ Freya'ya dair her şey **public dokümantasyondan** geliyor ve hiçbiri elle do�
 
 | Kısaltma | Anlamı |
 | --- | --- |
-| T, D | T = Day 1'de kuralların açıklandığı an: **10 Ekim Cumartesi 13:00** (İstanbul). D = teslim saati: **11 Ekim Pazar 23:00** (challenge sayfası daha erken bir teslim saati verirse o geçerlidir). "T+6" = T'den altı saat sonra; "D−4" = teslimden dört saat önce. |
+| T, D | T = Day 1'de kuralların açıklandığı an: **10 Ekim Cumartesi 13:00** (İstanbul) = 10:00 UTC. D = teslim saati: **11 Ekim Pazar 23:00** (İstanbul) = 20:00 UTC; challenge sayfası teyit etti. Gizli brief'ler **D−3**'te gelir (Pazar 20:00 İstanbul = 17:00 UTC); D−3 … D teslim penceresidir (Bölüm 2.7). "T+6" = T'den altı saat sonra; "D−4" = teslimden dört saat önce. |
 | M1, M2 | İki mühendis. M1 = builder beyni (spec, derleyici, testler). M2 = platform + ölçüm (Freya adaptörü, pratik benchmark, izleme). |
 | B0, V0, V1, V2 | Builder'ın basamakları. B0 = naif prompt. V0 = birebir politika + iskelet, LLM'siz. V1 = V0 + AgentSpec katmanı. V2 = V1 + build anı ölçüm ve seçim (Bölüm 12.5). |
 | Katman | AgentSpec'ten derlenen ve birebir politika metninin üstüne eklenen yapılandırılmış bölümler: tool kartları, kural dizini, olgular, akış, toplanacak bilgiler. |
-| Hedef A, A2, B | Derleme hedefleri. A = Freya ajan config'i. A2 = Freya'da çok düğümlü şablon. B = kendi runtime'ımız (Bölüm 8). |
+| Hedef A, A2, B | Derleme hedefleri. A = Freya'daki telefon ajanı. v1.4: telefon ajanı bir workflow'dur (adımlar, prompt'lar, tool'lar, koşullu rotalar, kod düğümleri); A tek adımlı workflow. A2 = Freya'da çok adımlı şablon. B = kendi runtime'ımız (Bölüm 8). |
 | H1–H3 | Benchmark'ın ne olduğuna dair üç hipotez (Bölüm 2.2). |
 | Karar noktası testi | Bir konuşma önekinden sonra ajanın tek bir sonraki eylemini sınayan test (Bölüm 9.2). |
 | E1–E12 | Pratik ve vekil benchmark'ta koşulacak deneyler (Bölüm 10.2). |
 | P0–P3 | Öncelikler. P0 = B0 ve V0 için şart. P1 = V1. P2 = V2. P3 = yalnız veri desteklerse. |
 | σ | Aynı config'in iki koşusu arasındaki skor farkı; gürültü tahmini (Bölüm 10.1). |
 | pass^k | Aynı görevin k bağımsız denemesinin hepsinde geçme oranı; pass^1 tek deneme. |
-| Konuşan ajan, kuran ajan | Konuşan ajan: builder'ın ürettiği, müşteriyle konuşan ajan. Kuran ajan: ajan inşa eden ajan, yani builder'ın kendisi ve onu yazan coding agent'lar (Bölüm 17). |
+| Konuşan ajan, kuran ajan | Konuşan ajan: builder'ın ürettiği, müşteriyle konuşan ajan (challenge sayfasındaki adıyla "phone agent"). Kuran ajan: ajan inşa eden ajan, yani builder'ın kendisi ve onu yazan coding agent'lar (Bölüm 17). |
 | Coding agent | Pipeline'ın kodunu yazarken kullandığınız kodlama ajanı (Claude Code, Codex ve benzerleri). |
 | Vekil benchmark, vekil düzenek | Platform yokken builder'ı ölçmek, sonrasında ikinci görüş almak için kullanılan public benchmark alanları. Vekil düzenek: τ^τ deposu + taban koşusu + ajan fabrikası (Bölüm 10.4). |
 | Geri düşüş (fallback) | Bir adım hata verdiğinde daha basit bir sonuca dönmek; örneğin katmanlı aday yerine V0'ın yayında kalması (Bölüm 5.4). |
-| Brief | Organizatörün görev girdisine verdiği ad: bankanın tahsilat brief'i (Bölüm 2.6). Bu dokümandaki "görev metni" ve "politika metni" (`policy_text`) odur. |
+| Brief | Organizatörün görev girdisine verdiği ad: bankanın tahsilat spesifikasyonu (Bölüm 2.6, 2.7). Pratikte `brief-a.md` ve onun üstüne kurulan `brief-b.md`; her brief'in yanında bir tool API dosyası (OpenAPI) gelir. Bu dokümandaki "görev metni" ve "politika metni" (`policy_text`) odur. |
+| Kit, vaka, ledger, düğüm | Düğüm (node): workflow'un bir adımı; kit'in dokümanı bu adı kullanıyor (Bölüm 2.8). Kit: organizatörün başlangıç paketi (challenge sayfasının Data sekmesi). Vaka (case): bir simüle müşteriyle bir görüşme; finalde 3 koşunun üçünde de geçmesi gerekir. Ledger: mock banka API'sinin her çağrıyı ve sonucunu tuttuğu kayıt; sonuç kontrolü ajanın söylediğine değil bu kayda bakar (Bölüm 2.7). |
 | Arayan, müşteri | E-postaya göre aramayı ajan yapıyor (giden arama). Bu dokümanın Türkçe metninde "arayan" geçen her yerde hattaki müşteri kastedilir; derlenen İngilizce metinler "customer" der (Bölüm 8.3). |
 
 ---
@@ -58,7 +61,7 @@ Freya'ya dair her şey **public dokümantasyondan** geliyor ve hiçbiri elle do�
 
 1. **Ara temsil AgentSpec.** Plan B'nin şeması taban; Plan A'dan `success_conditions` alındı ve Plan A'daki `confirmation: if_ambiguous` fikri üç kademeye genişletildi (Bölüm 6).
 2. **Politika metni prompta birebir girer.** Spec onun yerine geçen bir özet değil, üstüne binen yapılandırılmış bir katmandır. İki planda da olmayan en önemli değişiklik bu (Bölüm 3.3, 8.3).
-3. **Birincil derleme hedefi Freya ajan konfigürasyonu.** Kendi runtime'ımız yalnızca kurallar "ajan = çalıştırılabilir kod" derse ya da yerel simülasyon için yazılır (Bölüm 8).
+3. **Birincil derleme hedefi Freya'daki telefon ajanı, yani bir workflow** (v1.4; Bölüm 2.7, 8.4). Kendi runtime'ımız yalnızca kurallar "ajan = çalıştırılabilir kod" derse ya da yerel simülasyon için yazılır (Bölüm 8).
 4. **Kod korumaları platform ayarlarına eşlenir.** İki planın "evrensel runtime" korumalarının çoğu Freya'da prompt, tool açıklaması, tool config'i ve düğüm yapısı olarak ifade edilir (Bölüm 8.2).
 5. **V0 hem yedek hem rakip.** Her build'in ilk saniyesinde teslim edilebilir bir ajan vardır. Katmanlı bir aday V0'ın yerini ancak ölçümle alır: ya o görevin testlerinde açık farkla, ya da pratik benchmark'ta kanıtlanmış varsayılan olarak (Bölüm 9.4).
 6. **Adaylar bağımsız okumalardır:** V0 + iki farklı sağlayıcının spec'i; bütçe varsa üçüncü "katı" varyant (Bölüm 3.2, satır 1).
@@ -67,12 +70,14 @@ Freya'ya dair her şey **public dokümantasyondan** geliyor ve hiçbiri elle do�
 9. **Asıl kazanç offline döngüde:** pratik benchmark → hata etiketi → evrensel düzeltme → hold-out kontrolü. Göreve özgü düzeltme yasak (Bölüm 10).
 10. **Düz Python + Pydantic + ince native LLM adaptörleri + SQLite/JSONL.** Framework yok, multi-agent builder yok, build anında DSPy/GEPA yok.
 
-### 1.2 Araştırmanın değiştirdiği dört şey
+### 1.2 Araştırmanın değiştirdiği altı şey
 
 1. **Freya'nın platformu public dokümanda açık ve "üretilen ajan"ın ne olduğunu büyük ölçüde ele veriyor.** Ajan bir JSON konfigürasyonu; platformda persona + assertion + pass rate üreten bir Simulation özelliği, tool çağrısı doğrulayan unit testler ve ajanı metinle tur tur süren bir Chat API var (Bölüm 2.1). İki plan da bunu bilmeden yazılmış; ikisi de kendi simülatörünü ve kendi runtime korumalarını merkeze koyuyor.
 2. **Sierra 4 Eylül 2026'da tam olarak bu problemi ölçen τ^τ-bench'i yayımladı.** En iyi otomatik "ajan inşa eden ajan" %23,9'da; cevap anahtarını bilen benchmark yazarının kurduğu referans tavan %82,2'de. Aradaki farkın nedenleri bizim için bir yapılacaklar listesi (Bölüm 2.3, 17.3).
 3. **Planlardaki bazı olgular düzeltildi:** SABER'in yeri ve rakamları, τ³-bench'in gerçekte kullandığı ödül bileşenleri, model adları ve fiyatları (Bölüm 2.3, 2.4).
 4. **Benchmark'ların hata analizleri planı sekiz yerde değiştirdi (v1.2).** Ajanların nerede düştüğü Bölüm 17'de tek tek, kaynağıyla. Plana yansıyanlar: test kotasında bileşik talep, doğrulanmamış beyan ve "bilmiyorum" senaryoları ile politika dalı kapsamı (Bölüm 9.1); iskelet ile politika arasında çelişki taraması (Bölüm 6.4); iki yeni iskelet satırı ve bir aday listesi (Bölüm 8.3); üretilen ajan için bütçe kapısı (Bölüm 9.4); sessiz geri düşüş yasağı (Bölüm 5.4); üç yeni hata etiketi (Bölüm 9.6); public benchmark'larla vekil ölçüm (Bölüm 10.4); coding agent'lar için brifing ve çalışma düzeni (Bölüm 17.4, 17.5).
+5. **Challenge sayfası ve kickoff toplantısı oyunu netleştirdi (v1.4).** Telefon ajanı bir Freya workflow'u; konuşmalar metin ve İngilizce; ajan modeli herkes için aynı ve sabit. Skor 60 gizli vakada geçme oranı; bir vaka ancak üç koşunun üçünde de geçerse geçer; sonuç bankanın kayıtlarından (ledger), politika ve dürüstlük transkriptten bir judge modelle okunur. İki gizli brief Pazar 20:00'de gelir; builder brief başına en çok 30 dakika çalışır; workspace'te aynı anda tek simülasyon koşar; platformu probe etmek yasak. Plana yansıyanlar Bölüm 2.7'de.
+6. **Kit platformun gerçek davranışını verdi (v1.5).** Her turda üç ayrı model çağrısı var (extraction, routing, dialogue) ve routing prompt'u görmüyor: yol seçen kural koda ve deterministik geçişe gider. Tarih hesabı kod düğümünde `now`'dan yapılır. Hackathon modeli tool sonucundan sonra susabiliyor; çaresi her tool'a bir sonraki adımı söyleyen bir post-kanca. Pratik banka yalnız bilinen vaka kimlikleriyle oturum açıyor; gizli brief'te build anı simülasyonu büyük olasılıkla yok. Kit'in ajan tabanlı örnek builder'ı Brief A'da tek koşuda 10/10 aldı. Ayrıntı Bölüm 2.8'de.
 
 ### 1.3 Day 1, ilk saat: karar ağacı
 
@@ -94,6 +99,10 @@ Ajan modeli?       sabit ─► iskeleti o modelde ayarla |   serbest ─► E6 
 Hangi yol çıkarsa çıksın AgentSpec, iskelet metni, offline döngü ve bu dokümanın geri kalanı aynıdır.
 
 **Güncelleme (10 Ekim).** E-posta ilk dalı büyük ölçüde kapattı: builder Freya'da bir telefon ajanı yaratıyor, yani Hedef A. Diğer dallar 13:00'te challenge sayfasıyla netleşir (Bölüm 2.6).
+
+**Güncelleme (v1.4).** Challenge sayfası dalları kapattı (Bölüm 2.7): üretilen ajan bir Freya workflow'u (Hedef A; çok adımlı A2 artık ana yol, Bölüm 8.4); pratik vakalar platformda koşulabiliyor (`tools/run_cases.py`; workspace başına aynı anda bir simülasyon; build anında builder'ın 30 dakikasının içinde); mod metin, sesli ekler derlenmez; ajan modeli sabit (`freya.py`), iskelet o modelde ayarlanır. Kit'ten okunacak açık uçlar: sıcaklığın ayarlanıp ayarlanamadığı, kod düğümünün biçimi, kendi ürettiğimiz vaka dosyasının koşulup koşulamadığı (Bölüm 13).
+
+**Güncelleme (v1.5).** Kit bu üç ucu kapattı (Bölüm 2.8): workflow'da sıcaklık alanı yok (`agent_config` gönderilmez; düğüm başına yalnız `reasoning_override`); kod düğümünün biçimi belli ve rota kodun yazdığı değişkenle seçilebiliyor; `run_cases.py --cases` kendi dosyamızı kabul ediyor ama banka oturumu yalnız 13 pratik vakanın kimlikleriyle açılıyor.
 
 ---
 
@@ -118,6 +127,8 @@ API tabanı `https://app.freyavoice.ai/api/v2`, `Authorization: Bearer <anahtar>
 | **Bilgi bankası** | Workspace düzeyinde, beta; hibrit arama; workspace'teki tüm ajanlara otomatik açık; PDF/TXT/MD/DOCX yükleme (10 MB). Public API uç noktası listelenmemiş. | Workspace düzeyinde olduğu için farklı görevlerin dokümanları birbirine karışır; programatik yükleme de belirsiz. Varsayılan yol dokümanı prompta koymak (Bölüm 8.3). |
 | **Runtime** | Çağrı yaşam döngüsü dokümanda "pipecat" üzerinden anlatılıyor. Tool şemasındaki `handler` + `transition_to` ikilisi Pipecat Flows'un fonksiyon biçimiyle örtüşüyor [ÇIKARIM]. | Pipecat Flows'ta her düğüm "tek göreve odaklı prompt + yalnızca o düğümün tool'ları" demek. Bölüm 8.4'teki yapısal koruma fikri buna dayanıyor. |
 
+**Güncelleme (v1.4).** Hackathon'da telefon ajanı bir workflow'dur; kit'teki `freya.py` workflow'u bir kez yaratır, sonraki koşularda günceller ve `freya.export_workflow` ile dosyaya aktarır; workflow'da kod düğümleri var (Bölüm 2.7). Bu yüzden tablodaki "Workflow: oluşturma uç noktası belgelenmemiş" hükmü geçersiz. `llmConfig` gibi ajan düzeyi alanların workflow ve adım düzeyindeki karşılığı kit'in `docs/` klasöründen okunur. Simülasyon hackathon'da kit'in `tools/run_cases.py`'si üzerinden koşar (Bölüm 9.2). Tablonun kit'le çelişen her satırında kit kazanır. v1.5: tablo artık tarihsel bir kayıt; hackathon platformu Bölüm 2.8'de ve Ek B'de.
+
 ### 2.2 Bu, benchmark hakkında ne söylüyor?
 
 Etkinlik sayfasından kesin bildiklerimiz [OLGU]:
@@ -139,6 +150,8 @@ Etkinlik sayfasında platformla ilgili üç ifade var: builder "Freya'nın platf
 | **H3** | Belirli bir arayüzü uygulayan kod | τ^τ-bench tarzı: son durum + iletilen bilgi | ~%5 | Hedef B: kendi runtime'ımız ve kod kapıları. |
 
 **Güncelleme (10 Ekim).** E-postaya göre builder "Freya'da bir telefon ajanı yaratır" ve skor "ajanın doğru ele aldığı vakaların oranıdır" (Bölüm 2.6). Bu H3'ü neredeyse eliyor; H1 ile H2 arasındaki ayrımı (bir vakanın "doğru" sayılmasına kim, neye bakarak karar veriyor) çözmüyor. Tablodaki olasılıklar buna göre güncellendi: H1 ~%60 → ~%70, H3 ~%15 → ~%5.
+
+**Güncelleme (v1.4).** Challenge sayfası H2'yi doğruladı, artifact olarak workflow ile [OLGU, Evaluation sekmesi]: bir vaka üç kontrolün üçünü de geçerse geçer. Sonuç bankanın kayıtlarından (ledger) okunur: doğru ürün, tarih ve tutarda, bir kez kaydedilmiş söz. Politika ("brief'in içinde kaldı mı") ve dürüstlük ("tool çağrısı başarısızken 'kaydedildi' dedi mi") transkriptten, bir judge model tarafından, her vakanın kontrol listesine karşı okunur. H1'in persona başarı kriteri burada vaka kontrol listesi olarak yaşıyor; H3 elendi. Aşağıdaki altı sonuçtan 1 kısmen geçerli: kendi runtime'ımız yok, ama workflow'daki kod düğümleri değerlendirmede de koşar (Bölüm 8.2). 2, 5 ve 6 geçerli (6'da araç `run_cases.py`); 3 düştü (mod metin); 4: kit'in pratik simülasyonlarında çağrı sınırı 420 sn (v1.5; Bölüm 2.8). 5'teki sabit model `experimental-5`.
 
 H1 doğruysa altı sonuç çıkar:
 
@@ -199,32 +212,32 @@ Bu tablo kararları etkileyen özettir. Benchmark'ların hata analizlerinin tama
 
 Freya tarafında `llmConfig.provider` ve `model` serbest metin; dokümanda desteklenen model listesi yok. Hangi modellerin seçilebildiği Day 1'de öğrenilecek.
 
-### 2.5 Teslim ve değerlendirme akışı: en iyi tahmin [SPEKÜLASYON]
+### 2.5 Teslim ve değerlendirme akışı [OLGU, challenge sayfası]
 
-Kurallar 10 Ekim 13:00'te challenge sayfasıyla açıklanacak. O zamana kadar çalışma varsayımı şu; dayanağı etkinlik sayfasının ifadeleri, 10 Ekim organizatör e-postası (Bölüm 2.6), Freya'nın public API'si ve τ^τ-bench'in aynı problemi nasıl paketlediği.
+v1.3'e kadar bu bölüm bir tahmindi; v1.4'te challenge sayfasına göre yeniden yazıldı. Ayrıntılar ve kaynak sekmeler Bölüm 2.7'de.
 
-| Soru | En iyi tahmin | Güven | Dayanak |
+| Soru | Yanıt | Güven | Dayanak |
 | --- | --- | --- | --- |
-| Builder nedir? | Komut satırından çalışan, kimseye soru sormayan bir program. Dashboard'da elle kurulan bir şey değil. | Çok yüksek | Teslim edilen şey builder'ın kendisi: kodun tam sürümü, bağımlılıklar ve tekrar üretilebilir çalıştırma talimatı. |
-| Bize ne verilecek? | 10 Ekim 13:00'te chat'te üç şey: tam kuralların olduğu challenge sayfası, starter kit ve Freya hesabı açma adımları [OLGU, e-posta]. Starter kit'in içeriği bilinmiyor. Dashboard izlemek ve hata ayıklamak içindir; iş API'den yürür. | Yüksek | 10 Ekim e-postası; etkinlik sayfasındaki Day 1 programı: kurallar, geliştirme görevleri, platform kurulumu, pratik benchmark. |
-| Görev nasıl gelir? | Bir bankanın tahsilat brief'i [OLGU, e-posta]; yanında büyük olasılıkla tool tanımları, belki ek dokümanlar. Tek brief mi birden çok brief mi, bilinmiyor (Bölüm 13, soru 17). | Orta-yüksek | 10 Ekim e-postası; "görev açıklaması ve mevcut tool'lar" ifadesi; τ^τ-bench'in görev kiti. |
-| Builder'ın çıktısı ne? | Freya'da yaratılmış bir telefon ajanı (kimliği), belki config dosyasıyla birlikte. | Yüksek | 10 Ekim e-postası ("Freya'da bir telefon ajanı yaratır"); H1 ve H2 (Bölüm 2.2). |
-| Builder'ı kim çalıştırır? | İki olasılıktan daha güçlüsü: organizatör, belgelediğimiz tek komutla ve gizli görev dosyalarıyla. Öbürü: biz çalıştırırız ve ajan kimliklerini teslim ederiz. | Düşük-orta | "Elle düzeltme yok" ve "tekrar üretilebilir talimat" ilkini düşündürüyor (Bölüm 13, soru 2). |
-| Nasıl puanlanır? | Organizatör ajanı simüle müşterilere karşı koşar; skor, ajanın doğru ele aldığı vakaların oranıdır [OLGU, e-posta]. Bir vakanın neye göre "doğru" sayıldığı bilinmiyor. | Yüksek | 10 Ekim e-postası; Bölüm 2.2. |
+| Builder nedir? | Tek komutla çalışan, kimseye soru sormayan bir program: `python3 builder/build.py {brief_path} {tool_api_path}`. Girdi bir brief, çıktı bir telefon ajanı; koştuktan sonra elle düzeltme yok. Elle kurulmuş bir telefon ajanı tek başına geçerli giriş değildir. | Kesin | Overview ("What counts"); Submit (teslim formundaki `run_command`); Rules |
+| Bize ne verildi? | Kit (Data sekmesinden indirilir): iki brief, bankanın tool API'si (OpenAPI, yedi tool), 13 pratik vaka (`public-test-set.json`), Freya workflow dokümanı (`docs/`), `freya.py` istemcisi, örnek builder, `env.example`, skorlayıcı `tools/run_cases.py`. Freya API anahtarı ve destek kanalı e-postayla gelir. Kit v3'ün içeriği v1.5'te işlendi (Bölüm 2.8). | Kesin | Data sekmesi; Overview ("How the weekend goes") |
+| Görev nasıl gelir? | Bir brief (`.md`) ve ona ait tool API dosyası (`.openapi.json`). İki gizli brief Pazar 17:00 UTC'de (İstanbul 20:00) gelir: biri temiz bir spesifikasyon, öbürü ham banka malzemesi (bir e-posta, bir politika alıntısı, onu değiştiren bir memo, bir kod listesi). Yedi tool'un adı sabit; alanları ve izinli değerleri değişebilir. | Kesin | Overview ("How the weekend goes"); Evaluation ("The final benchmark"); Submit |
+| Builder'ın çıktısı ne? | Freya'da bir workflow: adımlar, her adımın kendi prompt'u ve tool'ları, koşullu rotalar, hesap için kod düğümleri. `freya.export_workflow` ile dosyaya aktarılıp commit edilir; organizatör dosyayı kendi workspace'ine yükleyip onu puanlar. | Kesin | Overview ("Inside a phone agent"); Submit |
+| Builder'ı kim çalıştırır? | Biz: gizli brief başına bir kez (birden çok koşu serbest), çıktısı `tee` ile trace dosyasına. İlk on takımda organizatör de repo'yu o commit'te klonlayıp aynı brief'lerde yeniden koşar ve trace'le karşılaştırır; skor açıkça düşük çıkarsa giriş silinir. Builder'ın model maliyeti bizim. | Kesin | Submit ("How we verify", "Limits") |
+| Nasıl puanlanır? | Vaka = bir simüle müşteri; geçme = sonuç (ledger) ∧ politika ∧ dürüstlük; kısmi kredi yok. 2 brief × 30 müşteri = 60 vaka; her vaka 3 kez koşulur ve üçü de geçmezse kalır. Skor = geçen vaka / 60. Eşitlikte: (1) geçen vakalarda kaydedilen toplam söz tutarı, (2) trace'ten okunan toplam build süresi (kısa olan önde), (3) erken teslim. | Kesin | Evaluation |
 
 ```text
-Day 1          challenge sayfası (kurallar) + starter kit + Freya hesabı (Cumartesi 13:00)
-                  │
-Hafta sonu     builder (bizim kod):  görev dosyası ─► Freya'da ajan ─► pratik simülasyon ─► skor
-                  │                  skor düşükse: evrensel düzeltme, yeniden ölç
-Day 2          teslim: kod + tek komut
-                  │
-Değerlendirme  gizli görevler ─► builder ─► ajanlar ─► gizli simülasyonlar ─► sıralama
+Cumartesi 13:00  kit (Data sekmesi) + Freya anahtarı ve destek kanalı (e-posta)
+                   │
+Hafta sonu       builder: brief + tool API ─► Freya'da workflow ─► run_cases.py (13 pratik vaka, metin) ─► skor
+                   │                         skor düşükse: evrensel düzeltme, yeniden ölç
+Pazar 20:00      2 gizli brief + tool API dosyaları ─► builder (brief başına ≤ 30 dk) ─► workflow ─► export + trace
+                   │                         yalnız hata düzeltmesi serbest; gizli brief'ten hiçbir şey koda girmez
+Pazar 23:00      teslim formu: repo, commit, run_command, iki workflow dosyası, iki trace
+                   │
+Sonra            gizli müşteriler (60 vaka × 3 koşu) ─► sıralama; ilk onda builder organizatörce yeniden koşulur
 ```
 
-Şema ilk olasılığı gösteriyor; builder'ı biz çalıştıracaksak son satırda gizli görevler bize verilir ve ajan kimliklerini biz teslim ederiz.
-
-Tasarıma etkisi: builder etkileşimsiz bir komut satırı programıdır; ayarlarını ortam değişkeninden alır; her görevde kendi başına çalışır ve yeniden çalıştırılabilir; LLM hatasında bile geçerli bir ajan bırakır, Freya'ya ulaşamıyorsa ajanı diske yazar ve bunu çıkış koduyla bildirir. Sözleşmenin ayrıntısı Bölüm 11.4'te.
+Tasarıma etkisi: builder etkileşimsiz bir komut satırı programıdır; ayarlarını ortam değişkeninden alır; her görevde kendi başına çalışır ve yeniden çalıştırılabilir; LLM hatasında bile geçerli bir ajan bırakır, Freya'ya ulaşamıyorsa ajanı diske yazar ve bunu çıkış koduyla bildirir. v1.4'ten beri brief başına 30 dakikalık süre sınırı ve trace'in içeriği de sözleşmenin parçasıdır. Sözleşmenin ayrıntısı Bölüm 11.4'te.
 
 ### 2.6 Organizatör e-postası (10 Ekim): ne biliyoruz, plana etkisi
 
@@ -239,7 +252,7 @@ Gönderen Yavuz Alp Sencer Öztürk (Freya, Founding Engineer), 10 Ekim 00:16. T
 | Hackathon tamamen çevrim içi; ofise gelinmiyor. Başlamadan önce chat'e katılmak gerekiyor (bağlantı e-postada). | Sorular ve teyitler chat'ten (Bölüm 13). |
 | Tek başına ya da iki kişilik takımla çalışılır; e-posta takım arkadaşına gelmediyse iletilmeli. | M1 / M2 bölümü geçerli. |
 
-**E-postanın söylemedikleri.** Kaç brief olduğu ve finalin starter kit'teki brief'le mi görülmemiş brief'lerle mi yapılacağı; brief'in yanında tool verilip verilmediği; modun ses mi chat mi olduğu ("telefon ajanı" sesi düşündürüyor, kesin değil); ilk kimin konuştuğu; bir vakanın neye göre "doğru" sayıldığı; builder'ı kimin çalıştırdığı (e-posta yalnızca ajanı organizatörün koştuğunu söylüyor); brief'in dili; kaynak sınırları; önceden yazılmış kodun serbest olup olmadığı. Hepsi 13:00'te challenge sayfasından okunacak (Bölüm 13).
+**E-postanın söylemedikleri.** Kaç brief olduğu ve finalin starter kit'teki brief'le mi görülmemiş brief'lerle mi yapılacağı; brief'in yanında tool verilip verilmediği; modun ses mi chat mi olduğu ("telefon ajanı" sesi düşündürüyor, kesin değil); ilk kimin konuştuğu; bir vakanın neye göre "doğru" sayıldığı; builder'ı kimin çalıştırdığı (e-posta yalnızca ajanı organizatörün koştuğunu söylüyor); brief'in dili; kaynak sınırları; önceden yazılmış kodun serbest olup olmadığı. Hepsi 13:00'te challenge sayfasından okunacak (Bölüm 13). v1.4: okundu; yanıtlar Bölüm 2.7 ve 13'te.
 
 **Plana etkisi.**
 
@@ -247,6 +260,139 @@ Gönderen Yavuz Alp Sencer Öztürk (Freya, Founding Engineer), 10 Ekim 00:16. T
 2. **Alan belli, brief belli değil.** Brief'e ait hiçbir değer (tutar, gün, faiz, taksit koşulu, yasal metin, banka adı) koda, iskelete ya da teste yazılmaz; her build'de brief'ten okunur. Final aynı brief'le yapılsa bile teslim ettiğimiz şey builder'dır (etkinlik sayfası: görülmemiş görevler). Değişmez 7 aynen geçerli (Bölüm 17.4). Tek brief verilirse hold-out görevler arasında değil vakalar arasında ayrılır (Bölüm 4.2, 10.1).
 3. **Vekil benchmark.** τ alanlarının hepsi gelen arama. Yöne bağlı olmayan değişiklikler için ikinci görüş olmayı sürdürür; giden aramaya özgü davranış hakkında sinyal vermez (Bölüm 10.4).
 4. **Starter kit.** Hazır bir istemci ya da örnek builder içeriyorsa adaptör ve komut satırı sözleşmesi ona hizalanır (Bölüm 11.4).
+
+### 2.7 Challenge sayfası ve kickoff toplantısı (10 Ekim): ne biliyoruz, plana etkisi
+
+İki kaynak var. Birincisi challenge sayfası (`freyavoice.ai/hackathon`): altı sekme (Overview, Data, Evaluation, Submit, Leaderboard, Rules), 10 Ekim 13:50 civarında şemalarıyla birlikte okundu. Sayfa canlı güncelleniyor; kit bağlantısı başlangıçtan sonra eklendi. İkincisi aynı gün yapılan kickoff toplantısının dökümü (Freya'dan Tunga Bayrak ve Yavuz Alp Sencer Öztürk). İkisi çelişirse sayfa esastır; Yavuz saatlerin değişebileceğini söyledi, destek kanalı izlenir. Tabloların sol sütunu [OLGU], sağ sütunu ve numaralı maddeler [ÇIKARIM].
+
+**Sayfada yazanlar**
+
+| Sayfada yazan (sekme) | Plandaki karşılığı |
+| --- | --- |
+| Görev: banka, ödemesi gecikmiş müşterilerini arayan, hatta kimin olduğunu doğrulayan, borcu söyleyen ve ne zaman ödeneceğini kaydeden bir telefon ajanı istiyor. Telefon ajanı Freya'da bir workflow: adımlar, prompt'lar ve tool'lar. Brief kimin sorulacağını, kimliğin nasıl doğrulanacağını, hangi ödeme tarihlerine izin verildiğini, çağrının nasıl kapatılacağını söyler. Telefon ajanını kimse elle düzeltmez. (Overview) | Hedef A bir workflow (Bölüm 1.1, 8). Giden arama varsayımı doğru (Bölüm 2.6). |
+| Konuşmalar metin ve İngilizce. Ajan çağrının tarih ve saatini `now` değişkeniyle alır; her tarih kuralı onu kullanır. Her telefon ajanı aynı Freya modelinde koşar; builder istediği modeli ya da coding agent'ı kullanabilir. (Overview) | Kanal `chat`; sesli ekler derlenmez (Bölüm 8.3). Beklenen dil İngilizce. E6 düştü (Bölüm 10.2, 11.1). Tarih kuralları `now`'dan hesaplanır. |
+| Workflow'da her adımın kendi prompt'u ve tool'ları var; koşullu rotalar konuşmayı bir sonraki adıma geçirir; iş günü gibi hesaplar modele bırakılmadan kodla yapılabilir. Kaç adım, hangi rotalar, hangi tool'lar: builder'ın çözdüğü tasarım problemi bu. (Overview, "Inside a phone agent") | A2 stretch olmaktan çıktı (Bölüm 8.4). Kod düğümleri Hedef A'ya kod getiriyor (Bölüm 8.2). |
+| Kit: `briefs/brief-a.md` (tek ürünü gecikmiş müşteriler için bankanın spesifikasyonu, 47 kural), `briefs/brief-b.md` (üç ürüne kadar müşteriler için ek kurallar; A'nın üstüne kurulu), `tools/openapi.json` (yedi tool: `verify_identity`, `get_account`, `create_promise`, `add_note`, `schedule_callback`, `transfer_to_agent`, `close_call`), `public-test-set.json` (13 vaka), `docs/` (workflow biçimi, tool ve kod düğümleri, builder'ın gerek duyduğu API çağrıları; "bir program okusun diye yazıldı"), `freya.py` (workflow'u bir kez yaratan, sonraki koşularda güncelleyen, yalnız standart kitaplık kullanan istemci), `examples/minimal_builder.py` (tek adım, prompt = brief, yedi tool; "başlangıç yeri, iyi skor değil"), `env.example` (Freya API anahtarı ve pratik banka için bizim uydurduğumuz takım anahtarı), `tools/run_cases.py` (pratik vakaları koşar; vaka başına geçti ya da kaldı ve nedeni). (Data) | `freya_probe.py`'nin işini `docs/` görür (Bölüm 12.1). B0 = örnek builder (Bölüm 12.5). Adaptör `freya.py`'nin üstüne kurulur (Bölüm 11.2). `make practice` = `run_cases.py` (Bölüm 10). |
+| Bir vaka şöyle koşar: simüle müşteri vakanın senaryosunu izler (metin, ses değil); telefon ajanı mock banka API'sini çağırır; API'yi organizatör barındırır; ledger her çağrıyı ve sonucunu tutar; skorlayıcı son durumu ledger'dan, konuşmayı transkriptten okur. Pratik oturumları ve kayıtları takım anahtarına bağlı. (Data, "How one case runs" şeması) | Ajanın "kaydettim" demesi bir şey kanıtlamaz; ölçülen ledger (Bölüm 8.3, kapanış). |
+| 13 pratik vaka: 10'u Brief A, 3'ü Brief B; hepsi 14 Ekim 2026 Çarşamba 11:00'de geçiyor, tarihler sabit. Vaka biçimi: değişkenler (`first_name`, `last_name`, `title`, `now`), gecikmiş ürünler, müşteri senaryosu, beklenen kayıtlar (`outcome`, `reason`, `promises`, `notes`, `callbacks`, `transfers`), serbest metin kontroller (`checks`), varsa enjekte hata (`faults`). (Data) | TestSpec'in tam simülasyon tarafı bu biçime hizalanır (Bölüm 9.1). Hold-out vaka düzeyinde (Bölüm 4.2). |
+| Vaka üç kontrolün üçünü de geçerse geçer: sonuç (ledger doğru durumda mı: doğru ürün, tarih ve tutarda, bir kez kaydedilmiş söz), politika (brief'in içinde kaldı mı: kimlik kontrolünden önce borç okunmadı, sınırı aşan tarih yok), dürüstlük (tool çağrısı başarısızken "kaydedildi" demedi). Sonuç kayıtlardan, politika ve dürüstlük transkriptten judge modelle ve vakanın kontrol listesine karşı okunur. Bankanın API'si brief'i zorlamaz: tatile ya da asgarinin altına düşen sözü itirazsız kaydeder. Doğru ret de geçer: müşteri borca itiraz ederse geçen sonuç kaydedilmiş bir itiraz ve sözün olmamasıdır. (Evaluation) | H2 doğrulandı (Bölüm 2.2); skor Bölüm 9.3 ile örtüşüyor. Brief'in her kısıtı ajanın işi (Bölüm 8.2). "Yapmamak" da sınanıyor (Bölüm 9.1). |
+| Final: 2 gizli brief; biri temiz spesifikasyon, öbürü ham banka malzemesi (bir e-posta, bir politika alıntısı, onu değiştiren bir memo, bir kod listesi). Brief başına 30 müşteri, her birinin bir ila üç ürünü var, birkaç farklı takvim gününde. Müşteriler insan gibi konuşur: sayıyı iki parçada söyler ("463…" sonra "51"), düzeltir, başka şeylerden bahseder, soru sorar, tutar ve tarihi kelimeyle söyler. Vaka başına 3 tekrar; vaka ancak üçü de geçerse geçer. Skor = geçen / 60. Eşitlik bozucular: geçen vakalarda kaydedilen toplam söz tutarı, trace'ten okunan toplam build süresi, teslim saati. (Evaluation) | Tutarlılık P0 (pass^3). Memo'lu brief için madde 6. Sağlamlık satırları Bölüm 8.3'te. |
+| Kendini skorla: `python3 tools/run_cases.py <agent_id> --brief A`; çıktıda vaka başına tool çağrısı dizisi ve kalma nedeni (ör. kaydedilen ile beklenen söz tarihi farkı). Örnek çıktıda geçen vakanın dizisi `verify > verify > get_account > promise > close_call`: her güvenlik sorusu ayrı bir `verify_identity` çağrısı gibi duruyor [ÇIKARIM]. On vakalık koşu 3–11 dakika; workspace başına aynı anda bir simülasyon; takımın tek workspace'i var. Aynı ajan bir koşuda geçip öbüründe kalabilir; `--reps 3`, finaldeki gibi, müşteriyi ancak her koşu geçerse sayar. (Evaluation) | Ölçüm kapasitesi dar ve tek kuyruk (Bölüm 10, 12.2). Ölçümde R = 3. |
+| Teslim: Pazar 17:00 UTC'de her takıma iki gizli brief ve her birinin tool API dosyası gelir. Builder her brief'te koşturulur, bastığı her şey saklanır; birden çok koşu serbest; brief başına bir telefon ajanı, onu üreten koşunun trace'iyle teslim edilir; koşudan sonra ajan düzeltilmez. Ajan `freya.export_workflow` ile dosyaya aktarılıp commit edilir; organizatör dosyayı kendi workspace'ine yükler, yani puanlanan export'tur. 20:00 UTC'den önce form kit e-postasındaki adrese: `team`, `repo`, `commit`, `run_command` (`python3 builder/build.py {brief_path} {tool_api_path}`), `workflows`, `traces`. (Submit) | Komut satırı sözleşmesi (Bölüm 11.4); Day 2 takvimi (Bölüm 12.4). |
+| Trace: koşunun başlangıç ve bitiş saati (build süresi eşitlik bozar); builder'ın her model çağrısı (hangi model, tek satırda ne istendiği); Freya'da yaratılan şey (workflow kimliği, ajan kimliği, adım ve tool sayısı); builder'ın kendi ajanında koştuğu her test ve sonucu ("kendi işini denetleyen builder alıştırmanın amacı"). Düz metin yeter; anahtarlar commit'ten önce silinir. Coding agent oturum logları isteğe bağlı; ilk üç takım yaklaşımını Freya'yla konuşur. (Submit) | İnsan okunur trace (Bölüm 11.4); öz denetim trace'te (madde 8). |
+| Doğrulama: ilk on takımda organizatör repo'yu o commit'te klonlar, builder'ı aynı brief'lerde kendisi koşar, trace'le karşılaştırır; her trace'i, teslim edilen kod ve iddia ettiği ajanla karşılaştıran bir hakem ajan okur; organizatörün koşusu açıkça düşük çıkarsa giriş silinir. (Submit) | Tekrar üretilebilirlik puanın parçası (madde 9). |
+| Sınırlar: builder koşusu brief başına 30 dakika (kendi testleri dahil); workspace başına en çok 10 workflow, her koşuda yenisini yaratmak yerine yerinde güncelle; builder'ın modeli serbest, maliyeti bizim; telefon ajanının modeli `freya.py`'de ayarlı Freya modeli, herkes için aynı, değiştirilmez; workspace başına aynı anda bir pratik simülasyon. (Submit) | Bütçe profilleri (Bölüm 5.3), teslim workflow'u ve adaylar (Bölüm 5.4), model (Bölüm 11.1). |
+| Kurallar: tek ya da iki kişilik takım. Teslim edilen builder'dır; elle kurulmuş telefon ajanı tek başına geçersiz. Gizli brief'lerin ajanları teslim edilen commit'ten elle düzeltme olmadan çıkmalı. Gizli brief başına bir trace; trace'siz giriş sıralanmaz. Telefon ajanı yalnız kit'teki tool API'sini çağırabilir; başka bir servise çağrı vakayı düşürür. Platform probe edilmez ve yük testine sokulmaz; takım başına tek Freya anahtarı. Gizli brief'ler açıldıktan sonra builder düzeltilebilir ama gizli brief'ten hiçbir şey ona yazılamaz; commit'i bir hakem denetler. Bütün veri sentetik. Overview'daki örnek: beklenmedik bir tabloda çöken ayrıştırıcıyı düzeltmek serbest; yeni brief'in tatil günlerini ya da sonuç adlarını koda ya da prompta eklemek yasak. (Rules, Overview) | Değişmez 7 ve "Asla" listesi (Bölüm 17.4); probe yasağı (madde 11). |
+| Takvim: başlangıç Cumartesi 10:00 UTC (kit ve anahtarlar; 13 pratik vakaya karşı geliştirme); gizli brief'ler Pazar 17:00 UTC (builder'ı koş); kapanış Pazar 20:00 UTC (teslim); sonuçlar incelemeden sonra. "Turuncu üç saat builder'ı koşmak ve hata düzeltmek içindir, yeni brief'lere göre ayarlamak için değil." (Overview, zaman çizelgesi) | İstanbul: T = Cumartesi 13:00, D−3 = Pazar 20:00, D = Pazar 23:00 (Bölüm 12). |
+
+**Kit sürüm notu [OLGU, depodaki kit'in README'si; kit'in tamamı v1.5'te Bölüm 2.8'de işlendi].** Depoya konan kit 3. sürüm (`build-the-builder-v3/`) ve sayfadaki dosya listesi eskimiş. Kit v2'de `examples/minimal_builder.py` kalktı; yerine `examples/base-agent.json` (örnek telefon ajanı) ile `examples/agent_builder.py` ve `.claude/skills/build-phone-agent` (Claude Agent SDK'yla çalışan örnek builder) geldi; kit'te ayrıca `tools/score.py` var. README'ye göre v3'te örnek builder kendi test koşusunu bekliyor (komut başına 20 dakikaya kadar) ve Brief A'da tek koşuda 10 pratik müşterinin 10'unu geçen bir ajan kurdu. Taban güçlü: bizim her basamağımız ona karşı ölçülür ve fark, tek koşuda değil `--reps 3`'te ve mutasyon brief'lerinde aranır (Bölüm 10.4, 12.5).
+
+**Şemalardan okunanlar.** Sayfadaki dört şema metni netleştiriyor.
+
+1. **Akış (Overview).** Brief (politikalar, tool API dokümanı, pratik müşteriler) → builder (brief'i okur, telefon ajanını yaratır, **sınar ve iyileştirir**; turuncu kutu, "yazdığınız kısım") → telefon ajanı (Freya'da workflow, koşullu rotalar, tool çağrıları) → organizatörün benchmark'ı (simüle müşteriler konuşur, bankanın kayıtları okunur) → skor = geçen vaka / koşulan vaka. Alt yazı: "yeni brief girer, farklı bir telefon ajanı çıkar, elle düzeltme yok; tek koşu." Sınama ve iyileştirme builder'ın tanımının içinde.
+2. **Telefon ajanının içi (Overview).** Etiketleri bilerek silinmiş örnek bir workflow: altı adım. Giriş adımında iki tool; ara adımların her biri kendi tool alt kümesiyle, bazı tool'lar birden çok adımda tekrar ediyor; tool'suz kırmızı bir adım (yalnız konuşup kapanan bir çıkış adımı gibi duruyor [ÇIKARIM]). Adımlar arasındaki her geçiş koşullu ("if"); iki ara adım arasında da rota var. Hem dallanma hem adım başına tool kısıtı bekleniyor.
+3. **Bir vaka nasıl koşar (Data).** Simüle müşteri ↔ telefon ajanı (konuşma) ↔ mock banka API'si (tool çağrıları) → ledger → son durum → skorlayıcı; transkript ayrıca skorlayıcıya gider.
+4. **Değerlendirme (Evaluation).** Sonuç **ve** politika **ve** dürüstlük: "and" ile bağlı üç kutu.
+
+Zaman çizelgesindeki turuncu bant Pazar 17:00–20:00 UTC'yi işaretliyor. Başlıktaki illüstrasyon (bir robotun öbürünün beynini ayarlaması) süs.
+
+**Pratik vakalardan okunan kural boyutları.** Gizli brief'ler "aynı tür çağrı, farklı kurallar" getiriyor: başka kimlik soruları, başka limitler ve son tarihler, başka bir sonuç tablosu, başka bir takvim; tool alanları ve izinli değerleri de değişebilir (Overview). Pratik vakaların aileleri ve kontrolleri builder'ın **her brief'ten** okuması gereken boyutları gösteriyor. Listeye bilerek hiçbir brief değeri yazılmadı; değerler her build'de brief'ten okunur (Bölüm 17.4, değişmez 7).
+
+| Vaka ailesi (pratik vakalar) | Brief'ten okunacak boyut |
+| --- | --- |
+| Kimlik (yanlış cevaplar) | Kimlik soruları, soru başına tekrar hakkı, toplam deneme sınırı, başarısızlıkta müşteriye ne söyleneceği |
+| Üçüncü kişi (telefonu bir yakını açıyor) | Doğrulamadan önce söylenemeyenler (yasak sözcükler, ürün, tutar), geri arama kuralı |
+| Tarihler (son tarihten sonrası, belirsiz dönem, tatil) | Gecikme bantları, bant başına son tarih kuralı, iş günü ve tatil takvimi, kesin gün sorma kuralı |
+| Tutarlar (tamamı fazla geliyor) | Tutar tabanı (asgari ödeme, taksit), tekliflerin sırası ve sayısı, söylenmesi zorunlu uyarı |
+| Zor durum, yeniden yapılandırma, zaten ödedi, itiraz | Sonuç tablosu (`outcome`, `reason`), devir kuyrukları, yasak teklifler (indirim, plan), zorunlu cümleler |
+| Tool hatası | Hata sonrası tekrar ve dürüstlük; ledger'da tek kayıt |
+| Çok ürün (Brief B) | İstemeden önce bütün ürünleri sayma, tek geri okuma ve tek onay, ürün başına yazma ve not, ürün başına bant ve son tarih |
+
+Toplantı bu boyutlara bir tane ekliyor: **deneme sayısının birebir tutması**. Banka "iki kez sor" diyorsa üçüncü soru da hatadır, eksik soru da (Bölüm 9.6, `ATTEMPT_COUNT_MISMATCH`).
+
+**Toplantıda söylenenler** [OLGU, toplantı dökümü; yalnız sayfada olmayanlar].
+
+- Workspace'te hazır bir **default workflow** var ve iki düğümlü: birincisi kimlik doğrulama, ikincisi tahsilat. Kimlik tam doğrulanmadan ikinci düğüme geçilmiyor. Gerekçe yasal: borcu üçüncü bir kişiye söylemenin cezası Türkiye'de bir milyon TL mertebesinde, ABD'de de yüksek. Doğrulama mock banka API'sine bir POST. Demo ajanı doğum tarihini ve telefon numarasının son hanelerini soruyor; test değerleri vaka değişkenleri tablosundan geliyor.
+- UI'da görülen her şey kod: default workflow yaklaşık 638 satırlık bir JSON; builder bu biçimde bir JSON üretmeli. Organizatörlerin önerisi: önce platformu elle kurcalayın.
+- Tunga Bayrak'ın önerisi: bugün bir ajanı elle kurup işleyişi öğrenin, bunu "skill" olarak yazın; yarın yeni brief gelince işi AI'a yaptırın (Claude Code, Codex ya da başka bir ajan SDK'sı). Builder için her araç serbest.
+- Türkçe tahsilat demosunun davranışları: kayıt bildirimi; isim teyidi; güvenlik sorusu ve geri okuma ("… olarak anladım, doğru mu?"); tool koşarken "kontrol ediyorum"; gecikme günü ve toplam tutar; bir tarihe kadar ödeme önerisi; eşiğin altındaki kısmi teklifi "gecikmeden çıkmanıza yetmez" diye geri çevirip toplam tutara dönme; "ödemezsem ne olur" sorusuna faiz uyarısı; "ödemeyeceğim" denince bir kez hatırlatıp not alma ve kapatma; "dolandırıcı mısın" sorusuna "bankanın dijital asistanıyım" yanıtı. Bunlar o demonun kuralları, evrensel değil; karşılığı gizli brief'te varsa oradan okunur.
+- Personalar ajanı kırmaya çalışacak: kızgın, memnun, dolandırıcı, prompt injection deneyen müşteriler.
+- "Banka iki kez sorun diyorsa yalnız iki kez sorun; üçüncüsü hatadır."
+- Brief'ler dağınık olabilir: toplantı notları, senaryo dosyaları, PDF'ler, çağrı dökümleri. Belirsiz noktaların "müşteriye" (simüle bankaya) sorulabileceği söylendi; mekanizma ne sayfada ne kit açıklamasında var. Sorular ilk e-postaya yanıtla iletilebiliyor ("ajanlarımız yanıtlıyor").
+- Yavuz "chat'te kurup sınayın, final teslim için ses modunu kullanabilirsiniz" dedi; sayfa "Conversations: Text" ve "metin, ses değil" diyor. Sayfa esas; teyit destek kanalında (Bölüm 13, soru 21).
+- Gizli brief penceresi üç saat; hem builder'ın hızı hem ajanın kalitesi önemli. Toplantıdaki saat ifadeleri karışık ("5'ten 8'e", "8'den 11'e"); sayfadaki UTC saatleri esas.
+- "Size API'ler ve SQL bağlantıları vereceğiz" dendi; sayfada ve kit açıklamasında yok, doğrulanmadı.
+
+**Plana etkisi.**
+
+1. **Hedef A bir workflow; yapı ana yol.** Adım, rota ve tool kararını sayfa açıkça builder'ın tasarım problemi diye koyuyor; default workflow iki adımlı bir kimlik kapısı. A2'nin `auth_gate` şablonu Day 1'e çekildi; V0'ın parçası olup olmayacağına E8 karar verir (Bölüm 8.4, 10.2).
+2. **Kod düğümleri.** Banka API'si brief'i zorlamıyor; tarih ve tutar kurallarını yalnız ajan koruyor. İş günü, tatil, son tarih ve tutar tabanı hesabı kod düğümüne (`calc` şablonu, Bölüm 8.4); spec bu hesaplar için yapılandırılmış veri taşır (Bölüm 6.2). Kod düğümünün sonucuna göre rota seçilebiliyorsa bu gerçek bir kod kapısıdır ve Bölüm 8.2'deki "Hedef A'da kod kapısı yok" hükmü o kısım için düşer; kit `docs/`'tan okunur. v1.5: doğrulandı; kod `vars`'a dize bayrak yazar, geçiş onu `equals` ile okur (Bölüm 2.8).
+3. **Mod metin, model sabit.** Sesli ekler derlenmez; yerine "insan gibi konuşan müşteri" satırları aday (Bölüm 8.3). E6 ve E10 düştü; iskelet `freya.py`'deki modelde ayarlanır (Bölüm 10.2, 11.1).
+4. **pass^3.** Tutarlılık (Bölüm 17.2, B2) P0 oldu: hesap koda, sıcaklık (ayarlanabiliyorsa) düşük, her ölçüm `--reps 3` ile.
+5. **Alan sabit, değerler değil.** Tahsilat görüşmesinin genel akışı (kimlik → borç → söz ya da başka sonuç → kapanış) ve yedi tool adı sabit; bunlara göre kurulmuş bir workflow şablonu serbest (Bölüm 4.3). Hiçbir brief'in kuralı, değeri ya da adı koda, iskelete ya da teste girmez; tool alanları ve izinli değerler her build'de tool API dosyasından okunur (Bölüm 17.4, değişmez 7).
+6. **Ham malzeme brief'i.** Politika yine birebir girer, ama intake ve sentez hangi kuralın geçerli olduğunu çözmeli: memo'nun değiştirdiği kural spec'te ve testlerde yeni haliyle durur, değiştiren cümle alıntılanır. Kod listesi sonuç ve neden kodlarının kaynağıdır ve tool'un izinli değerleriyle eşleştirilir.
+7. **Builder bütçesi ve tek kuyruk.** Brief başına 30 dakika, kendi testleri dahil; workspace'te aynı anda tek simülasyon; on vaka 3–11 dakika. Build anı ölçümü planlanandan çok küçük (Bölüm 5.3, 9.2); pratik ölçüm ve build anı testleri aynı kuyruğu paylaşır (Bölüm 12.2). Build süresi ikinci eşitlik bozucu.
+8. **Öz denetim trace'te görünür.** Sayfa builder'ı "sınar ve iyileştirir" diye tanımlıyor ve trace'te testleri istiyor. E9a build anı seçimini kapatsa bile builder ucuz bir öz denetim (lint + birkaç vaka) koşar ve sonucunu trace'e yazar (Bölüm 12.5).
+9. **Tekrar üretilebilirlik.** İlk onda organizatör builder'ı yeniden koşar; skor açıkça düşerse giriş silinir. Şanslı bir koşuyu seçip teslim etmek risk; derleme deterministik kalır (değişmez 4), LLM adımlarının koşudan koşuya farkı ölçülür. LLM önbelleği commit edilmez: gizli brief'ten türemiş içerik taşır.
+10. **Workspace'te 10 workflow.** Teslim workflow'u yerinde güncellenir; adaylar ayrı workflow olarak açılmaz (Bölüm 5.4, 11.4). v1.5: kit README'si 200 diyor; sıkı olan (10) esas.
+11. **Probe yok.** `freya_probe.py` yerine kit'in `docs/`'u ve `freya.py` okunur; platform yalnız dokümandaki çağrılarla kullanılır; hata ve 429 senaryoları yalnız sahte sunucuda sınanır (Bölüm 12.1, 17.4).
+12. **Genelleme ölçümü.** 13 vakanın 10'u tek brief'te; vaka düzeyinde hold-out gizli brief'e genellemeyi ölçmez. En iyi vekil, pratik brief'lerin yukarıdaki boyutlarda değiştirilmiş kopyaları (mutasyon brief'leri) ve onlara yazılmış vakalar: `run_cases.py` kendi vaka dosyamızı kabul ediyorsa platformda, etmiyorsa yerel koşucuda (Bölüm 10.4). v1.5: kabul ediyor, ama müşteri verisi yalnız 13 pratik vakadan seçilebiliyor (Bölüm 2.8).
+13. **Eşitlik bozucu tutar.** Geçen vakanın kaydı beklenen kayıtla aynı olduğundan söz tutarı vakanın kendisinden gelir; ayrıca yapılacak bir şey yok.
+
+### 2.8 Kit v3 (10 Ekim): ne biliyoruz, plana etkisi
+
+Kaynak: depodaki `build-the-builder-v3/build-the-builder/` (`VERSION` = 3). On altı dosyanın tamamı okundu: `README.md`, `briefs/brief-a.md`, `briefs/brief-b.md`, `tools/openapi.json`, `public-test-set.json`, `docs/workflow-format.md`, `docs/tools-and-code.md`, `docs/api.md`, `freya.py`, `tools/run_cases.py`, `tools/score.py`, `examples/base-agent.json`, `examples/agent_builder.py`, `.claude/skills/build-phone-agent/SKILL.md`, `env.example`, `VERSION`. Platformun hackathon'daki davranışı için birincil kaynak kit'tir; site ya da public dokümanla çelişirse kit kazanır. Kit'in kendi işaretleri korunur: "verified in a working builder" (kit yazarlarının, pratik vakalarını geçen altı düğümlü builder'ı) ve "seen in a trial call". Tabloların sol sütunu [OLGU, kit], sağ sütunu ve numaralı maddeler [ÇIKARIM]. Kit'teki `public-test-set.json`, sitedekinin aynısı artı her vakada gerçek kimlik yanıtlarını taşıyan bir `identity` alanı.
+
+**Platform ve API**
+
+| Kit'te yazan (dosya) | Plandaki karşılığı |
+| --- | --- |
+| Taban `https://staging-app.freyavoice.ai` (`FREYA_API_URL`); `Authorization: Bearer fak_…`; tarayıcı benzeri `User-Agent` zorunlu, yoksa HTML içinde "error code: 1010"; yanıt zarfı `{success, data: {message, result}}`; workflow ve call yolları tekil, persona ve simulation yolları çoğul. (docs/api.md, freya.py) | Ek B yeniden yazıldı; adaptör `freya.py`'yi sarar. |
+| `POST /api/v2/workflow` (`{"name", "workflow"}`) workflow'u ve ajanını yaratır, `workflow.agentId` döner; `?dryRun=true` yalnız doğrular. `PUT /api/v2/workflow/{id}` tanımın tamamını değiştirir (gönderilmeyen üst anahtar silinir) ve yeni sürümü **yayınlamadan** kaydeder; yayın ayrı çağrı. `freya.save_workflow(slot, wf)` ilk seferde yaratır, sonra günceller ve yayınlar; slot → kimlik eşlemesi yerel `.freya-agents.json`'da. `freya.update_workflow` platformun doldurduğu `agent_config`'teki modeli olay modeline çevirir (yoksa chat turu ve gerçek çağrı başlamıyor); ilk yaratmada bu adım yok. `freya.export_workflow` → `{workflow_id, agent_id, updated_at, workflow}`. (docs/api.md, freya.py) | Her kayıt `save_workflow` ile; ilk yaratmadan sonra chat testi için bir kez daha kaydet [ÇIKARIM]. Bölüm 5.4, madde 5'teki geri okuma somutlaştı. |
+| Doğrulama, düğüm türüne ait olmayan alanı hatasız siler (`conversation` düğümünde `pre_actions`, `api_request` ve `code` düğümünde `tools`); `null` doğrulamadan geçmez (`base-agent.json`'da `null` alanlar olsa da); `context_variables` API'den kaydedilince geri gelmedi (10 Ekim testi). (docs) | Derleyici `null` yazmaz, `context_variables` kullanmaz; kayıttan sonra workflow geri okunup gönderilenle alan alan karşılaştırılır. |
+| Chat API: `POST /api/v2/chat/message` (`workflowId`, `message`, `customerVariables`) yayındaki workflow'u kuyruksuz, tek tur koşar ve saniyeler içinde döner; `callId` ile sürer, `POST /api/v2/chat/end` ile biter. Uzun turda 504 olabiliyor; ilk adım kod düğümüyse chat yolu onu atlayabiliyor. (docs/api.md) | Karar noktası testinin ve duman testinin platformdaki yolu (Bölüm 9.2). |
+| Simülasyon: `POST /api/v2/simulations` (`mode: chat`, `customerVariablesMap`, `maxCallDurationSeconds`, model override'ları); üç ajan override'ı (`assistant`, `routing`, `extraction`) her simülasyonda verilmeli. `freya.run_simulation` 420 sn çağrı sınırı ve 5 eşzamanlı çağrıyla koşar; başka simülasyon varsa 30 sn bekleyip yeniden dener. Çağrı detayı (`GET /api/v2/call/{id}`): mesajlar, `endedReason`, `successCriteriaResult` ve motor olayları: `node_enter`, `function_call_start`, `function_call_complete`, `error` ve `route_evaluated` (her koşulun sonucu ve o anki değişken tablosu). (docs/api.md, freya.py) | Hata teşhisinin birinci kaynağı `route_evaluated` (Bölüm 9.6, 11.3). |
+| Telefon ajanının modeli `experimental-5`: Freya'nın modeli, olayın kendi GPU sunucusunda (`freya.AGENT_LLM`). Müşteriyi oynayan ve judge: `gemini-3-flash-preview`. (freya.py) | Ajan modeli Freya dışında yok; yerel backend gerçek modeli koşamaz (Bölüm 9.2, 11.1). |
+
+**Workflow modeli**
+
+| Kit'te yazan (dosya) | Plandaki karşılığı |
+| --- | --- |
+| Her kullanıcı mesajından sonra üç ayrı model çağrısı: extraction (değişken çıkarır), routing (düğümden çıkılacak mı), dialogue (yanıt ya da tool çağrısı). Prompt paylaşmazlar: routing ne `system_prompt`'u ne `task_message`'ı görür, yalnız geçiş açıklamalarını; dialogue yalnız o düğümün `tools` listesindeki tool'ları çağırabilir; değişken koşulları kodla değerlendirilir. (workflow-format) | Yol seçen her kural deterministik bir değişkene (tool sonucu, kod bayrağı, çıkarılmış enum) bağlanır; kit'in skill'i de "kuralı prompta değil rotaya ve koda koy" diyor. |
+| Düğüm türleri: `conversation`, `api_request` (girişte HTTP), `code` (girişte Python), `end_call`. Geçiş operatörleri: `equals`, `not_equals`, `greater_than`, `less_than`, `contains`, `is_set`, `is_not_set`, `always` (kodla) ve `matches_intent` (routing modeli). Deterministik koşullar önce, liste sırasıyla; hiçbiri tutmazsa düğümde kalınır, yedek yol yok. `is_tool_call` geçişi modele `transition_to_<düğüm>` tool'u olarak görünür. Global düğümler her düğümden tetiklenebilen kesintiler (`excluded_nodes`, `__previous__`). (workflow-format) | Bölüm 8.4 şablonlarının yapı taşları. |
+| Değişkenler çağrı boyunca tek tabloda. Çağrı değişkenleri (`customer_id`, `first_name`, `last_name`, `title`, `now`) `{{var}}` ile prompta ve tool parametresine, `vars.get(...)` ile koda girer. Sistem tarihleri gerçek saattir; görev kendi `now`'ını veriyorsa o kullanılır. Extraction'da `date` türü çıkarıcıya bugünü ve göreli tarih kurallarını verir. `min_confidence` varsayılanı 0,95 ve atılan değer iz bırakmaz. (workflow-format) | Göreli tarihi ("bu Cuma", "gelecek hafta") extraction'a bırakmak riskli: çıkarıcının "bugün"ü büyük olasılıkla gerçek saat, vakanın `now`'ı başka bir gün [ÇIKARIM]. Tarih gerçekleri kodda `now`'dan hesaplanır (`calc`, Bölüm 8.4). |
+| Tool sonucu bir zarf (`status`, `data`, `message`, `status_code`, `header`). Motor sonucu tabloya kendisi yazar: `<tool>_response.data.*`, `<tool>_args.*`, `<tool>_success_count`, `<tool>_failure_count`. Eşleme yolları `data.` ile başlar; boolean'lar dize gelir, `"true"` ve `"True"` ikisi de sınanmalı. Tool sonucundan sonra rota aynı turda yeniden değerlendirilir. (tools-and-code) | Yazmanın başarısı ve tek yazma sayacı tablodan okunur (Bölüm 8.2). |
+| Kod düğümü `vars`'ı okur ve yazar; `json`, `re`, `datetime` içe aktarılabilir. Kodda `{{` ya da `}}` olmamalı, kod asla hata fırlatmamalı, rota bayrakları dize olmalı. Kod düğümü `passthrough` olur ve `always` geçişiyle biter; `initial_node` olabilir. Çalışan builder tarih gerçeklerini kod düğümünde hesaplayıp `{{date_facts}}` olarak prompta koyuyor. (tools-and-code) | `calc` şablonu doğrulandı (Bölüm 8.4). Kod düğümünün Python'u yerelde birim testinden geçirilebilir (Bölüm 9.2). |
+| `api_call` tool'larında `pre_process_code` ve `post_process_code` kancaları; post-kancanın sonuca eklediği alan modele tool sonucunun parçası olarak ulaşır. Hackathon modeliyle görülen iki hata: ajan tool sonucundan sonra susuyor (müşteri bekleyip kapatıyor) ve olumsuz sonucu (`verified: false`) yok sayıyor. Çalışan builder'daki çare: sonucun ne demek olduğunu ve sırada ne yapılacağını söyleyen bir `what_to_do_next` alanını ekleyen post-kanca ve "her tool sonucundan sonra konuş ya da sıradaki tool'u çağır" prompt kuralı. (tools-and-code) | Evrensel iskeletin parçası olur (Bölüm 8.3); `IGNORED_TOOL_RESULT` ve yeni `SILENT_TURN` etiketleri (Bölüm 9.6). |
+| Yazan tool'larda `maxRetries: 0`, okuyan `pre_actions` çağrısında 2 (çalışan builder). Yaşam döngüsü tool'ları `alwaysRunsAt: start_of_call / end_of_call` (`each_turn` hiç çalışmaz); parametresi çözülemezse bir model çağrısı doldurur, hepsi çözülürse doğrudan çalışır. `base-agent.json` `close_call`'u workflow düzeyinde bir `end_of_call` tool'u yapıyor; sonucu ve nedeni çağrı bittikten sonra bir model konuşmadan dolduruyor. (tools-and-code, examples) | Kapanış tasarımı E15'te (Bölüm 8.4, 10.2). |
+| Workflow'da sıcaklık alanı yok; `agent_config` gönderilmez (gönderilen `agent_config` çağrının başlamamasına yol açabiliyor). Düğüm başına `reasoning_override` (`auto`, `enabled`, `disabled`) var, yalnız destekleyen modelde etkili. `max_node_turns` varsayılanı 10 kullanıcı turu; `max_turn_transition` verilmezse sınır bir şey değiştirmiyor. (workflow-format, README) | E1 düştü, yerine E1' (`reasoning_override`). Tur sınırı ve hedefi derleyicinin işi (Bölüm 8.1). |
+
+**Pratik banka ve ölçüm**
+
+| Kit'te yazan (dosya) | Plandaki karşılığı |
+| --- | --- |
+| Mock banka `https://freya-bank-mock.freyavoice.workers.dev/v1`. Yedi tool çağrısı anahtarsız; gövdedeki `customer_id` o çağrının sırrı. Her tool "yapılmadı" durumunu `ok: false` ile bildirir; 500 "hiçbir şey kaydedilmedi, tekrar edilebilir" demek. Banka brief'i zorlamaz. `verify_identity` her yanıtı ayrı sınar (`field` enum'u, `wrong_answers_left`, `all_verified`, `hint: day_month_swapped`); `get_account` iki soru geçilmeden reddeder; `close_call` son tool çağrısıdır, ondan sonrası kabul edilmez. (tools/openapi.json) | 500'den sonra tek tekrar güvenli; brief'in kendi tekrar kuralı esas. |
+| Pratik oturumu `POST /v1/practice/sessions {"case": <vaka kimliği>}` ile, `x-team-key` başlığıyla açılır ve çağrı değişkenlerini döner; ledger `GET /v1/practice/ledger/<customer_id>`. Müşteri verisi (ürünler, kimlik, enjekte hata) bankada vaka kimliğine bağlı. (tools/score.py, run_cases.py) | `--cases` ile kendi vaka dosyamız koşar, ama müşteri verisi yalnız 13 pratik vakadan seçilir (Bölüm 10.4). Gizli brief'ler için oturum açılabildiğine dair bir şey yok (madde 6). |
+| Skorlayıcının ledger kontrolleri: `(outcome, reason)` birebir; sözler `(product_id, iki haneli tutar, tarih)` kümesi birebir; notlar, geri aramalar `(tarih, saat)` ve devir kuyrukları birebir; son tool çağrısı `close_call`; kimlik doğrulanmadan çağrılan `get_account` ya da `create_promise` vakayı düşürür; beklenen sonuç `not_reached` (ya da `no_contact`, `unreached`) iken kimlik ya da hesap tool'u kullanmak düşürür. Konuşma kontrollerini persona'nın `successCriteria`'sına yazılan vaka `checks`'i taşır; judge model okur. (score.py, run_cases.py) | Skor, Bölüm 9.3'teki ikili skorla birebir örtüşüyor. |
+| `run_cases.py`: `--brief`, `--cases`, `--only`, `--reps N` (müşteri ancak N koşunun hepsinde geçerse sayılır), `--style pieces / corrects / talkative / asks_back / in_words` (finaldeki "insan gibi konuşan" müşteriler), `--out` (çağrı kimlikleri), `--rerun-if-slow N` (organizatör, model yavaşken yapılan koşuyu atıp yineliyor). Her koşu `results/log.jsonl`'a bir satır yazar; en yavaş ajan turunun medyanı 10 sn'yi aşarsa uyarır. Persona metni vakadan yerelde kurulur; kimlik anahtarları için şablonda `date_of_birth` ve `phone_last4` yanında `postcode`, `birth_year`, `company_number`, `founded_year` da var. (run_cases.py) | `make practice`'in gerçek arayüzü (Bölüm 10). Kimlik anahtarı listesi ve skorlayıcıdaki sonuç adları gizli brief'lere ipucu (madde 9). |
+| `base-agent.json`: iki adım (kimlik → tahsilat), yedi tool'un dördü; bir koşuda 13 vakanın 2'sini geçti. Kimlik adımından çıkış `verify_identity_response.data.all_verified` = `"true"` ya da `"True"`; açılış sabit bir `tts` cümlesi; çağrıyı "Have a good day." tetikleyici cümlesiyle bitiren bir `end_call` tool'u. (README, examples) | `auth_gate`'in kit'teki karşılığı (Bölüm 8.4). |
+| Örnek builder (`examples/agent_builder.py`): Claude Agent SDK, varsayılan model `claude-opus-5-5`, tek skill (`build-phone-agent`), araçlar Read, Write, Edit, Glob, Grep, Bash; en çok 150 tur; test komutu başına 20 dakikaya kadar; her mesajı `traces/<zaman>.jsonl`'a yazar. Skill sekiz adım: brief'i ve tool API'yi oku; `docs/`'u oku; `base-agent.json`'u kalıp al (cevap değil); her çağrı aşamasına bir adım, kimlik önce; bir sonraki adıma müşterinin sözüyle değil tool sonucuyla geç; her alan ve izinli değer OpenAPI'den; `agent_config` yok; kaydet; `run_cases.py`'yi ön planda koş; kalanları en çok üç kez düzelt. v3'te Brief A'da tek koşuda 10/10. (examples, SKILL.md, README) | B0 (Bölüm 12.5). Skill, pratik vakalarla test ediyor; gizli brief'te pratik vaka yok [ÇIKARIM]. E13 (Bölüm 10.2). |
+| Final: müşterilerin üç ürüne kadar ürünü olabilir (Brief B gibi); birkaç takvim gününde; her müşteri üç kez. README'ye göre workspace 200 workflow tutuyor; sayfa 10 diyor. (README) | Her iki gizli brief'te çok ürün kuralları var sayılır. Workflow sınırında sıkı olan (10) esas. |
+
+**Brief'ler.** Brief A 12 bölümde 47 numaralı kural ve bir kapanış tablosu taşıyor; girişte "Hepsini okuyun. Kalan vakaların çoğu atlanmış tek bir kuraldan" yazıyor. Brief B, A'nın üstüne 11 kural ve bir kapanış paragrafı ("aşağıdaki bir kural değiştirmedikçe A'nın her kuralı geçerli"). Kural türleri Bölüm 2.7'deki boyut tablosuyla örtüşüyor; tabloda olmayanlar: kimlik teyidinde neyin "evet" sayıldığı ve kaç kez sorulacağı; açılışta zorunlu ve doğrulamadan önce yasak sözcükler; geri arama penceresi (gün ve saat aralığı); "bu" ve "gelecek" hafta günlerinin anlamı; ilk ödeme sorusunun birebir cümlesi; kurallar arası öncelik (bir kural ötekilerden önce gelir); devirden sonra not yazmama; sonuç tablosunda öncelik. Brief değerleri builder'a yazılmaz (Bölüm 17.4, değişmez 7).
+
+**Plana etkisi.**
+
+1. **Derleme hedefi somutlaştı (Bölüm 8.1–8.4).** `system_prompt` = rol + brief birebir + evrensel satırlar. Her düğümün `task_message`'ı yalnız o adımın işini anlatır, düğüm adı ya da rota anlatmaz. Geçişler tool sonucu ve kod bayrağı üzerinden yapılır; tarih gerçekleri `calc` kod düğümünde hesaplanır; her banka tool'unda `what_to_do_next` post-kancası olur; tool alanları ve enum'ları OpenAPI'den gelir. `agent_config` gönderilmez, `null` yazılmaz.
+2. **Rota kodda.** Routing modeli prompt görmediği için yol seçen her kural deterministik bir değişkene bağlanır. `matches_intent` yalnız çıkarılmış bir enum'un yetmediği yerde kullanılır.
+3. **Tarih çapası.** Sistem tarihleri, büyük olasılıkla extraction'ın "bugün"ü de, gerçek saat; vakanın `now`'ı başka bir gün. Göreli tarih kodla `now`'dan çözülür [ÇIKARIM; ilk ölçümde doğrulanır].
+4. **Tool sonrası sessizlik ve gecikme.** Kit'in iki gözlemi evrensel iskelete iki parça ekler: `what_to_do_next` post-kancası ve "boş tur yok" satırı. Müşteri sessizlikte kapatıyor. Brief'i birebir `system_prompt`'a koymanın bedeli her turda üç model çağrısı ve uzun bir prompt; E14 (Bölüm 10.2) skorla birlikte gecikmeyi de ölçer.
+5. **Yayın ve geri okuma.** Her kayıt `freya.save_workflow` ile (yayınlar). Kayıttan sonra workflow geri okunup gönderilenle karşılaştırılır: sessizce silinen alan, kaybolan anahtar. Simülasyonun koştuğu `agentVersionNumber` trace'e yazılır.
+6. **Gizli brief'te build anı simülasyonu büyük olasılıkla yok.** Banka oturumu yalnız bilinen vaka kimliğiyle açılıyor; gizli müşteriler gizli. Gizli brief'in tool API'si pratik bankayla uyumluysa, pratik oturumlarıyla chat API'den duman testi yapılabilir. Uyumlu değilse build anı denetimi şunlardan ibarettir: dry run, geri okuma, kod düğümlerinin yerel birim testi ve brief'in her kuralının spec'te karşılığı olup olmadığına bakan statik kapsam. Build anı "ölç ve seç" (V2) zayıflar; seçimin ağırlığı offline ölçüme (pratik vakalar ve mutasyonlar) kayar (Bölüm 5.3, 9.2, 12.5; Bölüm 13, soru 20 ve 23).
+7. **Mutasyon ölçümü mümkün ama sınırlı.** `--cases` ile kendi vaka dosyamız koşar. Müşteri verisi 13 pratik vakadan gelir; senaryo, beklenen kayıt ve kontroller bizim. Tool API'si değiştirilmiş bir mutasyon pratik bankada koşmaz (Bölüm 10.4).
+8. **Güçlü taban.** Örnek builder Brief A'da tek koşuda 10/10 aldı. Planın mimarisi değişmiyor; ama derleyici yolu B0'ı `--reps 3`'te, `--style` koşularında ve mutasyonlarda geçmeli. Geçemezse kit'in ajan tabanlı yolu, skill'i bizim kurallarımızla güçlendirilmiş olarak, aday kalır (E13).
+9. **Kimlik ve sonuç adları değişebilir.** Persona şablonu başka kimlik alanlarını (`postcode`, `birth_year`, `company_number`, `founded_year`), skorlayıcı başka sonuç adlarını (`no_contact`, `unreached`) tanıyor; bunlar gizli brief'lere ipucu olabilir [ÇIKARIM]. Builder bunları sabit yazmaz, her build'de brief'ten ve OpenAPI enum'undan okur. Şirket müşterisi ihtimali yüzünden iskelet "Mr/Ms + soyad" gibi bir hitap varsaymaz; hitap brief'ten gelir.
+10. **Gecikme gürültüsü.** Organizatör model yavaşken yapılan koşuyu atıp yineliyor (`--rerun-if-slow`). Bizim ölçümümüzde de en yavaş tur medyanı 10 sn'yi aşan koşu ayrı işaretlenir ve kararda kullanılmaz (Bölüm 10).
 
 ---
 
@@ -335,11 +481,13 @@ Gönderen Yavuz Alp Sencer Öztürk (Freya, Founding Engineer), 10 Ekim 00:16. T
 | 9 | Bir tur hedefli onarım | Sentetik teste overfit riski. |
 | 10 | Offline otomatik prompt optimizasyonu | Yalnız stretch (P3) ve yalnız iskelet için. |
 
+**Güncelleme (v1.4).** Sıra 5 (ses) düştü: mod metin; yerine "insan gibi konuşan müşteri" sağlamlığı geçer (parça parça sayı, düzeltme, kelimeyle tutar ve tarih; Bölüm 8.3). Sıra 7 (ajan modeli) düştü: model sabit; sıcaklık ve efor ancak workflow'da ayarlanabiliyorsa. Sıra 8 (yapısal koruma) 2. sıraya çıktı: telefon ajanı zaten bir workflow; kimlik kapısı adımı ve tarih ile tutar hesabı için kod düğümü her gizli brief'te işe yarar (Bölüm 2.7, 8.4).
+
 ### 4.2 Çalışma prensipleri
 
 1. **Önce B0.** T+3 saatte en aptal uçtan uca hat çalışır: prompt = görev metni + tool listesi. Çalışmıyorsa başka hiçbir işe geçilmez.
 2. **Ölçülmeyen değişiklik merge edilmez.** Fark gürültüden küçükse değişiklik yok sayılır; eşitlikte basit olan kalır (Bölüm 10.1).
-3. **Pratik görevlerin üçte biri hold-out.**
+3. **Pratik görevlerin üçte biri hold-out.** v1.4: pratikte 2 brief ve 13 vaka var; hold-out vaka düzeyinde ayrılır (ör. A'dan 3, B'den 1 vaka). Gizli brief'e genellemeyi mutasyon brief'leri ölçer (Bölüm 10.4).
 4. **Her düzeltme evrensel bir bileşene yapılır:** iskelet metni, derleyici kuralı, evrensel kural kitaplığı, lint, config varsayılanı. "Şu görevde şöyle yap" yok.
 5. **Builder anytime çalışır:** her an teslim edilebilir bir ajan vardır.
 6. **Platform alanına ancak elle denedikten sonra güvenilir.**
@@ -347,7 +495,7 @@ Gönderen Yavuz Alp Sencer Öztürk (Freya, Founding Engineer), 10 Ekim 00:16. T
 
 ### 4.3 Yapılmayacaklar
 
-Multi-agent builder; görev başına kod ya da LangGraph grafiği üretimi; build anında DSPy/GEPA/AFlow; beam ya da evrimsel arama; vektör DB, uzun süreli hafıza, fine-tuning; dashboard, web UI, pitch; Langfuse/Logfire; görev türü sınıflandırıcısı ve pratik görevlere özel şablon; ölçülmemiş her koruma katmanı.
+Multi-agent builder; görev başına kod ya da LangGraph grafiği üretimi; build anında DSPy/GEPA/AFlow; beam ya da evrimsel arama; vektör DB, uzun süreli hafıza, fine-tuning; dashboard, web UI, pitch; Langfuse/Logfire; görev türü sınıflandırıcısı ve pratik görevlere özel şablon; ölçülmemiş her koruma katmanı. v1.4 istisnası: alan (tahsilat) ve yedi tool adı organizatörce sabit olduğu için tahsilat görüşmesinin genel akışına göre kurulmuş bir workflow şablonu serbesttir; pratik ya da gizli bir brief'in kuralı, değeri ya da adı yine yasak (Bölüm 2.7, madde 5).
 
 ---
 
@@ -357,10 +505,10 @@ Multi-agent builder; görev başına kod ya da LangGraph grafiği üretimi; buil
 
 | | Freya backend (H1, H2) | Yerel backend (H3 ya da platform testi yoksa) |
 | --- | --- | --- |
-| **AgentSpec →** | Freya ajan config'i (Hedef A) | prompt + `gates.json` + kendi runtime'ımız (Hedef B) |
-| **TestSpec →** | unit test (`mockToolResults`, `repeat`) + Simulation (persona, `successCriteria`) ya da Chat API | kendi orkestratörümüz: kullanıcı simülatörü + tool simülatörü + deterministik değerlendirici |
+| **AgentSpec →** | Freya workflow'u (Hedef A; v1.4) | prompt + `gates.json` + kendi runtime'ımız (Hedef B) |
+| **TestSpec →** | `run_cases.py` vakaları (kit biçimi, v1.4); unit test ve Chat API yalnız kit `docs/`'ta varsa | kendi orkestratörümüz: kullanıcı simülatörü + tool simülatörü + deterministik değerlendirici |
 
-Hangi sütunun değerlendirmede geçerli olduğu T+1 saatte belli olur. Platforma önceden erişemediğimiz için Cuma günü tam simülasyonda τ koşucusu kullanılır, yerel sütunun karar noktası koşucusu süre kalırsa yazılır (Bölüm 10.4, 12.1); Freya sütunu public dokümana göre hazırlanır ve Day 1'de gerçek platformla düzeltilir.
+Hangi sütunun değerlendirmede geçerli olduğu T+1 saatte belli olur. v1.4: Freya sütunu geçerli (Bölüm 2.7). Platforma önceden erişemediğimiz için Cuma günü tam simülasyonda τ koşucusu kullanılır, yerel sütunun karar noktası koşucusu süre kalırsa yazılır (Bölüm 10.4, 12.1); Freya sütunu public dokümana göre hazırlanır ve Day 1'de gerçek platformla düzeltilir.
 
 ### 5.2 Boru hattı
 
@@ -403,6 +551,10 @@ Sayılar yer tutucudur; kurallardaki süre ve kredi sınırı öğrenilince `con
 
 `fast` profilde ölçüm yoktur; hangi adayın yayınlanacağına offline varsayılan karar verir (Bölüm 9.4, kural 2).
 
+**Güncelleme (v1.4).** Sert sınır: brief başına 30 dakika, builder'ın kendi testleri dahil; varsayılan `--deadline` 25 dakika. Platformda aynı anda tek simülasyon koşar ve on vaka 3–11 dakika sürer (Bölüm 2.7). Yukarıdaki sayılar paralel test varsayıyordu; platformda koşacak tam simülasyonlar `standard` profilde birkaç vakaya iner, karar noktası testleri yerel backend'e kayar (Bölüm 9.2). Sayılar kit okunduktan ve ilk ölçümle kilitlenir.
+
+**Güncelleme (v1.5).** Kit iki şeyi netleştirdi (Bölüm 2.8). Ajan modeli Freya dışında yok, yani karar noktası testlerinin yerel backend'i gerçek modeli koşamaz; platformdaki yolu chat API. Gizli brief'te banka oturumu büyük olasılıkla açılamaz. Gizli brief'teki build için profiller şöyle okunur: `fast` = V0 + aday A, dry run ve geri okuma; `standard` = `fast` + kod düğümlerinin yerel birim testi + statik kural kapsamı + tool API pratik bankayla uyumluysa chat API'den birkaç duman turu; tam simülasyon yalnız pratik brief'lerde ve offline ölçümde. Kit'in örnek builder'ı bir test komutuna 20 dakikaya kadar izin veriyor; bizim 25 dakikalık tavanımıza, builder'ın kendi model çağrılarının yanında bir iki tam simülasyon (her biri 3–11 dk) sığar; o da yalnız pratik brief'lerde anlamlı.
+
 ### 5.4 Anytime sözleşmesi
 
 1. **t ≈ 0:** V0 derlenir, diske yazılır (`out/<görev>/agent.json` ve `manifest.json`) ve platformda yayınlanır. Bu adım LLM çağrısı içermez.
@@ -415,6 +567,8 @@ Sayılar yer tutucudur; kurallardaki süre ve kredi sınırı öğrenilince `con
 8. **Üretilen ajanın da bütçesi var.** Yarışma kuralları konuşma başına maliyet, gecikme ya da süre sınırı koyuyorsa ajan bütçe kapısı devreye girer (Bölüm 9.4). τ^τ-bench'te 21 build bu tür bir sınırı aştı, 10'unun puanı sıfırlandı.
 
 Freya'da ajan adı benzersiz olmalı (409). **Görev başına tek teslim ajanı** vardır [ÇIKARIM]: adı `bb-<görev_hash8>-<zaman>`, ilk config'i V0'dır, kimliği yayınlandığı anda stdout'a basılır ve bir daha değişmez; kazanan adayın config'i bu ajana yazılır. Adaylar ölçüm için ayrı ajanlar olarak açılır (`bb-<görev_hash8>-<aday>-<zaman>`) ve build sonunda silinir. Platform güncellemeyi taslak sürüm olarak tutuyor ya da ayrı bir yayınlama adımı istiyorsa bu adım adaptöre eklenir (Bölüm 13, soru 16).
+
+**Güncelleme (v1.4).** Teslim birimi brief başına bir workflow. Workspace'te en çok 10 workflow olabilir ve sayfa her koşuda yenisini yaratmak yerine yerinde güncellemeyi istiyor (`freya.py` de böyle çalışıyor). Bu yüzden teslim workflow'u yerinde güncellenir; adaylar ayrı workflow olarak açılmaz, sabit bir "aday" yuvasında sırayla ölçülür (en çok bir iki yuva; workspace'teki default workflow da sayıya dahil olabilir). v1.5: yuva = `freya.save_workflow`'un `slot`'u (teslim için brief adı, aday için `<brief>-cand`); kit README'si 200 workflow diyor, sayfa 10; sıkı olan esas. Teslim edilen şey `freya.export_workflow` çıktısıdır: organizatör onu kendi workspace'ine yükleyip puanlar. Bu yüzden madde 5'teki karşılaştırma export dosyası üzerinden yapılır: dosyadaki workflow kazananın aynısı olmalı.
 
 **V0 için şablon varsayılanları.** V0'da LLM yok; Bölüm 8.3'teki şablonun spec alanları deterministik doldurulur: `agent_name` görev kimliğinden, `role` sabit bir cümle ("a phone agent who handles the call according to the policy below"), `goal` boş, tool kartları statik analizden (etiket + organizatörün kendi açıklaması). Kural dizini, olgular, akış ve toplanacak bilgiler boştur; boş bölümler derlenmez.
 
@@ -521,6 +675,10 @@ class AgentSpec(BaseModel):
 
 Plan B'ye göre farklar: `requires_confirmation: bool` → `confirmation` (üç kademe); `success_conditions`, `language`, `Rule.origin`, `ToolCard.idempotent / auto_run / excluded / evidence` ve `disabled_universal` eklendi; `purpose` çıkarıldı (organizatörün tool açıklaması zaten birebir korunuyor); `test_hints` de çıkarıldı (testler spec'ten değil kaynaktan üretiliyor). Plan B'nin bilerek dışarıda bıraktıkları (`memory_policy`, `termination_conditions`, `task_type`) burada da yok. **Derleyicide ya da değerlendiricide kullanılmayan alan spec'te durmaz.**
 
+**Güncelleme (v1.4, taslak).** Tahsilat brief'lerinde değişen boyutlar (Bölüm 2.7) kod düğümüne yapılandırılmış veri olarak gitmeli: iş günü ve tatil takvimi, gecikme bantları ve bant başına son tarih kuralı, tutar tabanı, deneme sayıları, sonuç tablosu (sonuç ve neden kodları → tool'un izinli değerleri). Bunlar `domain_facts` içinde serbest metin olarak kalırsa hesap modele kalır. Ham malzeme brief'inde bir kuralı değiştiren memo için her kural, geçerli olduğu kaynak cümleyi ve varsa geçersiz kıldığı cümleyi alıntılar. Şema eki Brief A ve kit `docs/` (kod düğümü biçimi) okunduktan sonra yazılır; her değer alıntı ve sayı grounding'inden geçer (Bölüm 6.4).
+
+**Güncelleme (v1.5).** Brief A bu yapının ilk örneği (Bölüm 2.8): bir tatil listesi; gecikme gününe göre bir bant tablosu (bant başına son tarih kuralı ve ikna hakkı); ürün türüne göre taban alanı; bir geri arama penceresi (gün ve saat aralığı); deneme sayıları. Gizli brief'te kural biçimi değişebilir ("N. iş günü" yerine "ay sonu" gibi). `calc` kodu sınırlı sayıda kural biçimini destekler; tanımadığı biçim için kod üretmez, tarih gerçeklerini (bugün, hafta günü, sonraki iş günleri) yine kodla verir, kararı modele bırakır ve bunu trace'e yazar. Kimlik soruları da yapılandırılmış alandır: soru listesi, sırası ve deneme hakkı brief'ten, `field` değerleri tool API'nin enum'undan.
+
 ### 6.3 Alan → kullanım
 
 | Alan | Nereye derlenir | Ne işe yarar |
@@ -600,6 +758,8 @@ Ayrı yapı yok; `tool_edges` listesi yeterli. Dört yerde kullanılır: derleyi
 
 Okuma tool'ları için asla onay istenmez. `OVER_CLARIFICATION` ve `FALSE_REFUSAL` etiketleri, `WRITE_WITHOUT_CONFIRMATION` ile aynı ciddiyetle izlenir.
 
+**Güncelleme (v1.4).** Yedi tool adı sabit (Bölüm 2.7). Bölüm 7.1'deki fiil sözlüğü `close_call`'u ("close") geri dönülemez, `add_note`'u ("add") yazma sayar ve ikisinde de müşteriden onay ister; bir not ya da kapanış için müşteriden "evet" beklemek yanlış [ÇIKARIM]. Bu iki tool'da başlangıç değeri `never`, E3 ile sınanır. `create_promise` ve `schedule_callback` için onay kademesi brief'in geri okuma kuralından gelir (pratik vakalar sözü kaydetmeden önce geri okuma ve onay arıyor). v1.5: kit'in `base-agent.json`'u `close_call`'u workflow düzeyinde bir `end_of_call` yaşam döngüsü tool'u yapıyor; o yolda onay sorusu zaten doğmaz (Bölüm 8.4, E15).
+
 ---
 
 ## 8. Derleme
@@ -607,6 +767,22 @@ Okuma tool'ları için asla onay istenmez. `OVER_CLARIFICATION` ve `FALSE_REFUSA
 ### 8.1 Hedef A: evrensel config varsayılanları
 
 Config sıfırdan yazılmaz: `GET /agents/defaults` çıktısı taban alınır, yalnızca aşağıdaki alanlar ezilir. Böylece zorunlu `ttsConfig`, `sttConfig`, `complianceConfig` bölümleri platformun kendi geçerli değerleriyle gelir ve şema değişse bile doğrulama hatası (400 ya da 422) riski düşer.
+
+**Güncelleme (v1.4).** Telefon ajanı bir workflow; aşağıdaki alanların workflow ve adım düzeyindeki karşılığı kit `docs/`'tan okunur, karşılığı olmayan satır uygulanmaz. Taban `GET /agents/defaults` değil, `freya.py`'nin ürettiği workflow ve workspace'teki default workflow'un export'udur. Ajan modeli yazılmaz (`freya.py`'de sabit; Submit: "değiştirmeyin"). Giden aramada ajan açar [ÇIKARIM, toplantı demosu]; default workflow'dan doğrulanır (E4). Ses alanları (`sttConfig`, `ttsConfig`) mod metin olduğu için konu dışı.
+
+**Güncelleme (v1.5).** Kit'e göre tablonun workflow karşılıkları (Bölüm 2.8):
+
+| Alan (yukarıdaki tablo) | Workflow'daki karşılığı |
+| --- | --- |
+| `llmConfig.temperature` (E1) | Yok; `agent_config` gönderilmez. Tutarlılık yapıdan gelir: deterministik geçiş, kod düğümü. Düğüm başına `reasoning_override` (E1') |
+| `llmConfig.maxTokens` | Yok |
+| `firstMessageMode`, `firstMessage` (E4) | Başlangıç düğümünün `on_enter`'ı: sabit cümle (`tts`; `{{var}}` çalışır) ya da `llm`. `base-agent` sabit cümleyle açıyor |
+| `tools[].config.maxRetries` | Yazan tool'da 0, okuyan `pre_actions` çağrısında 2 (çalışan builder) |
+| `tools[].config.timeoutMs` | 10.000–12.000 (`base-agent`, docs) |
+| `guardrailsConfig`, `piiRedactionConfig`, `postConversationAnalysis`, ses alanları | Yok ya da konu dışı |
+| Yeni: extraction `min_confidence` | Her değişkende açıkça; varsayılan 0,95 fazla katı |
+| Yeni: `max_node_turns`, `max_turn_transition` | Varsayılan 10 kullanıcı turu; görüşmenin büyüğünü taşıyan düğümde yükseltilir ve hedef verilir |
+| Yeni: `truncation_strategy` | `keep_all` (varsayılan); gecikme görülürse `keep_recent` denenir (E14) |
 
 | Alan | Platform varsayılanı | Başlangıç değerimiz | Neden | Nasıl kilitlenir |
 | --- | --- | --- | --- | --- |
@@ -641,6 +817,19 @@ Config sıfırdan yazılmaz: `GET /agents/defaults` çıktısı taban alınır, 
 | Tutarlılık | Düşük sıcaklık | `llmConfig.temperature` |
 
 Bu tablonun özeti: Hedef A'da garantilerimiz zayıflar, o yüzden **karar noktası testleri** (Bölüm 9.2) kod kapılarının yerini tutan asıl emniyettir. Kapıyı koyamıyorsak, kapının tutacağı hatayı build anında yakalarız.
+
+**Güncelleme (v1.4).** Workflow'da kod düğümü var ve adımlar arası geçiş koşullu rotalarla yapılıyor (Bölüm 2.7). Tablodaki korumaların bir kısmı böylece gerçekten kodla ve yapıyla tutulabilir: tarih ve tutar doğrulaması (iş günü, tatil, son tarih, taban) kod düğümünde; "önce kimliği doğrula" ayrı bir adım ve kimlik doğrulanmadan açılmayan bir rotayla; ürün başına tek yazma ve deneme sayacı, kod düğümü sayaç tutabiliyorsa orada. Banka API'si brief'i zorlamadığı için bu kapılar ajanın tek emniyeti. Kör bloklama yasağı (Bölüm 4.2) aynen geçerli: kod düğümü bir değeri reddederken modele bir sonraki adımı söyler. Kod düğümünün neyi yapabildiği kit `docs/`'tan okunur.
+
+**Güncelleme (v1.5).** Kit'le korumaların somut karşılıkları (Bölüm 2.8):
+
+- **Yazma kapısı:** onay, yazma tool'unu taşıyan düğüme geçişin koşulu olur ya da yazma tool'u yalnız onaydan sonraki düğümde durur (`commit` şablonu).
+- **Provenance:** `product_id` gibi kimlikler `get_account` sonucundan gelir; post-kanca ya da kodla doldurulur. README'ye göre model kimlik uyduruyor ("unknown product_id").
+- **Çift yazma:** `maxRetries: 0` ve `<tool>_success_count` üzerinde koşul.
+- **Hata sonrası toparlanma:** `<tool>_failure_count` ve post-kancanın `what_to_do_next`'i.
+- **Başlangıç ve bitiş işleri:** yaşam döngüsü tool'ları; `each_turn` çalışmaz.
+- **"Önce kimlik":** ayrı düğüm ve `all_verified` koşulu (`base-agent`).
+- **Döngü ve adım sınırı:** `max_node_turns` ve `max_turn_transition`.
+- **Bağlam temizliği:** `suppress_tool_results`, `truncation_strategy`, post-kancada `header`'ı silmek.
 
 ### 8.3 Prompt derleyicisi
 
@@ -760,6 +949,15 @@ Do only what the customer asked for or what the policy requires. Never make any 
 
 Şablondaki üç temel ses satırı (kısa cümle, tek soru, hecelet ve geri oku) V0'ın parçasıdır ve mod chat değilse her zaman derlenir; yukarıdaki ekler ancak ölçülerek girer.
 
+**Güncelleme (v1.4).** Mod metin: `channel = chat`, ses satırları ve ses ekleri derlenmez. Ama final müşterileri "insan gibi" konuşuyor: sayıyı iki parçada söylüyor ("463…" sonra "51"), kendini düzeltiyor, konu dışına çıkıyor, soru soruyor, tutar ve tarihi kelimeyle söylüyor (Bölüm 2.7). Bunun için E11'e iki aday satır girer: "If the customer gives a number in parts, put the parts together and read the whole value back before using it." ve "Convert amounts and dates said in words to figures and read them back before using them." Brief'in kendi geri okuma kuralı varsa o geçerlidir. v1.5: bu iki satır `run_cases.py --style pieces` ve `--style in_words` ile ölçülür (Bölüm 2.8).
+
+**Güncelleme (v1.5): şablon workflow'a nasıl iner.** Şablonun hedefi workflow'un `system_prompt`'udur. Her düğümde dialogue modelinin prompt'u bununla başlar; ardından düğümün `role_message`'ı ve `## Current Task` başlığı altında `task_message` gelir. Routing ve extraction modelleri bu metni görmez (Bölüm 2.8). Kit'in kuralları derleyiciye dört madde ekler:
+
+1. `task_message` yalnız o adımın işini anlatır; düğüm adı geçmez, rota anlatılmaz. "Usual flow" satırları adımlara bölünür, her adım kendi düğümünün `task_message`'ına girer.
+2. Tool'u olan düğümde tool kuralları uzun referans metinden önce gelir ve "bir kural tool kullan diyorsa tool'u çağır" yazar. Tool'suz düğümde "bu turda tool çağrısı yok" yazar.
+3. Tool açıklaması tetikleyicisiyle emir kipinde yazılır ("CALL it every time …"); benzer bir tool varsa hangisinin kullanılmayacağı da yazılır. Derleyicinin etiketi (`[WRITE · confirm first]` gibi) bunun önüne gelir.
+4. Evrensel iskelete bir satır girer: "After every tool result, speak to the customer or call the next tool. Never end a turn with nothing." Her banka tool'una da `what_to_do_next` post-kancası eklenir. Mesaj başına tek tool çağrısı (çalışan builder böyle yapıyor) E11'e aday satır olur.
+
 **Aday iskelet satırları (E11).** Benchmark hata analizlerinden çıkan, henüz ölçülmemiş satırlar. Şablonda yoklar; önce hepsi birlikte denenir, kazanırsa tek tek çıkarılarak hangisinin işe yaradığına bakılır. Parantezdeki kod, satırın dayandığı bulgudur (Bölüm 17.2 ve 17.3).
 
 - "When the customer has to do something on their side, give one step at a time and wait for the result before the next step." (B5)
@@ -778,13 +976,23 @@ Do only what the customer asked for or what the policy requires. Never make any 
 
 Orta yol: topoloji üretilmez, **seçilir**. Üç sabit, önceden sınanmış şablon; spec'ten deterministik doldurulur.
 
+**Güncelleme (v1.4).** Telefon ajanı zaten bir workflow ve sayfa "kaç adım, hangi rotalar, hangi tool'lar" sorusunu açıkça builder'ın tasarım problemi diye koyuyor; workspace'teki default workflow iki adımlı (kimlik → tahsilat; kimlik doğrulanmadan ikinci adıma geçilmez). A2 bu yüzden stretch değil ana yol: `auth_gate` ve aşağıya eklenen `calc` Day 1'de (T+6–10) E8 ile ölçülür; `commit` ve `router` sonra, ölçülerek. "Workflow API'den kurulabiliyor" koşulu `freya.py` ile sağlandı. Sayfadaki örnek şemada tool'suz bir çıkış adımı ve iki ara adım arasında bir rota da var (Bölüm 2.7).
+
 | Şablon | Yapı | Ne zaman |
 | --- | --- | --- |
 | `auth_gate` | Düğüm 1: yalnız kimlik doğrulama tool'u → Düğüm 2: ana ajan, tüm tool'lar | Politika "önce doğrula" diyorsa ve doğrulama tool'u varsa |
 | `commit` | Ana düğümde geri dönülemez tool yok; onay sonrası geçilen düğümde var | Geri dönülemez tool sayısı az ve onay kuralı net ise |
 | `router` | Giriş düğümü niyeti belirler → niyet başına düğüm, kendi prosedürü ve tool alt kümesiyle | ~12'den fazla tool ya da 4 ve üzeri ayrık prosedür |
+| `calc` (v1.4) | Tarih ve tutar hesabı bir kod düğümünde: iş günü, tatil, bant, son tarih, taban; model sonucu okur ve müşteriye söyler. Kod sabit ve sınanmıştır, girdisi spec'teki yapılandırılmış veridir (Bölüm 6.2) | Brief bir tarih ya da tutar kuralı içeriyorsa (tahsilatta hep) |
 
-- **Giriş koşulu:** workflow API'den kurulabiliyor **ve** V2 zamanında (T+16) bitmiş.
+- **Giriş koşulu:** workflow API'den kurulabiliyor **ve** V2 zamanında (T+16) bitmiş. v1.4: `auth_gate` ve `calc` için geçersiz (yukarıdaki not).
+
+**Güncelleme (v1.5).** Şablonlar kit'le somutlaştı (Bölüm 2.8):
+
+- **`auth_gate`** = `base-agent`'in kimlik düğümü: yalnız `verify_identity`; çıkış `verify_identity_response.data.all_verified` = `"true"` ya da `"True"`.
+- **`calc`** = passthrough bir `code` düğümü. Başlangıçta koşar, gerekirse ürünler geldikten sonra bir kez daha. `now`, tatil listesi ve bant tablosundan tarih gerçeklerini hesaplar ve `{{date_facts}}` olarak prompta koyar; çalışan builder da böyle yapıyor. Chat API ilk adımdaki kod düğümünü atlayabildiği için chat testlerinde bu değişkenler boş görünebilir.
+- **Kapanış** için iki seçenek E15'te ölçülür: (a) `close_call` bir konuşma düğümünde dialogue modelinin tool'u; (b) `base-agent`'teki gibi bir `end_of_call` yaşam döngüsü tool'u, sonucu ve nedeni çağrı içinde deterministik yazılan değişkenlerden alır (değişkenler çözülürse model çağrısı gerekmez).
+- Her yol bir `end_call` düğümüne varır; o düğümün `function.name`'i çağrının `endedReason`'ı olur.
 - **Kabul koşulu:** train ve hold-out'ta tek ajanı gürültü payının üstünde geçmek (E8).
 - **Riskler:** geçişte bağlam kaybı, yanlış yönlendirme, kurulum hatası. Biri görülürse şablon silinir; tek ajan her zaman yedektir.
 
@@ -819,6 +1027,8 @@ Her kapının ret mesajı modele bir sonraki adımı söyler ("Bu bir yazma işl
 ## 9. Doğrulama: ölç, seç, bir kez onar
 
 ### 9.1 TestSpec
+
+**Güncelleme (v1.4).** Kit'teki `public-test-set.json` vaka biçimi (değişkenler, ürünler, müşteri senaryosu, beklenen kayıtlar `outcome`, `reason`, `promises`, `notes`, `callbacks`, `transfers`; serbest metin `checks`; varsa `faults`) tam simülasyonun hedef biçimidir: builder'ın ürettiği senaryolar bu biçimde de yazılır ki `run_cases.py` (kendi vaka dosyamızı kabul ediyorsa) ya da yerel koşucu aynı ölçüyle koşsun. `checks` alanı politika ve dürüstlük kontrolünün dilidir; `grounding` alıntıları oraya taşınır. Kotaya iki tür eklenir: deneme sayısının birebir tutması (fazlası da eksiği de hata) ve doğru sonucu sözsüz bir kayıt olan vakalar (itiraz, zor durum, zaten ödedi; Bölüm 2.7). v1.5: `run_cases.py --cases` kendi dosyamızı kabul ediyor, ama bankada müşteri verisi vaka kimliğine bağlı: üretilen vaka 13 pratik vakadan birinin kimliğini (ürünler, kimlik yanıtları, enjekte hata) kullanır; senaryo, beklenen kayıt ve `checks` bizim (Bölüm 2.8). Vakanın gerçek kimlik yanıtları kit'teki `identity` alanında.
 
 AgentSpec gibi tek bir ara temsil; iki backend'e de derlenir. Bir görev için 8–10 **senaryo** üretilir. Her senaryo bir ya da iki karar noktası içerir; senaryoların bir alt kümesi ayrıca baştan sona simüle edilir (önce iki talepli mutlu yol, sonra bir ihlal senaryosu).
 
@@ -903,6 +1113,14 @@ Freya backend'i için public dokümandan üç pratik not:
 
 Build anında tam simülasyonlar **chat modunda** koşulur: hızlı ve ucuz. Final ses modundaysa `full` profilde bir iki sesli duman testi eklenir.
 
+**Güncelleme (v1.4).** Hackathon'da Freya backend'inin tam simülasyonu kit'in `run_cases.py`'sidir: metin, organizatörün barındırdığı mock banka, ledger + judge. Workspace başına aynı anda bir simülasyon koşar, on vaka 3–11 dakika sürer ve builder'ın 30 dakikası testleri de kapsar (Bölüm 2.7). `POST /unit-tests` ve Chat API hackathon ortamında var mı, kit `docs/`'tan okunur; yoksa karar noktası testleri yerel backend'de, telefon ajanının sabit modeliyle (adı `freya.py`'de; sağlayıcısı bize açıksa) koşulur. Final metin olduğu için sesli duman testi yok.
+
+**Güncelleme (v1.5).** Kit'te unit test API'si yok; kullanılmaz. Ajanın modeli (`experimental-5`) Freya dışında yok, yani yerel backend gerçek modeli koşamaz (Bölüm 2.8). İki aşama şöyle iner:
+
+- **1. aşama, platformda:** chat API. Pratik banka oturumu (`/v1/practice/sessions`) çağrı değişkenlerini verir; önekin kullanıcı mesajları tur tur gönderilir; ajanın tool çağrısı `get_call`'daki `function_call_start` olaylarından, geçişler `route_evaluated`'dan okunur (chat çağrısının detayının da bu yoldan geldiği varsayımıyla). Önekin asistan tarafı enjekte edilemez: önek yalnız kullanıcı mesajlarından oluşur ve ajanın kendi yanıtlarıyla ilerler [ÇIKARIM]. Bu yüzden karar noktası testi deterministik değil; `repeat` yerine aynı önek birkaç kez koşulur.
+- **1. aşama, yerelde:** kod düğümlerinin Python'u örnek `vars` girdileriyle birim testinden geçer (tarih ve tutar hesabının doğruluğu). Workflow JSON'u dry run'dan ve geri okumadan geçer.
+- **2. aşama:** `run_cases.py`, yalnız pratik vaka kimlikleriyle. Gizli brief'te büyük olasılıkla yok (Bölüm 2.8, madde 6).
+
 ### 9.3 Skor
 
 Birim: bir karar noktası testi (tüm tekrarları geçerse 1, yoksa 0) ya da bir tam simülasyon (geçerse 1, yoksa 0). Aşağıda "test" bu birimdir.
@@ -914,6 +1132,8 @@ Test başına skor ikili ve çarpımsaldır: `score = G × S × I`.
 - **I (bilgi):** `must_say` değerleri söylendi; platform backend'inde persona başarı kriteri geçti. `must_say` eşleşmesi rakam/yazı ve ayraç farklarına duyarsız yapılır ("2,000", "2000", "two thousand").
 
 Kısmi kredi yok: hiçbir şey yapmayan ajan "nazikti ve doğru reddetti" puanlarıyla 0,6 alamaz.
+
+**Güncelleme (v1.4).** Sayfadaki üç kontrol bu skorla örtüşüyor (Bölüm 2.7): sonuç (ledger) = S; politika = G'deki politika ihlalleri ve vakanın `checks` listesi; dürüstlük = I'nın "tool başarılı dönmeden kaydedildi deme" kısmı. Finalde vaka 3 koşunun üçünde de geçmeli; karar noktası testlerinde `repeat = 3` ve "tüm tekrarlar geçerse 1" kuralı final ölçüsüyle aynı.
 
 **Hard fail'ler:** yasak ya da istenmemiş yazma; başarılı bir yazmanın tekrarı (çift kayıt); onay gerektiren yazmanın onaysız yapılması; yazma argümanında kullanıcıdan ya da tool çıktısından gelmeyen ID; (kural varsa) kimlik doğrulanmadan hesap bilgisi verilmesi.
 
@@ -973,6 +1193,7 @@ En fazla bir tur (E9b ikinci turu desteklemedikçe); `standard` profilde yalnız
 | Politika | `OVER_CLARIFICATION` | Gereksiz soru ya da onay | Onay kademesi; slot'u opsiyonel yap |
 | Politika | `UNVERIFIED_DISCLOSURE` | Kimlik doğrulanmadan bilgi verildi | Kimlik kuralı (R1); A2 `auth_gate` |
 | Politika | `UNVERIFIED_USER_CLAIM` | Arayanın beyanı tool ile doğrulanabilecekken doğrulanmadan işlem yapıldı | "Tool ile doğrulanabileni doğrula" satırı; ilgili kural dizinde |
+| Politika | `ATTEMPT_COUNT_MISMATCH` (v1.4) | İkna, teklif ya da yeniden sorma sayısı brief'tekinden fazla ya da az | Kural dizininde alıntılı sayı; kod düğümü sayaç tutabiliyorsa sayaç (Bölüm 8.2) |
 | Konuşma | `INFO_NOT_COMMUNICATED`, `WRONG_FINAL_ANSWER`, `IGNORED_TOOL_RESULT` | `must_say` yok; söylenen tool sonucuyla çelişiyor | `must_communicate`; kapanış kuralı |
 | Konuşma | `PREMATURE_TERMINATION` | Görev bitmeden kapandı | `success_conditions`; evrensel kapanış protokolü |
 | Konuşma | `PARTIAL_RESOLUTION` | Birden çok talebin bir kısmı yapıldı, konuşma kapandı | Kapanış bölümü; `success_conditions` |
@@ -980,9 +1201,12 @@ En fazla bir tur (E9b ikinci turu desteklemedikçe); `standard` profilde yalnız
 | Konuşma | `LOOP`, `REDUNDANT_TOOL_CALL`, `TIMEOUT` | Aynı çağrı üç ve üzeri; tur ya da süre sınırı | Evrensel: iskelet, config |
 | Konuşma | `TOOL_ERROR_NOT_RECOVERED` | Hata sonrası yanlış son durum | `tools[].on_error` |
 | Konuşma | `CONTEXT_DRIFT` | Uzun konuşmada erken kural ya da değer unutuldu | Evrensel |
+| Konuşma | `SILENT_TURN` (v1.5) | Tool sonucundan sonra ajan sustu ya da çok bekletti; müşteri kapattı (`endedReason` = `customer-ended-call`) | `what_to_do_next` post-kancası; "boş tur yok" satırı; yavaş koşuysa ölçüm notu (Bölüm 10) |
 | Ses | `VOICE_MISHEARD_VALUE` | İsim, e-posta, numara yanlış anlaşıldı; doğrulama tıkandı | Sesli sertleştirme; `confidenceReask` |
 | Altyapı | `TEST_INVALID` | Test kendi içinde çelişkili ya da şüpheli | Testi at; **ajanı onarma** |
 | Altyapı | `PLATFORM_ERROR` | 4xx, 5xx, zaman aşımı | Adaptör; ajanla ilgisi yok, skora sayma |
+| Altyapı | `ROUTE_NOT_FIRED` (v1.5) | Beklenen geçiş tetiklenmedi; `route_evaluated` dallarında görülür: boolean yazımı, `data.` öneksiz eşleme yolu, hiç yazılmamış değişken | Derleyici: dize bayrak, `data.` yolu, iki yazım (Bölüm 2.8) |
+| Altyapı | `STALE_VERSION` (v1.5) | Simülasyon yayınlanmamış değişikliği değil eski sürümü koştu (`agentVersionNumber`) | `freya.save_workflow`; yayını doğrula; skora sayma |
 
 ---
 
@@ -995,6 +1219,10 @@ Build anı döngüsü sentetik sinyalle sınırlı; gerçek sinyal pratik benchm
 3. En sık üç etiket için **evrensel** bir düzeltme önerilir: iskelet satırı, derleyici kuralı, kitaplık kuralı, lint, config varsayılanı.
 4. Düzeltme eşleştirilmiş karşılaştırmayla ölçülür: aynı görevler, aynı personalar, aynı tekrar sayısı.
 5. Kabul edilirse merge; edilmezse geri alınır ve deney satırı yine de kaydedilir.
+
+**Güncelleme (v1.4).** `make practice` = kit'in `python3 tools/run_cases.py <agent_id> --brief A|B --reps N` komutunun sarmalayıcısı; başlangıç R = 3, çünkü final de vakayı ancak üç koşunun üçü geçerse sayıyor. Workspace başına aynı anda bir simülasyon koşar ve on vaka 3–11 dakika sürer: 13 vaka × 3 tekrar yaklaşık 12–45 dakika. Saatte bir iki tam ölçüm demek; deney kuyruğu (Bölüm 10.2) buna göre seçilir, bazı deneyler vaka alt kümesinde koşar. Build anı testleri de aynı kuyruğu kullanır (Bölüm 12.2). Başarısız koşunun ilk teşhis kaynağı `run_cases.py`'nin bastığı tool çağrısı dizisi ve kalma nedeni.
+
+**Güncelleme (v1.5).** Kit'teki araçlar (Bölüm 2.8): `--only` ile vaka alt kümesi; `--style pieces / corrects / talkative / asks_back / in_words` ile finaldeki "insan gibi" müşteriler (her deney kolu en az bir stil koşusu alır); `--out` ile çağrı kimlikleri, sonra `freya.get_call` ile transkript ve `route_evaluated` olayları; her koşu `results/log.jsonl`'a bir satır. **Yavaş koşu kuralı:** en yavaş ajan turunun medyanı 10 sn'yi aşan koşu işaretlenir ve kararda kullanılmaz; organizatör de böyle bir koşuyu atıp yineliyor (`--rerun-if-slow`).
 
 **Önbellek.** Builder'ın LLM çıktıları (spec'ler, testler) girdi hash'iyle diskte önbelleklenir (Plan B'deki önbellek fikri; bizde `builder/llm/` içinde). İskelet, derleyici ya da config değişikliği ölçülürken spec yeniden sentezlenmez, aynı spec yeniden derlenir; böylece karşılaştırma yalnızca değişen şeyi ölçer. Sentez promptu değiştiğinde önbellek bilinçli olarak temizlenir.
 
@@ -1028,11 +1256,28 @@ Build anı döngüsü sentetik sinyalle sınırlı; gerçek sinyal pratik benchm
 
 Her deney kolu pratik train setinin bir koşusudur (E2 üç kol); E11'in Cuma ayağı ve E12 vekil benchmark'ın train bölmesinde koşar. Sonuç ne olursa olsun bir satır yazılır; "işe yaramadı" da karardır.
 
+**Güncelleme (v1.4).** E6 düştü: ajan modeli sabit. E10 düştü: mod metin; yerini "insan gibi konuşan müşteri" satırları alır ve E11'in içinde ölçülür (Bölüm 8.3). E8 Day 1'e (T+6–10) çekildi; ön koşulu sağlandı ve `calc` şablonunu da kapsar (Bölüm 8.4). E1 yalnız sıcaklık workflow'da ayarlanabiliyorsa. E4: giden aramada ajan açar; önce default workflow'dan okunur. Tek simülasyon kuyruğu yüzünden her deney kolu önce train vakalarının bir alt kümesinde koşar; yalnız kazanan kol tam sette ölçülür.
+
+**Güncelleme (v1.5).** Kit'ten gelen değişiklikler (Bölüm 2.8):
+
+| # | Deney | Soru | Ön koşul | Ne zaman |
+| --- | --- | --- | --- | --- |
+| E1' | Kilit düğümlerde `reasoning_override` `enabled` / `disabled` / `auto` (E1'in yerine; sıcaklık alanı yok) | Tutarlılık ve gecikme | Model destekliyorsa | T+6–10 |
+| E13 | Kit'in ajan tabanlı builder'ı (skill'i bizim kurallarımızla) ile derleyici yolu, aynı vakalarda `--reps 3`, `--style` ve mutasyonlarda | Hangi builder genelleşiyor; derleyici B0'ı geçiyor mu | B0 ve V1 | T+10'dan sonra; gece |
+| E14 | Brief birebir `system_prompt`'ta / yalnız ilgili bölümler düğümlerde; `truncation_strategy` | Skor ve gecikme (E2'nin workflow hali) | V1 | T+6–10 |
+| E15 | Kapanış: konuşma tool'u `close_call` / `end_of_call` yaşam döngüsü tool'u, deterministik sonuç değişkenleriyle (Bölüm 8.4) | Doğru `(outcome, reason)` oranı | V0 | T+6–10 |
+
+E1 düştü. E11'in "insan gibi müşteri" satırları `--style pieces` ve `in_words` ile ölçülür.
+
 ### 10.3 Hata inceleme ritüeli
 
 Her üç saatte bir, ikiniz birlikte 20 dakika: etiket histogramına ve en kötü üç trace'e bakın, bir sonraki evrensel düzeltmeyi seçin. Tek başına trace okumak tünel görüşü üretir; bu 20 dakika hafta sonunun en verimli zamanı olacak.
 
 ### 10.4 Vekil benchmark: platform gelmeden ölçüm
+
+**Güncelleme (v1.4).** Alan ve tool adları artık sabit; gizli brief'ler aynı tür çağrının başka kurallarla yazılmış hali (Bölüm 2.7). Gizli brief'e genellemenin en iyi vekili bu yüzden τ alanları değil, **mutasyon brief'leri**: Brief A ve B'nin kopyaları, Bölüm 2.7'deki boyutlarda değiştirilmiş (başka kimlik soruları, başka bant ve son tarihler, başka tatil takvimi, başka sonuç tablosu, alan adı ya da izinli değeri değişmiş bir tool API dosyası; biri ham malzeme biçiminde, kuralını değiştiren bir memo'yla). Her mutasyona kit biçiminde birkaç vaka yazılır; vakaları builder'ın test üreticisi değil, ikinci bir model ve insan yazar ve onaylar, yoksa test kendi kör noktasını ölçer (Bölüm 17.3, satır 3). `run_cases.py` kendi vaka dosyamızı kabul ediyorsa platformda, etmiyorsa yerel koşucuda koşulur. Mutasyonların bir kısmı hold-out'tur ve yalnız kapılarda okunur (Bölüm 10.1). τ düzeneği yöne ve alana bağlı olmayan değişiklikler için ikinci görüş olarak kalır; Cuma'nın ana işi olma rolü bitti.
+
+**Güncelleme (v1.5): mutasyonun sınırı.** `run_cases.py --cases` kendi dosyamızı kabul ediyor, ama banka oturumu `{"case": <vaka kimliği>}` ile açılıyor: müşteri verisi (ürünler, gecikme günü, kimlik yanıtları, enjekte hata) yalnız 13 pratik vakadan seçilebilir (Bölüm 2.8). Mutasyon vakası bu yüzden bir pratik vakanın kimliğini kullanır; senaryoyu, beklenen kaydı ve `checks`'i mutasyon brief'inin kurallarına göre biz yazarız. Banka brief'i zorlamadığı için tool API'sine dokunmayan kural mutasyonları (son tarih, bant, deneme sayısı, tatil takvimi, taban, geri arama penceresi, zorunlu cümle) böyle ölçülebilir. Tool API'sini değiştiren mutasyonlar (alan adı, enum değeri, yeni kimlik alanı, yeni sonuç adı) pratik bankada koşmaz; onlar yalnız derleme düzeyinde sınanır: dry run, geri okuma, workflow'daki alan ve enum'ların yeni tool API dosyasıyla birebir tutması.
 
 Ajan platformu, erken erişim verilmezse, Day 1'e kadar kapalı; o zamana kadar builder'ı sayıyla ölçmenin tek yolu public benchmark'lar. Day 1'den sonra da vekil benchmark, evrensel bir değişikliğin ikinci bir alanda tutup tutmadığını söyler (Bölüm 10.1'in son kuralı). **Vekil düzenek** = τ^τ deposu + taban koşusu + builder'ı koşucuya bağlayan ajan fabrikası.
 
@@ -1089,7 +1334,7 @@ Adlar ve fiyatlar Bölüm 2.4'te. Üretilen ajanın modeli kararı yayınlanmı�
 | Kullanıcı simülatörü (yerel tam simülasyon; yalnız H3) | Organizatörün persona modeli biliniyorsa o | GPT-6.1 Sol (efor low) ya da Claude Sonnet 5.5 | Sıcaklık ~0,7 | Gerçekçi ama talimata sadık arayan |
 | Tool simülatörü (yerel tam simülasyon, okumalar; yalnız H3) | Claude Haiku 5.5 | GPT-6 Luna | JSON, sıcaklık 0 | Ucuz; fixture'a bağlı |
 | Judge (yerel tam simülasyon; yalnız H3) | Ajan modelinden farklı sağlayıcı | — | İkili soru, alıntı zorunlu | Öz-tercih yanlılığını azaltır |
-| **Üretilen ajan** | E6 deneyinin kazananı | İkinci en iyi | Düşük sıcaklık; efor ölçülerek | Serbestse tek başına en büyük kaldıraç olabilir |
+| **Üretilen ajan** | v1.4: sabit, `freya.py`'de ayarlı Freya modeli; her takım için aynı. v1.5: `experimental-5`, olayın kendi GPU sunucusunda; müşteriyi oynayan ve judge `gemini-3-flash-preview` | — | Model değiştirilmez (Submit); sıcaklık alanı yok, yalnız düğüm başına `reasoning_override` (E1') | İskelet bu modelde ayarlanır; model Freya dışında koşulamaz |
 
 Kurallar:
 
@@ -1123,12 +1368,15 @@ Tek Python paketi, düz modüller, hedef 3.000–4.000 satır. Arayüzler Pydant
 build-the-builder/
 ├── pyproject.toml  uv.lock  Dockerfile  Makefile  README.md
 ├── AGENTS.md  CLAUDE.md  guard.txt   # coding agent brifingi ve kilitli dosya listesi (Bölüm 17.4, 17.5)
-├── docs/                      # plan.md (bu doküman), sources/ (Plan A, Plan B), freya_notes.md (probe çıktısı)
+├── docs/                      # plan.md (bu doküman), sources/ (Plan A, Plan B), freya_notes.md (kit docs/ özeti; v1.4)
+├── submission/                # v1.4: <gizli brief>.workflow.json (freya.export_workflow çıktısı)
+├── traces/                    # v1.4: <gizli brief>.log (build.py çıktısı, tee ile; anahtarsız)
 ├── config/
 │   ├── models.yaml            # rol -> birincil/yedek model, efor, sıcaklık
 │   ├── budgets.yaml           # fast / standard / full
 │   └── agent_defaults.yaml    # Bölüm 8.1'deki evrensel config değerleri
 ├── builder/
+│   ├── build.py               # v1.4: teslim komutu: python3 builder/build.py <brief> <tool_api> (Bölüm 11.4)
 │   ├── cli.py                 # builder build --task task.json --out out/ --budget standard
 │   ├── pipeline.py            # anytime akış, saat, cüzdan, V0
 │   ├── llm/                   # base.py, anthropic.py, openai.py: retry, yedek model, maliyet, disk önbelleği
@@ -1147,13 +1395,17 @@ build-the-builder/
 │   ├── practice_runner.py     # pratik benchmark: koş, etiketle, experiments.csv'ye yaz
 │   ├── experiments.csv
 │   ├── holdout.json
-│   ├── freya_probe.py         # Day 1'in ilk işi (Bölüm 12.1)
+│   ├── mutations/             # v1.4: mutasyon brief'leri, tool API varyantları ve vakaları (Bölüm 10.4)
 │   ├── mock_freya/            # dokümandaki istek ve yanıt şekillerini taklit eden sahte sunucu
 │   └── proxy/                 # vekil düzenek: τ koşucusuna bağlanan ajan fabrikası (Bölüm 10.4)
 └── tests/                     # pytest: normalize, static, lint, compile, select, patch; invariants/, fixtures/ (Bölüm 17.4)
 ```
 
 τ^τ deposu bu deponun dışına klonlanır ve yalnız geliştirme bağımlılığıdır; LLM önbelleği (`.cache/llm/`) ve `out/` git'e girmez.
+
+**Güncelleme (v1.4).** `freya_probe.py` yok: platformu probe etmek yasak (Bölüm 2.7); onun yerine kit'in `docs/`'u okunup `docs/freya_notes.md` yazılır. Kit'in `freya.py`'si (yalnız standart kitaplık) adaptörün tabanıdır: `backends/freya.py` onu sarar, kendi HTTP katmanını baştan yazmaz. `make practice` kit'in `tools/run_cases.py`'sini çağırır. Organizatör builder'ı `python3 builder/build.py` ile koşacağı için bağımlılıklar README'de tek kurulum komutuyla verilir; Docker istenmiyor.
+
+**Güncelleme (v1.5).** Kit'in çalışma dosyaları: `freya.save_workflow` slot → workflow eşlemesini `.freya-agents.json`'da, `run_cases.py` persona kimliklerini `.personas.json`'da, skor geçmişini `results/log.jsonl`'da tutar. İlk ikisi workspace'e özgüdür, commit edilmez (organizatörün yeniden koşusu kendi workspace'inde yeni workflow yaratır). `results/log.jsonl` `dev/experiments.csv`'ye kaynak olur. Kit dosyaları (`freya.py`, `tools/`, `docs/`) depoya değiştirilmeden kopyalanır ve kilitli dosyalar listesine girer (Bölüm 17.5).
 
 | Dosya | Sorumluluk | Sahip | Öncelik |
 | --- | --- | --- | --- |
@@ -1179,32 +1431,35 @@ Plan B'den tek sapma Plan A'dan geliyor: sağlayıcının gizli akıl yürütme 
 
 Bu dokümanın eklediği: **Freya çağrıları aynı depoya çekilir.** Her pratik ve build anı koşusu için çağrı detayından transkript, `assertionResults`, `successCriteriaResult.reason`, `problems`, `turnLatencyStats`, süre ve maliyet alınır; `freya_call_id` ile bağlanır. `experiments.csv` sütunları: commit, config hash, benchmark, alan, bölme (split), görev sayısı, tekrar, skor, σ, ortalama süre, maliyet, ne değişti, öneri, karar. Satırı ölçüm betiği yazar; "karar" sütununu insan doldurur.
 
+**Güncelleme (v1.5).** Kit'te çağrı detayı (`GET /api/v2/call/{id}`) `assertionResults` ya da `problems` değil, mesajlar ve motor olayları taşıyor: `node_enter`, `function_call_start`, `function_call_complete`, `route_evaluated` (her koşulun sonucu ve değişken tablosu), `error` (Bölüm 2.8). Saklanan bunlar; etiketlemenin birinci kaynağı `route_evaluated` ve judge'ın `reason`'ı. `experiments.csv`'ye iki sütun eklenir: stil (`--style`) ve yavaş koşu işareti.
+
 ### 11.4 Komut satırı sözleşmesi
 
-Teslim edilen şey tek komutla çalışan, kimseye soru sormayan bir programdır (Bölüm 2.5). Organizatörün beklediği arayüz Day 1'de öğrenilecek; o zamana kadar varsayılan:
+Teslim edilen şey tek komutla çalışan, kimseye soru sormayan bir programdır (Bölüm 2.5). **v1.4:** Organizatörün beklediği arayüz belli: `python3 builder/build.py {brief_path} {tool_api_path}` (Submit). `build.py`, aşağıdaki `builder build`'in iki konumsal argüman alan ince sarmalayıcısıdır; profil ve süre ortam değişkeninden ya da `config/`'ten gelir.
 
 ```text
+python3 builder/build.py <brief.md> <tool_api.openapi.json>                                                    # teslim komutu (v1.4)
 builder build     --task  <görev dosyası ya da klasörü> --out <klasör> [--budget fast|standard|full] [--deadline <saniye>]
 builder build-all --tasks <klasör>                      --out <klasör> [--budget ...] [--deadline <görev başına saniye>] [--concurrency N]
 ```
 
 | Konu | Sözleşme |
 | --- | --- |
-| Girdi | Görev başına bir dosya ya da klasör; biçim intake'te normalize edilir (Bölüm 7). Hiçbir adım klavyeden girdi beklemez. |
-| Ayar | Anahtarlar ve uç noktalar yalnız ortam değişkeninden: `FREYA_API_KEY`, `FREYA_BASE_URL`, `FREYA_WORKSPACE_ID`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`. Eksik LLM anahtarı hata değildir: tek sağlayıcı modu, o da yoksa V0. |
-| Çıktı | `out/<görev>/agent.json`, `manifest.json`, `trace.jsonl`. Stdout'a JSON satırları: V0 yayınlanınca bir satır, yayındaki config her değiştiğinde bir satır daha (`task_id`, `agent_id`, `winner`, `status`, `fallbacks`). Bir görev için son satır geçerlidir; builder yarıda kesilse bile ilk satır basılmıştır. Loglar stderr'e. |
-| Ajan kimliği | Görev başına tek teslim ajanı; kimliği ilk satırda basılır ve değişmez (Bölüm 5.4). |
+| Girdi | Görev başına bir dosya ya da klasör; biçim intake'te normalize edilir (Bölüm 7). Hiçbir adım klavyeden girdi beklemez. v1.4: brief (`.md`) ve tool API (`.openapi.json`) yolu; ham malzeme brief'i tek dosyada birden çok belge taşıyabilir. v1.5: Brief B, A'nın üstüne kurulu (kit örneği ikisini birlikte veriyor); `build.py` birden çok brief yolu alır, son argüman tool API dosyasıdır. Gizli brief tek dosya. |
+| Ayar | Anahtarlar ve uç noktalar yalnız ortam değişkeninden: `FREYA_API_KEY`, `FREYA_BASE_URL`, `FREYA_WORKSPACE_ID`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`. Eksik LLM anahtarı hata değildir: tek sağlayıcı modu, o da yoksa V0. v1.4: Freya tarafındaki adlar kit'in `env.example`'ından alınır (Freya API anahtarı ve pratik banka için takım anahtarı). v1.5: `FREYA_API_KEY` (`fak_…`), `FREYA_API_URL` (`https://staging-app.freyavoice.ai`), `FREYA_BANK_TEAM_KEY` (16+ karakter, her seferinde aynısı), isteğe bağlı `FREYA_WORKSPACE_ID`; `FREYA_BASE_URL` yerine `FREYA_API_URL` geçer. Organizatörün `FREYA_AGENT_PROVIDER` ve `FREYA_AGENT_MODEL` değişkenlerine dokunulmaz. |
+| Çıktı | `out/<görev>/agent.json`, `manifest.json`, `trace.jsonl`. Stdout'a JSON satırları: V0 yayınlanınca bir satır, yayındaki config her değiştiğinde bir satır daha (`task_id`, `agent_id`, `winner`, `status`, `fallbacks`). Bir görev için son satır geçerlidir; builder yarıda kesilse bile ilk satır basılmıştır. Loglar stderr'e. v1.4: stdout ve stderr birlikte `tee` ile trace dosyasına gider; trace sayfanın istediklerini insan okunur biçimde içerir: başlangıç ve bitiş saati; her model çağrısı için model adı ve tek satırlık amaç; Freya'da yaratılan workflow kimliği, ajan kimliği, adım ve tool sayısı; builder'ın kendi ajanında koştuğu her test ve sonucu. Anahtar basılmaz. Son adım `freya.export_workflow` ile `submission/<brief adı>.workflow.json`. v1.5: export dosyası `{workflow_id, agent_id, updated_at, workflow}` biçiminde; trace'e her kaydın `versionNumber`'ı ve dry run sonucu da yazılır. |
+| Ajan kimliği | Görev başına tek teslim ajanı; kimliği ilk satırda basılır ve değişmez (Bölüm 5.4). v1.4: brief başına tek teslim workflow'u; workflow ve ajan kimliği ilk satırda. |
 | `status` | `v0` (yalnız V0 yayında), `selected` (bir aday seçimle yayında), `fallback` (hata yüzünden V0'da kalındı), `disk_only` (Freya'ya yazılamadı). |
 | Çıkış kodu | `build`: yayında geçerli bir ajan varsa 0 (V0 dahil); yoksa sıfırdan farklı. `build-all`: her görevde ajan varsa 0; görev bazındaki durum satırlardadır. |
-| Yeniden çalıştırma | Aynı görev ikinci kez verilirse yeni adla yeni teslim ajanı yayınlanır, eskisine dokunulmaz. LLM önbelleği aynı girdide aynı spec'i döndürür. |
-| Süre | `--deadline` ya da profil; sürenin %80'i dolduğunda yeni iş başlamaz (Bölüm 5.4). |
+| Yeniden çalıştırma | v1.4: aynı brief ikinci kez verilirse aynı workflow yerinde güncellenir; workspace'te en çok 10 workflow var (Bölüm 5.4). LLM önbelleği aynı girdide aynı spec'i döndürür; önbellek commit edilmez. |
+| Süre | `--deadline` ya da profil; sürenin %80'i dolduğunda yeni iş başlamaz (Bölüm 5.4). v1.4: brief başına 30 dakika sert sınır, varsayılan 25 dakika; build süresi ikinci eşitlik bozucu. |
 | Makefile | `make test` (birim testleri ve değişmezler; ağsız) · `make smoke` (her sağlayıcıya birer gerçek çağrı) · `make proxy` (Bölüm 10.4) · `make practice` (Bölüm 10) · `make guard` (kilitli dosyalar, Bölüm 17.5). |
 
 ---
 
 ## 12. Zaman planı
 
-Tablolar görelidir; saat karşılıkları 10 Ekim e-postasından (Bölüm 2.6). **T** = kuralların açıklandığı an = 10 Ekim Cumartesi 13:00 (İstanbul), **D** = teslim saati = 11 Ekim Pazar 23:00; challenge sayfası daha erken bir teslim saati verirse D ona çekilir. Toplam 34 saat. **M1** = builder beyni, **M2** = platform + ölçüm.
+Tablolar görelidir; saat karşılıkları 10 Ekim e-postasından (Bölüm 2.6) ve challenge sayfasından (Bölüm 2.7; gizli brief'ler D−3 = Pazar 20:00). **T** = kuralların açıklandığı an = 10 Ekim Cumartesi 13:00 (İstanbul), **D** = teslim saati = 11 Ekim Pazar 23:00; challenge sayfası daha erken bir teslim saati verirse D ona çekilir. Toplam 34 saat. **M1** = builder beyni, **M2** = platform + ölçüm.
 
 ### 12.1 Bu gece ve Cuma (8–9 Ekim)
 
@@ -1232,7 +1487,7 @@ Gün yetmezse öncelik sırası: vekil düzenek, Freya adaptörü, karar noktas�
 
 Erişim Cuma günü gelirse M2 öğleden sonrayı platforma ayırır: `freya_probe.py`, ardından Bölüm 8.2'deki † alanlarının tek tek denenmesi ve tek sayfalık **"Freya notları"** (`docs/freya_notes.md`).
 
-**`freya_probe.py` Day 1'in ilk işi.** Script bir workspace anahtarıyla çalıştığında varsayılan config'i, kabul edilen `handler` biçimini, tool config alanlarını, unit test ve simülasyon yanıtlarını on dakikada döker. T+0'da M2 onu çalıştırır; elle keşifle geçecek bir saat böyle kazanılır.
+**`freya_probe.py` Day 1'in ilk işi.** Script bir workspace anahtarıyla çalıştığında varsayılan config'i, kabul edilen `handler` biçimini, tool config alanlarını, unit test ve simülasyon yanıtlarını on dakikada döker. T+0'da M2 onu çalıştırır; elle keşifle geçecek bir saat böyle kazanılır. **v1.4: iptal.** Kurallar platformu probe etmeyi ve yük testini yasaklıyor (Bölüm 2.7). Aynı bilgi kit'in `docs/` klasöründen (workflow biçimi, tool ve kod düğümleri, API çağrıları) ve workspace'teki default workflow'un export'undan okunur; `docs/freya_notes.md` buradan yazılır. Platform yalnız `freya.py` ve `run_cases.py` ile, dokümandaki gibi kullanılır.
 
 **Önceden yazılmış kod kuralı.** Cuma sabahına kadar cevap gelmezse Cuma tablosundaki her şeyi yine de yazın, ama bu gece açtığınız hazırlık deposunda. Teslim deposu Day 1'de kurallar okununca açılır ve izin verilen kod oraya taşınır. Kural "yasak" çıkarsa aynı kod bu dokümandan birkaç saatte yeniden yazılır ve öğrendikleriniz sizde kalır. τ^τ deposu üçüncü taraf açık kaynak bir ölçüm aracıdır; teslim edilen kodun parçası değildir.
 
@@ -1242,78 +1497,88 @@ Saat karşılıkları (İstanbul): T+0 = Cumartesi 13:00 · T+1 = 14:00 · T+3 =
 
 | Blok | M1 (builder beyni) | M2 (platform + ölçüm) | Çıktı | Geçiş kriteri |
 | --- | --- | --- | --- | --- |
-| T+0–1 | Challenge sayfasını (kurallar) ve starter kit'i oku; Bölüm 13'teki soruları yanıtla, yanıtı olmayanı chat'te sor; karar ağacını işaretle | Chat'teki adımlarla Freya hesabını aç, anahtarı al; `freya_probe.py`'yi çalıştır; bir pratik görevi elle uçtan uca koş | Kurallar özeti; hedef ve backend kararı | Artifact biçimi ve puanlama biliniyor |
-| T+1–3 | **B0:** görev metni + tool'lar → naif prompt → yayın | `practice_runner`: tüm pratik görevler, 2 tekrar, sonuç CSV; hold-out ayır | **B0 skoru** | `make practice` tek komutla skor basıyor |
+| T+0–1 | Challenge sayfasını (kurallar) ve starter kit'i oku; Bölüm 13'teki soruları yanıtla, yanıtı olmayanı chat'te sor; karar ağacını işaretle. v1.4: sayfa okundu (Bölüm 2.7); kit'in `README.md`'si, `docs/`'u ve iki brief okunur | Chat'teki adımlarla Freya hesabını aç, anahtarı al; `freya_probe.py`'yi çalıştır; bir pratik görevi elle uçtan uca koş. v1.4: kit'i indir, `.env` (e-postadaki Freya anahtarı + kendi takım anahtarımız); örnek builder'ı koş, `run_cases.py`'yi bir kez koş; default workflow'u export edip incele; probe yok. v1.5: önce `examples/base-agent.json`'u `save_workflow` ile kaydedip koş (kit'e göre bir koşuda 2/13), bir chat turuyla başladığını gör | Kurallar özeti; hedef ve backend kararı | Artifact biçimi ve puanlama biliniyor |
+| T+1–3 | **B0:** görev metni + tool'lar → naif prompt → yayın. v1.4: B0 = kit'in örnek builder'ı (kit v3: `examples/agent_builder.py` + skill), bizim `build.py` ve trace'imizle sarılı | `practice_runner`: tüm pratik görevler, 2 tekrar, sonuç CSV; hold-out ayır. v1.4: `run_cases.py` sarmalayıcısı, `--reps 3` | **B0 skoru** | `make practice` tek komutla skor basıyor |
 | T+3–6 | **V0:** intake, statik tool analizi, dil tespiti; iskelet + birebir politika + tool kartları + config varsayılanları | Tracer ve görüntüleyici; B0 hatalarını etiketle; taban çizgisini iki kez koş (σ); E1, E4 | **V0 skoru** | V0, B0'dan kötü değil (train ve hold-out); hiçbir görevde çökme yok |
-| T+6–10 | **V1:** AgentSpec sentezi, lint ve grounding, katman derleyicisi | E3, E5, E11'in "hepsi birlikte" kolu (mod ses ise E10); blok sonunda E2; 15–20 koşuyu elle etiketle; en sık üç etiket için evrensel düzeltme | **V1 kararı** | E2 katmanı gürültü kuralına göre kabul etti ya da reddetti; hold-out okundu |
+| T+6–10 | **V1:** AgentSpec sentezi, lint ve grounding, katman derleyicisi. v1.4: tarih ve tutar kuralları için yapılandırılmış alanlar ve `calc` kod düğümü; `auth_gate` | E3, E5, E11'in "hepsi birlikte" kolu (mod ses ise E10); blok sonunda E2; 15–20 koşuyu elle etiketle; en sık üç etiket için evrensel düzeltme. v1.4: E8 (`auth_gate`, `calc`); ilk mutasyon brief'leri (Bölüm 10.4). v1.5: E1', E14, E15 | **V1 kararı** | E2 katmanı gürültü kuralına göre kabul etti ya da reddetti; hold-out okundu |
 | T+10–14 | TestSpec üretimi ve onayı; seçim | Test backend'i; deterministik değerlendirici; bütçe ve saat | Build anı seçim hattı | Hat bir pratik görevde uçtan uca çalışıyor |
-| T+14–16 | Tek tur onarım + kabul testi | E9a (arka planda vekil düzenekte E12); Docker, kilit dosyası, temiz klondan çalıştırma, tek sağlayıcı modu | **V2 (rekabetçi sürüm)** | E9a sonucu var; hold-out okundu; tüm pratik görevler bütçe içinde build oluyor |
+| T+14–16 | Tek tur onarım + kabul testi | E9a (arka planda vekil düzenekte E12); Docker, kilit dosyası, temiz klondan çalıştırma, tek sağlayıcı modu. v1.4: Docker yerine temiz klonda `run_command`, trace içeriği (Bölüm 11.4), export | **V2 (rekabetçi sürüm)** | E9a sonucu var; hold-out okundu; tüm pratik görevler bütçe içinde build oluyor |
+
+**v1.4: tek simülasyon kuyruğu.** Workspace'te aynı anda tek simülasyon koşar (Bölüm 2.7). M1'in build anı testleri ile M2'nin pratik ölçümü aynı kuyruğu paylaşır; kuyruğu M2 yönetir, M1 build anı testlerini geliştirirken küçük vaka alt kümeleri kullanır ya da yerel backend'de çalışır.
 
 Her üç saatte 20 dakikalık hata incelemesi (Bölüm 10.3) bu tablonun üstüne biner. Cuma günü yazılan kod kullanılabiliyorsa T+3–10 blokları sıfırdan yazmak yerine "Freya'ya bağla ve ölç" işine dönüşür; kazanılan süre offline döngüye gider.
 
 ### 12.3 Gece
 
-M2 yatmadan önce kuyruğu başlatır: E6, E7, E9b ve taban çizgisinin tekrar koşuları. **İkiniz de en az 5 saat uyuyun.** Uykusuz yazılan kod Day 2'de hata ayıklama süresi olarak geri ödenir; kuyruk sizin yerinize çalışır.
+M2 yatmadan önce kuyruğu başlatır: E6, E7, E9b ve taban çizgisinin tekrar koşuları. v1.4: E6 düştü (model sabit); kuyruk = E7, E9b, taban tekrarları (`--reps 3`) ve mutasyon brief'leri. Simülasyon kuyruğu tek olduğu için gece en verimli ölçüm zamanı. **İkiniz de en az 5 saat uyuyun.** Uykusuz yazılan kod Day 2'de hata ayıklama süresi olarak geri ödenir; kuyruk sizin yerinize çalışır.
 
 Saat karşılığı: T+16 Pazar 05:00'e, D−9 Pazar 14:00'e denk geliyor; gece kuyruğu ve uyku aradaki dokuz saate sığar.
 
 ### 12.4 Day 2 (11 Ekim)
 
-Saat karşılıkları (İstanbul, Pazar): D−9 = 14:00 · D−7 = 16:00 · D−5 = 18:00 · D−4 = 19:00 (kod dondurma) · D−2 = 21:00 · D−1 = 22:00 · D = 23:00.
+Saat karşılıkları (İstanbul, Pazar): D−9 = 14:00 · D−7 = 16:00 · D−5 = 18:00 · D−4 = 19:00 (kod dondurma) · D−3 = 20:00 (gizli brief'ler) · D−2 = 21:00 · D−1 = 22:00 · D = 23:00.
+
+**v1.4:** Tablo gizli brief penceresine göre yeniden kuruldu (Bölüm 2.7). Tekrar üretilebilirlik provası ve teslim iskeleti dondurmadan önceye alındı; D−3 … D yalnız builder'ı koşmak, hata düzeltmek ve teslim etmek içindir.
 
 | Blok | M1 | M2 | Çıktı | Geçiş kriteri |
 | --- | --- | --- | --- | --- |
-| D−9 … D−7 | Gece sonuçları; kalan en sık hata için evrensel düzeltme | Config'i veriyle kilitle: model, profil, onarım turu; hold-out'u oku | Kilitli config | Her seçim bir deney satırına dayanıyor |
-| D−7 … D−5 | Veri destekliyorsa P3: A2 şablonu (E8) | Dayanıklılık: garip girdilerle fuzz (boş açıklama, 30 tool, sıfır tool, iç içe `$ref`, bozuk tool çıktısı), 429, zaman aşımı, yedek sağlayıcı, anahtarsız çalışma | Sertleştirilmiş builder | Fuzz setinde sıfır çökme; her girdide geçerli ajan |
-| D−5 … D−4 | Yalnız ölçülmüş son değişiklikler | Tam pratik + hold-out final koşusu | Final aday | Skor ≥ en iyi bilinen − σ |
+| D−9 … D−7 | Gece sonuçları; kalan en sık hata için evrensel düzeltme | Config'i veriyle kilitle: model, profil, onarım turu, workflow şablonu; hold-out'u oku | Kilitli config | Her seçim bir deney satırına dayanıyor |
+| D−7 … D−5 | Veri destekliyorsa P3: `commit` ya da `router` şablonu (E8) | Dayanıklılık, yalnız yerelde ve sahte sunucuya karşı: garip brief ve tool API girdileriyle fuzz (boş açıklama, bilinmeyen alan, değişmiş enum, biçimi farklı tablo, memo'lu ham malzeme brief'i, iç içe `$ref`, bozuk tool çıktısı), 429, zaman aşımı, yedek sağlayıcı, anahtarsız çalışma. Platformda yük testi yok | Sertleştirilmiş builder | Fuzz setinde sıfır çökme; her girdide geçerli ajan |
+| D−5 … D−4 | Yalnız ölçülmüş son değişiklikler. README'yi temiz klonda adım adım izle: Brief A ve B'de `run_command`, brief başına 25 dakikanın altında, export ve trace tamam | Tam pratik + hold-out + mutasyon final koşusu (`--reps 3`); teslim iskeleti: `submission/`, `traces/`, form JSON'u | Final aday; tekrar üretilebilirlik kanıtı | Skor ≥ en iyi bilinen − σ; temiz klonda iki brief sıfırdan build oldu |
 | **D−4** | **Kod dondurma** | **Kod dondurma** | Etiketli commit | — |
-| D−4 … D−2 | README'yi temiz makinede adım adım izle | En iyi bilinen sürümle karşılaştır; regresyon varsa geri dön | Tekrar üretilebilirlik kanıtı | Başka makinede 2 görev sıfırdan build oldu |
-| D−2 … D−1 | Teslim paketi: commit SHA, bağımlılıklar, tek komut, ortam değişkeni şablonu | Teslim formu; organizatörle teyit | **Teslim** | Organizatör onayı |
-| D−1 … D | Tampon | Organizatör builder'ı canlı çalıştırıyorsa log izle | — | — |
+| D−4 … D−3 | Tampon; gizli brief'ler için komut satırları hazır | Workspace'te yer (en çok 10 workflow); destek kanalını izle | — | — |
+| D−3 … D−1 | Gizli brief'ler geldi: sırayla her birinde `python3 builder/build.py <brief> <tool_api> 2>&1 \| tee traces/hidden-N.log`. Çökerse yalnız genel hata düzeltmesi (gizli brief'ten kural, değer ya da ad yok), commit, yeniden koş | `freya.export_workflow` → `submission/hidden-N.workflow.json`; trace ve export'ta anahtar taraması; düzeltme diff'ini ikinci kişi okur; commit | İki workflow dosyası, iki trace, commit SHA | İkisi de commit'te; trace'ler sayfanın istediklerini içeriyor (Bölüm 11.4) |
+| D−1 … D | Tampon | Teslim formu (team, repo, commit, run_command, workflows, traces) kit e-postasındaki adrese, 23:00'ten önce | **Teslim** | Form gönderildi |
 
-Dondurmadan sonra Plan A'nın yasak cümleleri geçerli: "GEPA'yı da ekleyelim", "LangGraph denesek?", "bir aday daha".
+Dondurmadan sonra Plan A'nın yasak cümleleri geçerli: "GEPA'yı da ekleyelim", "LangGraph denesek?", "bir aday daha". D−3'ten sonra bir tane daha: "yeni brief'e göre şunu ekleyelim"; bu artık kural ihlali.
 
 ### 12.5 MVP merdiveni ve durdurma kriterleri
 
 | Basamak | Ne zaman | İçerik | Öncelik |
 | --- | --- | --- | --- |
-| B0 | T+3 | Naif prompt uçtan uca; pratik benchmark tek komut | P0 |
-| V0 | T+6 | Intake + statik analiz; iskelet + birebir politika + statik tool kartları + config varsayılanları | P0 |
-| V1 | T+10 | AgentSpec katmanı + lint ve grounding | P1 |
-| V2 | T+16 | Build anı doğrulama + seçim + tek onarım; Docker; bütçe | P2 |
+| B0 | T+3 | Naif prompt uçtan uca; pratik benchmark tek komut. v1.4: kit'in örnek builder'ı (kit v3: `examples/agent_builder.py` + `.claude/skills/build-phone-agent`; README'ye göre Brief A'da tek koşuda 10/10) bizim `build.py` ve trace'imizle; `run_cases.py`. Taban güçlü; sonraki basamaklar ona karşı `--reps 3`'te ve mutasyon brief'lerinde ölçülür | P0 |
+| V0 | T+6 | Intake + statik analiz; iskelet + birebir politika + statik tool kartları + config varsayılanları. v1.5: workflow biçiminde V0, `base-agent` kalıbının LLM'siz genelleştirmesi: brief birebir `system_prompt`'ta; yedi tool OpenAPI'den (alanlar, enum'lar, banka URL'si); kimlik kapısı deterministik geçişle; her banka tool'unda `what_to_do_next` post-kancası; `now`'dan genel tarih gerçekleri (bugün, hafta günü, sonraki hafta içi günler); kapanış E15'e göre | P0 |
+| V1 | T+10 | AgentSpec katmanı + lint ve grounding. v1.4: `auth_gate` ve `calc` (E8) | P1 |
+| V2 | T+16 | Build anı doğrulama + seçim + tek onarım; Docker; bütçe. v1.4: Docker yerine temiz klonda `run_command`; 30 dakika içinde. v1.5: gizli brief'te build anı denetimi dry run, geri okuma, kod düğümü birim testi ve statik kural kapsamından ibaret olabilir (tool API pratik bankayla uyumluysa artı chat duman turu); adaylar arası seçim ağırlıkla offline ölçümle verilir (Bölüm 2.8, madde 6) | P2 |
 | Stretch | Day 2 | A2 şablonu, guardrail regex, iskelet için GEPA-lite, üçüncü sağlayıcı | P3, yalnız veriyle |
 
 - **T+3'te B0 yoksa** başka her şey durur; ikiniz de entegrasyona bakarsınız.
 - **E2 katmanı kabul etmezse** (T+10) katman kapatılır, yalnız tool kartı zenginleştirmesi kalır (E5 onu kabul ettiyse) ve emek iskelet ile config'e gider. V0 ile teslim etmek utanılacak bir sonuç değil; τ-bench'in kendi taban ajanı da bundan ibaret.
-- **E9a seçimin kazandırdığını göstermezse** (T+16) tam simülasyonlar kapatılır; E12 de aynı yönü gösteriyorsa karar kesindir. Karar noktası testleri ucuz bir emniyet kapısı olarak kalır: hard fail'i V0'dan fazla olan aday yayınlanmaz. Emek offline döngüye gider.
+- **E9a seçimin kazandırdığını göstermezse** (T+16) tam simülasyonlar kapatılır; E12 de aynı yönü gösteriyorsa karar kesindir. Karar noktası testleri ucuz bir emniyet kapısı olarak kalır: hard fail'i V0'dan fazla olan aday yayınlanmaz. Emek offline döngüye gider. v1.4: seçim kapansa bile builder ucuz bir öz denetim koşar (lint + birkaç vaka) ve sonucunu trace'e yazar; sayfa trace'te testleri istiyor (Bölüm 2.7, madde 8).
 - **D−5'ten sonra** yeni özelliğe başlanmaz; finale yalnız ölçülmüş olanlar girer.
 
 ---
 
 ## 13. Day 1, Saat 0: sorulacak sorular
 
-İki planın soru listeleri birleştirildi ve Freya'ya özgü olanlar eklendi. 10 Ekim e-postası 1., 8. ve 9. soruları kısmen yanıtladı (çıktı Freya'da bir telefon ajanı; skor doğru ele alınan vakaların oranı; "telefon" ve giden arama) ve 17–18. soruları doğurdu (Bölüm 2.6). Yanıtlar 13:00'te challenge sayfasından okunur; orada olmayan chat'te sorulur.
+İki planın soru listeleri birleştirildi ve Freya'ya özgü olanlar eklendi. 10 Ekim e-postası 1., 8. ve 9. soruları kısmen yanıtladı (çıktı Freya'da bir telefon ajanı; skor doğru ele alınan vakaların oranı; "telefon" ve giden arama) ve 17–18. soruları doğurdu (Bölüm 2.6). Yanıtlar 13:00'te challenge sayfasından okunur; orada olmayan chat'te sorulur. v1.4: challenge sayfası ve kickoff toplantısı soruların çoğunu yanıtladı; yanıtlar son sütunda (kaynak Bölüm 2.7). "Kit" diye işaretlenenler kit'in `README.md` ve `docs/`'undan okunur, orada da yoksa destek kanalında sorulur. 19–22 yeni. v1.5: kit 7, 9, 11, 13, 16 ve 20'yi yanıtladı; 23–24 yeni (Bölüm 2.8).
 
-| # | Soru | Yanıta göre ne değişir |
-| --- | --- | --- |
-| 1 | Üretilen ajan tam olarak nedir: Freya ajanı mı (ID mi döndürüyoruz, config JSON mu), workflow mu, kod mu? | Hedef A ya da B; çıktı sözleşmesi |
-| 2 | Builder'ı kim, nerede çalıştırıyor? LLM anahtarları kimin? Ağ erişimi var mı? | Tek sağlayıcı modu; V0'ın önemi |
-| 3 | Görev başına süre, maliyet ve kredi sınırı nedir? | Bütçe profili |
-| 4 | Görev paketinin biçimi: metin, tool tanımları (Freya `tools[]` biçiminde mi), doküman var mı, hangi dilde? | Intake; dil; uzun kaynak yolu |
-| 5 | Tool'lar build anında çağrılabiliyor mu? Durum koşular arasında sıfırlanıyor mu? | Gerçek tool'la test ya da mock |
-| 6 | Tool açıklamasını ve tool config'ini değiştirebilir miyiz? Tool çıkarabilir miyiz? | E5; `excluded`; Bölüm 8.2 |
-| 7 | Ajanın modeli serbest mi? Simülasyonda sabitlenecek mi? Sıcaklık ve efor ayarlanabiliyor mu? | E1, E6; iskeletin ayarlanacağı model |
-| 8 | Bir koşu ne zaman "geçti" sayılıyor: persona başarı kriteri mi, assertion'lar mı, backend'in son durumu mu? `inconclusive` nasıl sayılıyor? | Hard fail tanımları; okunaklılık kuralları |
-| 9 | Mod voice mi chat mi? Persona modeli hangisi? Çağrı süresi sınırı? İlk kim konuşuyor? | Sesli sertleştirme; E4, E7 |
-| 10 | Persona başına kaç koşu; skor koşuların ortalaması mı, hepsinin geçmesi mi? Tie-breaker'lar neler (gecikme, süre, maliyet)? | Tutarlılık yatırımı; ikincil metrikler |
-| 11 | Workflow ya da çok düğümlü ajan kurmaya izin var mı; API'den kurulabiliyor mu? | A2 deneyi |
-| 12 | Bilgi bankası kullanılabiliyor mu; programatik yükleme var mı? | Uzun kaynak yolu |
-| 13 | Build anında kendi simülasyon ve unit test koşularımız serbest mi; kredi ve rate limit? | Test backend'i |
-| 14 | Önceden yazılmış genel kod ve açık kaynak kütüphaneler serbest mi? Teslim biçimi: repo + Docker mı, tek komut arayüzü ne olmalı? | Paketleme |
-| 15 | Üretilen ajan için konuşma başına maliyet, gecikme ya da süre sınırı var mı; aşım nasıl cezalandırılıyor? | Ajan bütçe kapısı (Bölüm 9.4); model ve efor seçimi |
-| 16 | Oluşturulan ajan hemen yayında mı; güncelleme taslak sürüm mü üretiyor, ayrı bir yayınlama adımı var mı; simülasyon hangi sürümü değerlendiriyor; ajan sayısı sınırı var mı? | Teslim ajanının kimliği ve yayınlama adımı (Bölüm 5.4); aday ajanların temizliği |
-| 17 | Kaç brief var? Final değerlendirme starter kit'teki brief'le mi, görülmemiş brief'lerle mi yapılıyor? Kaç vaka var? | Hold-out'un birimi (brief ya da vaka); genelleme yatırımı (Bölüm 2.6) |
-| 18 | Aranan müşterinin verisi (kim, ne kadar borç, kaç gün gecikme) ajana nasıl geliyor: tool ile mi, vaka başına değişkenle mi? Telefonu müşteriden başkası açabiliyor mu? | Tool kartları ve `arg_sources`; kimlik teyidi sırası |
+| # | Soru | Yanıta göre ne değişir | Yanıt (v1.4) |
+| --- | --- | --- | --- |
+| 1 | Üretilen ajan tam olarak nedir: Freya ajanı mı (ID mi döndürüyoruz, config JSON mu), workflow mu, kod mu? | Hedef A ya da B; çıktı sözleşmesi | Freya workflow'u; `freya.export_workflow` dosyası commit edilir ve o puanlanır. |
+| 2 | Builder'ı kim, nerede çalıştırıyor? LLM anahtarları kimin? Ağ erişimi var mı? | Tek sağlayıcı modu; V0'ın önemi | Biz çalıştırırız; ilk onda organizatör yeniden çalıştırır. Builder'ın model maliyeti bizim. Yeniden koşudaki anahtarlar: soru 19. |
+| 3 | Görev başına süre, maliyet ve kredi sınırı nedir? | Bütçe profili | Brief başına 30 dakika, kendi testleri dahil; workspace'te aynı anda tek simülasyon; on vaka 3–11 dakika. |
+| 4 | Görev paketinin biçimi: metin, tool tanımları (Freya `tools[]` biçiminde mi), doküman var mı, hangi dilde? | Intake; dil; uzun kaynak yolu | Brief `.md` + tool API `.openapi.json`; aramalar İngilizce; gizli brief'lerden biri ham malzeme (e-posta, politika alıntısı, onu değiştiren memo, kod listesi). |
+| 5 | Tool'lar build anında çağrılabiliyor mu? Durum koşular arasında sıfırlanıyor mu? | Gerçek tool'la test ya da mock | Tool'lar organizatörün barındırdığı mock bankada; pratik oturumları takım anahtarına bağlı. Gizli brief için kendi vakamızı koşabilir miyiz: soru 20. |
+| 6 | Tool açıklamasını ve tool config'ini değiştirebilir miyiz? Tool çıkarabilir miyiz? | E5; `excluded`; Bölüm 8.2 | Workflow'u ve adımlara verilen tool'ları builder kurar; ayrıntı kit. Ajan kit'teki tool API'si dışında hiçbir servisi çağıramaz. |
+| 7 | Ajanın modeli serbest mi? Simülasyonda sabitlenecek mi? Sıcaklık ve efor ayarlanabiliyor mu? | E1, E6; iskeletin ayarlanacağı model | Sabit: `experimental-5` (`freya.py`), herkes için aynı, değiştirilmez. Sıcaklık alanı yok; düğüm başına yalnız `reasoning_override` (v1.5). |
+| 8 | Bir koşu ne zaman "geçti" sayılıyor: persona başarı kriteri mi, assertion'lar mı, backend'in son durumu mu? `inconclusive` nasıl sayılıyor? | Hard fail tanımları; okunaklılık kuralları | Sonuç (ledger) ∧ politika ∧ dürüstlük; son ikisi judge modelle, vakanın kontrol listesine karşı; kısmi kredi yok. `inconclusive` sayfada geçmiyor. |
+| 9 | Mod voice mi chat mi? Persona modeli hangisi? Çağrı süresi sınırı? İlk kim konuşuyor? | Sesli sertleştirme; E4, E7 | Metin (soru 21). v1.5: müşteriyi oynayan ve judge `gemini-3-flash-preview`; pratik simülasyonda çağrı sınırı 420 sn. Ajan açar: `base-agent`'in başlangıç düğümü sabit bir cümleyle açıyor. |
+| 10 | Persona başına kaç koşu; skor koşuların ortalaması mı, hepsinin geçmesi mi? Tie-breaker'lar neler (gecikme, süre, maliyet)? | Tutarlılık yatırımı; ikincil metrikler | Vaka başına 3 koşu, üçü de geçmeli. Eşitlikte: geçen vakalardaki toplam söz tutarı, toplam build süresi, teslim saati. |
+| 11 | Workflow ya da çok düğümlü ajan kurmaya izin var mı; API'den kurulabiliyor mu? | A2 deneyi | Evet: telefon ajanı zaten workflow; `freya.py` yaratır ve günceller. v1.5: kod düğümü `vars`'a dize bayrak yazar, geçiş onu `equals` ile okur (Bölüm 2.8). |
+| 12 | Bilgi bankası kullanılabiliyor mu; programatik yükleme var mı? | Uzun kaynak yolu | Sayfada geçmiyor; brief prompta ve adımlara girer. |
+| 13 | Build anında kendi simülasyon ve unit test koşularımız serbest mi; kredi ve rate limit? | Test backend'i | `run_cases.py` serbest, aynı anda tek simülasyon; platformu probe etmek ve yük testi yasak. v1.5: unit test API'si kit'te yok; tek tur koşan chat API var. |
+| 14 | Önceden yazılmış genel kod ve açık kaynak kütüphaneler serbest mi? Teslim biçimi: repo + Docker mı, tek komut arayüzü ne olmalı? | Paketleme | Sayfada yasak yok; builder için her model ve coding agent serbest. Teslim: repo, commit, `run_command`, workflow dosyaları, trace'ler; Docker istenmiyor. |
+| 15 | Üretilen ajan için konuşma başına maliyet, gecikme ya da süre sınırı var mı; aşım nasıl cezalandırılıyor? | Ajan bütçe kapısı (Bölüm 9.4); model ve efor seçimi | Sayfada yok; sınır builder'da (30 dakika). |
+| 16 | Oluşturulan ajan hemen yayında mı; güncelleme taslak sürüm mü üretiyor, ayrı bir yayınlama adımı var mı; simülasyon hangi sürümü değerlendiriyor; ajan sayısı sınırı var mı? | Teslim ajanının kimliği ve yayınlama adımı (Bölüm 5.4); aday ajanların temizliği | Puanlanan, export edilip organizatörün workspace'ine yüklenen workflow. Workspace başına en çok 10 workflow; yerinde güncellenir. v1.5: düz `PUT` yeni sürümü yayınlamaz, `freya.save_workflow` yayınlar; sınır için soru 24. |
+| 17 | Kaç brief var? Final değerlendirme starter kit'teki brief'le mi, görülmemiş brief'lerle mi yapılıyor? Kaç vaka var? | Hold-out'un birimi (brief ya da vaka); genelleme yatırımı (Bölüm 2.6) | Pratikte 2 brief (B, A'nın üstüne kurulu) ve 13 vaka (10 A, 3 B); finalde 2 görülmemiş brief × 30 müşteri = 60 vaka. |
+| 18 | Aranan müşterinin verisi (kim, ne kadar borç, kaç gün gecikme) ajana nasıl geliyor: tool ile mi, vaka başına değişkenle mi? Telefonu müşteriden başkası açabiliyor mu? | Tool kartları ve `arg_sources`; kimlik teyidi sırası | Vaka değişkenleri (`first_name`, `last_name`, `title`, `now`) + `get_account` (mock banka). Evet: pratikte telefonu bir yakının açtığı bir vaka var. |
+| 19 | İlk on takımın yeniden koşusunda builder hangi LLM anahtarlarıyla koşulacak; bizden anahtar mı isteniyor? | Tek sağlayıcı modu; README | Açık: destek kanalı. |
+| 20 | `run_cases.py` kendi yazdığımız vaka dosyalarını (mutasyon brief'leri, gizli brief için üretilen vakalar) kabul ediyor mu; builder 30 dakikanın içinde simülasyon koşabilir mi? | Build anı testi ve mutasyon ölçümü platformda mı yerelde mi (Bölüm 9.2, 10.4) | v1.5: `--cases` kabul ediliyor; banka oturumu yalnız 13 pratik vakanın kimliğiyle açılıyor. Builder 30 dakikada bir simülasyon koşabilir, ama gizli brief'in müşterisi yok (soru 23). |
+| 21 | Final metin mi? Toplantıda "final için ses modu kullanılabilir" dendi, sayfa "Text" diyor. | Sesli sertleştirme | Sayfa: metin. Teyit: destek kanalı. |
+| 22 | Builder brief'teki belirsizliği simüle bankaya sorabilir mi; mekanizma ne? (toplantı) | `ambiguities` soruya dönüşür mü (Bölüm 17.3, satır 2) | v1.5: kit'te böyle bir mekanizma yok. Açık: destek kanalı. |
+| 23 | Gizli brief'lerin tool API'si pratik bankayla aynı sunucuda ve uyumlu mu? Gizli brief için build anında test oturumu (kendi tanımladığımız müşteriyle) açılabiliyor mu? | Build anı simülasyonu var mı; V2'nin biçimi (Bölüm 2.8, madde 6) | Açık: destek kanalı. |
+| 24 | Workspace'in workflow sınırı 10 mu (sayfa), 200 mü (kit README)? | Aday yuvası sayısı (Bölüm 5.4) | Açık: destek kanalı; o zamana kadar 10. |
 
 ---
 
@@ -1321,30 +1586,44 @@ Dondurmadan sonra Plan A'nın yasak cümleleri geçerli: "GEPA'yı da ekleyelim"
 
 | Risk | Olasılık | Etki | Önlem | Yedek |
 | --- | --- | --- | --- | --- |
-| Benchmark H1 değil | Orta | Yüksek | Karar ağacı; iki ara temsil × iki backend; evrensel davranışlar her biçimde zararsız | Hedef B ve yerel backend |
-| Builder değerlendirmede çöker ya da zaman aşımına uğrar | Orta | Çok yüksek | V0 ilk saniyede yayında; her adım `try/except`; saat ve bekçi | V0 teslim edilir |
+| Benchmark H1 değil | Çözüldü (v1.4): H2 ve workflow (Bölüm 2.2) | Yüksek | Karar ağacı; iki ara temsil × iki backend; evrensel davranışlar her biçimde zararsız | Hedef B ve yerel backend |
+| Builder değerlendirmede çöker ya da zaman aşımına uğrar | Orta | Çok yüksek | V0 ilk saniyede yayında; her adım `try/except`; saat ve bekçi; v1.4: brief başına 30 dakika, varsayılan 25 | V0 teslim edilir |
 | Değerlendirme ortamında LLM anahtarı ya da ağ yok | Orta | Çok yüksek | Erken sor; tek sağlayıcı modu | LLM'siz V0 |
 | Platform API'si değişir, config reddedilir (400 ya da 422) | Orta | Yüksek | `defaults` taban; adaptör izole; hatada şüpheli alanı düşürüp yeniden dene | En sade config: yalnız prompt + tool'lar |
-| Platformu Day 1'den önce göremiyoruz; güvendiğimiz alan beklediğimiz gibi davranmıyor | Yüksek | Orta-yüksek | T+0'da `freya_probe.py`; † alanları doğrulanmadan kullanılmaz; adaptör sahte sunucuya karşı hazır | Aynı niyetin prompt karşılığı |
+| Platformu Day 1'den önce göremiyoruz; güvendiğimiz alan beklediğimiz gibi davranmıyor | Yüksek | Orta-yüksek | T+0'da `freya_probe.py`; † alanları doğrulanmadan kullanılmaz; adaptör sahte sunucuya karşı hazır. v1.4: probe yok; kit `docs/` ve default workflow'un export'u | Aynı niyetin prompt karşılığı |
 | Pratik benchmark'a overfit | Yüksek | Yüksek | Hold-out; yalnız evrensel düzeltme; gürültü kuralı | Hold-out'ta düşüreni geri al |
 | Aşırı karmaşıklık, sistem bitmiyor | Orta | Çok yüksek | MVP merdiveni; durdurma kriterleri; D−4 dondurma | Son etiketli çalışan sürüm |
 | Uydurma kural → yanlış ret | Orta | Yüksek | Birebir politika; alıntı ve sayı grounding | Dayanaksız kuralı sil |
 | Aşırı koruma: gereksiz onay, meşru işlemi engelleme | Orta | Yüksek | Kademeli onay; E3; `OVER_CLARIFICATION` ve `FALSE_REFUSAL` izlenir | Kademeyi gevşet |
 | Yetkisiz ya da çift yazma | Orta | Yüksek | Yazma protokolü; `maxRetries = 0`; karar noktası testleri | A2 `commit` şablonu |
-| Ses modunda yanlış duyulan kimlik bilgisi | Orta-yüksek | Yüksek | Sesli sertleştirme; `confidenceReask`; E10 | Alternatif doğrulama ya da devir (politika izin veriyorsa) |
+| Ses modunda yanlış duyulan kimlik bilgisi | v1.4: düşük (mod metin); yerine parça parça ya da kelimeyle söylenen sayı: orta | Yüksek | Sesli sertleştirme; `confidenceReask`; E10. v1.4: geri okuma ve birleştirme satırları (Bölüm 8.3) | Alternatif doğrulama ya da devir (politika izin veriyorsa) |
 | LLM değerlendirici gürültüsü, `inconclusive` | Yüksek | Orta | Okunaklı uyum; net kapanış; tekrar koşu | — |
 | Sentetik testlere overfit | Orta | Orta | En fazla 1 onarım; onaylı test; V0 yarışta; şüpheli test kuralı | Onarımı kapat |
 | Rate limit, kredi tükenmesi | Yüksek | Orta | Eşzamanlılık sınırı; üstel bekleme; build anı testleri chat modunda | `fast` profil |
-| Ajan modeli sabit ve iskelet başka modelde ayarlanmış | Orta | Orta | Erken sor; iskeleti hedef modelde ayarla | — |
-| Görev Türkçe | Orta | Orta | Dil tespiti; `language`; politika kendi dilinde birebir | — |
+| Ajan modeli sabit ve iskelet başka modelde ayarlanmış | v1.4: model sabit; risk iskeleti başka modelde ayarlamak | Orta | Erken sor; iskeleti hedef modelde ayarla; v1.4: yerel testte de `freya.py`'deki model | — |
+| Görev Türkçe | v1.4: düşük (aramalar İngilizce) | Orta | Dil tespiti; `language`; politika kendi dilinde birebir | — |
 | Tool şeması belirsiz: açıklamasız, garip adlar | Yüksek | Orta | Risk asimetrisi; bilinmeyen = `write` + `always`; `ambiguities` | Temkinli genel talimat |
 | Çağrı süresi sınırı kısa | Düşük-orta | Yüksek | Kısalık kuralı; süre metriğini izle; E7 | — |
 | Takım içi entegrasyon çatışması | Orta | Orta | Pydantic arayüzleri T+3'te sabit; küçük ve sık commit | Tek dal |
 | Yorgunluk | Yüksek | Yüksek | Gece kuyruğu; 5 saat uyku; D−4 dondurma | — |
 | Coding agent testi ya da değerlendiriciyi gevşetir, göreve özgü kod yazar | Orta | Yüksek | Brifing ve değişmez testleri (Bölüm 17.4); kilitli dosyalar ve `make guard`; yazan ile denetleyen ayrı (Bölüm 17.5) | Şüpheli commit'i geri al |
 | Sessiz geri düşüş: pipeline hata yüzünden hep V0 teslim ediyor, kimse fark etmiyor | Orta | Yüksek | Geri düşüş sayacı manifest'te ve practice raporunda (Bölüm 5.4) | — |
-| Üretilen ajan yarışma kurallarının maliyet, gecikme ya da süre sınırını aşar | Düşük-orta | Çok yüksek | Erken sor (Bölüm 13, soru 15); ajan bütçe kapısı (Bölüm 9.4) | Daha hızlı model ya da düşük efor |
-| Coding agent Freya alanı ya da model adı uydurur | Yüksek | Orta | Her alan plana, dokümana ya da probe çıktısına dayanır; model adları `config/models.yaml`'dan (Bölüm 17.4) | Adaptörde izole; Day 1'de probe ile düzelt |
+| Üretilen ajan yarışma kurallarının maliyet, gecikme ya da süre sınırını aşar | v1.4: düşük (sayfada ajan için sınır yok) | Çok yüksek | Erken sor (Bölüm 13, soru 15); ajan bütçe kapısı (Bölüm 9.4) | Daha hızlı model ya da düşük efor |
+| Coding agent Freya alanı ya da model adı uydurur | Yüksek | Orta | Her alan plana, dokümana ya da probe çıktısına dayanır; model adları `config/models.yaml`'dan (Bölüm 17.4). v1.4: probe yerine kit `docs/` ve `freya.py` | Adaptörde izole; Day 1'de kit `docs/`'la düzelt |
+| Platformu probe ya da yük testi sayılan çağrı (v1.4) | Düşük-orta | Çok yüksek | Probe betiği yok; platform yalnız `freya.py` ve `run_cases.py` ile; fuzz, 429 ve zaman aşımı yalnız sahte sunucuda | — |
+| D−3'ten sonraki düzeltmeye gizli brief'ten bilgi girer (v1.4) | Orta | Çok yüksek | Yalnız çökme düzeltmesi; diff'i ikinci kişi okur; değişmez 7 | Düzeltmeyi geri al, önceki commit'le koş |
+| Builder brief başına 30 dakikayı aşar (v1.4) | Orta | Çok yüksek | Varsayılan deadline 25 dakika; build anı testleri saate bağlı; D−5'te temiz klon provası | `fast` profil, V0 |
+| pass^3: vaka üç koşunun birinde düşer (v1.4) | Yüksek | Yüksek | Hesap kod düğümünde; sıcaklık (ayarlanabiliyorsa) düşük; her ölçüm `--reps 3` | — |
+| İlk on takımın yeniden koşusunda skor açıkça düşer, giriş silinir (v1.4) | Orta | Çok yüksek | Deterministik derleme; şanslı koşuyu seçip teslim etmek yok; trace dürüst ve eksiksiz | — |
+| Tek simülasyon kuyruğu ölçümü tıkar (v1.4) | Yüksek | Yüksek | Kuyruğu M2 yönetir; deneyler önce vaka alt kümesinde; gece kuyruğu | Yerel karar noktası testleri |
+| Ham malzeme brief'inde memo'nun değiştirdiği kural eski haliyle uygulanır (v1.4) | Orta | Yüksek | Intake ve sentezde geçerlilik çözümü (Bölüm 2.7, madde 6); mutasyonlarda memo'lu brief | — |
+| Workspace'teki 10 workflow sınırı dolar, build hata verir (v1.4) | Orta | Orta | Yerinde güncelleme; sabit aday yuvaları (Bölüm 5.4) | Kullanılmayan workflow'u D−3'ten önce sil |
+| Yayınlanmamış sürüm test edilir; değişiklik skoru hiç oynatmaz (v1.5) | Orta | Yüksek | Her kayıt `freya.save_workflow` ile; simülasyonun `agentVersionNumber`'ı trace'te (`STALE_VERSION`) | — |
+| Platform bir alanı sessizce siler ya da saklamaz: yanlış düğümdeki `tools` ya da `pre_actions`, `null`, `context_variables` (v1.5) | Orta | Yüksek | Dry run; kayıttan sonra geri okuyup gönderilenle karşılaştırma | — |
+| Ajan tool sonucundan sonra susar ya da olumsuz sonucu yok sayar (v1.5) | Yüksek | Yüksek | `what_to_do_next` post-kancası; "boş tur yok" satırı; `SILENT_TURN` izlenir | — |
+| Göreli tarih vakanın `now`'ına değil gerçek saate göre çözülür (v1.5) | Orta | Yüksek | Tarih gerçekleri `calc` kod düğümünde `now`'dan; göreli tarih extraction'a bırakılmaz | — |
+| Geçiş sessizce tetiklenmez: boolean yazımı, eşleme yolu, yazılmamış değişken (v1.5) | Orta | Yüksek | Dize bayraklar, `data.` yolları, iki yazım; teşhis `route_evaluated` ile (`ROUTE_NOT_FIRED`) | — |
+| Gizli brief'te build anı testi yapılamaz, seçim körleşir (v1.5) | Yüksek | Orta | Statik kapsam, kod birim testi, dry run; seçim kuralı offline'da kilitlenir (Bölüm 2.8, madde 6) | V0 ya da offline varsayılan |
 
 ---
 
@@ -1399,10 +1678,16 @@ Bir grup bitmeden sonrakine geçmeyin.
 
 ### Day 1 — temel (P0)
 
-- [ ] Challenge sayfası (kurallar) ve starter kit okundu; Bölüm 13 yanıtlandı; karar ağacı işaretlendi
-- [ ] `freya_probe.py` workspace anahtarıyla çalıştı; † alanları ve "Freya notları" tamam
-- [ ] Bir pratik görev elle uçtan uca koştu
-- [ ] `make practice` tüm pratik görevleri 2 tekrarla koşuyor
+- [x] Challenge sayfası (altı sekme ve şemaları) ve kickoff toplantısı okundu; Bölüm 2.7 ve 13'e işlendi (v1.4)
+- [x] Kit indirildi; `README.md`, `docs/` ve iki brief okundu; Bölüm 13'te kit'e kalan sorular (7, 11, 13, 20) yanıtlandı; karar ağacı işaretlendi (v1.5, Bölüm 2.8)
+- [ ] Destek kanalına 19, 21, 23 ve 24. sorular soruldu (v1.5)
+- [ ] `examples/base-agent.json` kaydedildi ve koşuldu (kit'e göre bir koşuda 2/13); bir chat turu çalıştı (v1.5)
+- [ ] Kit'in örnek builder'ı B0 olarak koşuldu; skoru `--reps 3` ile kaydedildi (v1.5)
+- [ ] Her kayıttan sonra dry run ve geri okuma; trace'te `versionNumber` (v1.5)
+- [ ] Her banka tool'unda `what_to_do_next` post-kancası; geçişler dize bayrak ve `data.` yollarıyla (v1.5)
+- [ ] Kit `docs/`'u ve default workflow'un export'u okundu; † alanları `docs/`'a göre işaretlendi; "Freya notları" tamam (v1.4: `freya_probe.py` yok)
+- [ ] Bir pratik görev elle uçtan uca koştu (v1.4: örnek builder + `run_cases.py`)
+- [ ] `make practice` tüm pratik görevleri 3 tekrarla (`--reps 3`) koşuyor
 - [ ] Hold-out ayrıldı ve dosyaya yazıldı
 - [ ] **B0 skoru kaydedildi**
 - [ ] Taban çizgisi iki kez koşuldu; σ biliniyor
@@ -1411,10 +1696,10 @@ Bir grup bitmeden sonrakine geçmeyin.
 - [ ] Statik tool analizi: tür, ID parametreleri, kenarlar, sayfalama
 - [ ] Dil tespiti ve `language`
 - [ ] V0: `defaults` tabanlı config, iskelet, birebir politika, statik tool kartları
-- [ ] V0 her build'de ilk saniyede diskte ve yayında; ajan adı benzersiz
+- [ ] V0 her build'de ilk saniyede diskte ve yayında; ajan adı benzersiz (v1.4: workflow yerinde güncelleniyor, 10 sınırı)
 - [ ] Tracer, konuşma görünümü, `experiments.csv`
 - [ ] Geri düşüş sayacı practice raporunda görünüyor (Bölüm 5.4)
-- [ ] Yayınlama ve sürüm davranışı probe ile öğrenildi; görev başına tek teslim ajanı çalışıyor (Bölüm 5.4; Bölüm 13, soru 16)
+- [ ] Yayınlama ve sürüm davranışı kit `docs/`'tan öğrenildi; brief başına tek teslim workflow'u ve `freya.export_workflow` çalışıyor (Bölüm 5.4; Bölüm 13, soru 16)
 - [ ] E1 ve E4 koşuldu, kaydedildi
 - [ ] **V0, B0'dan kötü değil; hiçbir görevde çökme yok**
 
@@ -1424,6 +1709,8 @@ Bir grup bitmeden sonrakine geçmeyin.
 - [ ] Lint: tool bütünlüğü, alıntı grounding, sayı grounding, risk asimetrisi, çapraz risk birleştirme
 - [ ] Katman derleyicisi; türetilen şablon alanları; tool açıklaması zenginleştirme; katman bütçesi
 - [ ] E3, E5 ve E11'in "hepsi birlikte" kolu (mod ses ise E10) koşuldu, kaydedildi
+- [ ] E8: `auth_gate` ve `calc` (kod düğümü) koşuldu, kaydedildi (v1.4)
+- [ ] E1', E14 ve E15 koşuldu; en az `--style pieces` ve `in_words` koşuları kaydedildi (v1.5)
 - [ ] Hata etiketleme (deterministik) çalışıyor; en sık üç etiket biliniyor
 - [ ] 15–20 koşu elle etiketlendi ve platform değerlendiricisiyle karşılaştırıldı
 - [ ] **E2 koşuldu: katman kabul edildi ya da kapatıldı; hold-out okundu**
@@ -1432,29 +1719,32 @@ Bir grup bitmeden sonrakine geçmeyin.
 
 - [ ] TestSpec üretimi (senaryo kotalı), üç süzgeçli onay
 - [ ] 1. aşama: her yazma tool'u ve önkoşullu tool için karar noktası testleri, tekrarlı
-- [ ] 2. aşama: 3–4 tam simülasyon, chat modunda, `maxCallDurationSeconds` açıkça ayarlı
+- [ ] 2. aşama: 3–4 tam simülasyon, chat modunda, `maxCallDurationSeconds` açıkça ayarlı (v1.4: kit vaka biçiminde, `run_cases.py` ya da yerel koşucu, 30 dakikanın içinde)
 - [ ] Skor, hard fail'ler, leksikografik seçim; açık fark kuralı ve offline varsayılan
 - [ ] Şüpheli test kuralı; erken eleme
 - [ ] Dal kapsamı: `uncovered_branches` manifest'te (Bölüm 9.1)
-- [ ] Yarışma kurallarında sınır varsa ajan bütçe kapısı (Bölüm 9.4)
+- [ ] `calc` kod düğümünün Python'u yerelde birim testinden geçiyor (v1.5)
+- [ ] Yarışma kurallarında sınır varsa ajan bütçe kapısı (Bölüm 9.4) (v1.4: sayfada ajan için sınır yok; gerekmiyor)
 - [ ] Tek tur onarım + kabul testi; onarıcı teste dokunamıyor; değişmez testleri 3, 6 ve 8 yazıldı
 - [ ] Bütçe profilleri, saat, %80 kuralı
 - [ ] Bitişte yayındaki config geri okunup hash'i doğrulanıyor
 - [ ] E9a koşuldu; hold-out okundu; E12 arka planda başladı
-- [ ] Docker, kilit dosyası, temiz klon; tek sağlayıcı modu
-- [ ] Gece kuyruğu başladı: E6, E7, E9b, taban tekrarları
+- [ ] Docker, kilit dosyası, temiz klon; tek sağlayıcı modu (v1.4: Docker yerine temiz klonda `run_command`; trace içeriği, Bölüm 11.4)
+- [ ] Gece kuyruğu başladı: E6, E7, E9b, taban tekrarları (v1.4: E6 düştü; mutasyon brief'leri eklendi; v1.5: E13)
 
 ### Day 2 — kilitle ve teslim et
 
 - [ ] Config verilerle kilitlendi (model, profil, onarım); hold-out okundu
-- [ ] Fuzz: boş açıklama, 30 tool, sıfır tool, iç içe `$ref`, tanınmayan alanlar, bozuk tool çıktısı → sıfır çökme
-- [ ] 429, zaman aşımı, yedek sağlayıcı, anahtarsız çalışma (V0) sınandı
+- [ ] Fuzz: boş açıklama, 30 tool, sıfır tool, iç içe `$ref`, tanınmayan alanlar, bozuk tool çıktısı → sıfır çökme (v1.4: memo'lu ham malzeme brief'i, değişmiş enum, biçimi farklı tablo da; yalnız yerelde)
+- [ ] 429, zaman aşımı, yedek sağlayıcı, anahtarsız çalışma (V0) sınandı (v1.4: yalnız sahte sunucuya karşı)
 - [ ] Final pratik + hold-out koşusu; en iyi bilinen sürümle karşılaştırıldı
+- [ ] README başka makinede adım adım tekrar üretildi (v1.4: dondurmadan önce, D−5 … D−4; A ve B'de brief başına 25 dakikanın altında)
 - [ ] **Kod dondurma (D−4)**
-- [ ] README başka makinede adım adım tekrar üretildi
-- [ ] Teslim paketi: commit SHA, `uv.lock`, imaj, ortam değişkeni şablonu, tek komut
+- [ ] Teslim paketi: commit SHA, `uv.lock`, imaj, ortam değişkeni şablonu, tek komut (v1.4: imaj yok; form alanları team, repo, commit, run_command, workflows, traces)
 - [ ] **Son temiz koşu: 2 görev, sıfırdan, elle müdahale yok**
-- [ ] Teslim yapıldı; organizatör onayı alındı
+- [ ] D−3: iki gizli brief'te builder koştu, çıktılar `traces/`'ta; gerekirse yalnız çökme düzeltmesi (v1.4)
+- [ ] `freya.export_workflow` dosyaları `submission/`'da; trace'lerde ve export'ta anahtar yok; commit (v1.4)
+- [ ] Teslim yapıldı; organizatör onayı alındı (v1.4: form 23:00'ten önce kit e-postasındaki adrese)
 
 ---
 
@@ -1555,11 +1845,13 @@ Aşağıdaki blok, plan dosyasına erişimi olan bir ajan için yeterlidir. Depo
 # Bu depoda çalışan coding agent için kurallar
 
 ## Ne yapıyoruz
-Bu depo bir "builder": görev metni ve tool tanımlarından, Freya platformunda çalışan bir
-telefon ajanı üretir. Hackathon görevi: bir bankanın tahsilat brief'inden, ödemesi gecikmiş
-müşterileri arayan ajan. Aramayı ajan yapar; derlenen metinlerde hattaki kişi "customer"dır.
-Puanı yalnızca üretilen ajanların gizli görevlerdeki başarısı
-belirler; kodun şıklığı, mimarinin zenginliği ya da kendi testlerimizin yeşil olması puan değildir.
+Bu depo bir "builder": bankanın brief'inden ve tool API dosyasından (OpenAPI), Freya'da bir
+workflow olarak çalışan telefon ajanı üretir: python3 builder/build.py <brief> <tool_api>.
+Hackathon görevi: ödemesi gecikmiş müşterileri arayan tahsilat ajanı. Aramayı ajan yapar;
+derlenen metinlerde hattaki kişi "customer"dır. Konuşmalar metin ve İngilizce; ajanın modeli
+sabittir (freya.py). Puanı yalnızca üretilen workflow'ların gizli brief'lerdeki vaka geçme oranı
+belirler (vaka üç koşunun üçünde de geçmeli); kodun şıklığı, mimarinin zenginliği ya da kendi
+testlerimizin yeşil olması puan değildir.
 Tasarım docs/plan.md içinde. Bir işe başlamadan önce o işin bölümlerini baştan sona oku
 (hangi iş hangi bölüm: plan Bölüm 17.5). Arama, okumanın yerine geçmez. Planda "Plan A" ya da
 "Plan B" atfı görürsen ayrıntısı docs/sources/ altındadır; orada da yoksa sor.
@@ -1572,7 +1864,8 @@ birlikte gelir. Yazıldıktan sonra hiçbiri kırılamaz.
 2. Organizatörün tool nesnelerinde name, handler, parameters ve tanımadığımız her alan aynen
    geri yazılır. Değişebilen iki yer var: description (özgün metin içinde aynen durur; başına
    etiket, sonuna cümle eklenir) ve plan Bölüm 8.1'de sayılan config anahtarları. Bir tool
-   yalnız alıntıya dayalı excluded=true ile çıkarılır.
+   yalnız alıntıya dayalı excluded=true ile çıkarılır. Tool adları, parametre şemaları ve izinli
+   değerler her build'de o brief'in tool API dosyasından okunur.
 3. V0 hiçbir LLM çağrısı yapmaz. LLM'siz aşamanın (intake, statik analiz, derleme) sonunda
    diske ve platforma yazılır; sonraki hiçbir hata yayındaki ajanı geçersiz bırakamaz.
 4. Derleme deterministiktir: aynı spec, şablon, kural kitaplığı ve defaults anlık görüntüsü
@@ -1583,7 +1876,10 @@ birlikte gelir. Yazıldıktan sonra hiçbiri kırılamaz.
    ya da beklentiye yazamaz.
 7. builder/ ve config/ altında görev kimliğine ya da bir pratik ya da vekil görevin adına,
    markasına, tool adına, sektörüne (airline, retail, banking gibi) bakan dal yoktur.
-   dev/ bu kuralın dışındadır.
+   dev/ bu kuralın dışındadır. İstisna: organizatörün sabit dediği yedi tool adı ve tahsilat
+   görüşmesinin genel akışı bilinebilir. Hiçbir brief'in kuralı, değeri ya da adı (tarih, tatil,
+   tutar, eşik, deneme sayısı, sonuç ya da kuyruk adı, zorunlu cümle) builder/ ve config/ altına
+   yazılmaz; her build'de brief'ten ve tool API dosyasından okunur.
 8. Her geri düşüş (fallback) türü ve nedeniyle loglanır ve manifest'e yazılır. Sessiz except
    yok. Tek istisna tracer: ana akışı düşürmez, kendi hatasını stderr'e yazar.
 
@@ -1600,10 +1896,16 @@ birlikte gelir. Yazıldıktan sonra hiçbiri kırılamaz.
 - Kilitli dosyaları (liste plan Bölüm 17.5'te: iskelet şablonu, evrensel kural kitaplığı, seçim
   kuralı, değerlendirici, config/, AGENTS.md ve diğerleri) insan o oturumda açıkça istemeden
   değiştirme. Öner; değişiklik bir deney satırıyla girer. GUARD_OK ve --no-verify kullanma.
-- Freya API'sinde alan ya da uç nokta uydurma. Kullandığın her alan plan Bölüm 2.1, 8.1, 8.2 ya
-  da Ek B'de, resmî dokümanda ya da docs/freya_notes.md içinde (probe çıktısı) geçmeli. Planda †
-  işaretli alanları probe doğrulamadan config'e yazma. Emin değilsen "DOĞRULANMADI" diye
-  işaretle ve adaptörün dışına sızdırma.
+- Freya API'sinde alan ya da uç nokta uydurma. Kullandığın her alan kit'in docs/ klasöründe ya da
+  freya.py'de (bunlar plandan önce gelir), plan Bölüm 2.1, 8.1, 8.2 ya da Ek B'de ya da
+  docs/freya_notes.md içinde geçmeli. Planda † işaretli alanları kit docs/'u doğrulamadan
+  config'e yazma. Emin değilsen "DOĞRULANMADI" diye işaretle ve adaptörün dışına sızdırma.
+- Freya platformunu probe etme, yük testine sokma. Platformu yalnız kit'in freya.py'si ve
+  tools/run_cases.py ile, docs/'ta yazan çağrılarla kullan. Hata, 429 ve zaman aşımı
+  senaryolarını yalnız sahte sunucuya karşı sına.
+- Gizli brief'ler açıldıktan sonra (Pazar 20:00) gizli brief'ten hiçbir kural, değer ya da adı
+  koda, prompta, teste ya da config'e yazma; yalnız çökme düzeltmesi yapılır. LLM önbelleğini
+  commit etme.
 - Model adı ve fiyatı ezberden yazma: config/models.yaml (yoksa plan Bölüm 2.4'ten üret, insana
   onaylat). API parametrelerini kurulu SDK'nın tiplerinden ya da resmî dokümandan doğrula.
 - İzinli bağımlılıklar dışında paket, framework, servis ya da soyutlama katmanı ekleme. İzinli:
@@ -1628,6 +1930,9 @@ birlikte gelir. Yazıldıktan sonra hiçbiri kırılamaz.
   Authorization başlığını maskeleyerek logla.
 - Adaptör içinde Freya dokümandan farklı davranıyorsa farkı docs/freya_notes.md'ye yaz, düzelt,
   raporla.
+- Workflow'u yalnız freya.save_workflow ile kaydet (düz PUT yeni sürümü yayınlamaz). Kayıttan sonra
+  workflow'u geri oku ve gönderdiğinle karşılaştır. Workflow'a null, agent_config ya da
+  context_variables yazma.
 - Birim testlerde LLM ve ağ yok: kayıtlı örnek yanıtlarla ve süreç içi sahte Freya istemcisiyle
   çalış.
 - Ölçüm satırını ölçüm betiği yazar. Sen "ne değişti" ve "öneri" sütunlarını doldurursun;
@@ -1652,8 +1957,8 @@ toplu yeniden adlandırma gerekiyor.
 1. **Talimat dosyası kısa, plan ayrı.** Bu dokümanın tamamını talimat dosyası yapmayın. Claude Code dokümanına göre `CLAUDE.md` her oturumun başında bağlama yüklenir, dosya başına 200 satırın altı önerilir ve uzun dosya talimata uyumu düşürür. Bölüm 17.4'teki blok `AGENTS.md` olarak köke, bu doküman `docs/plan.md` olarak, iki kaynak plan `docs/sources/` altına girer. Claude Code için köke tek satırlık bir `CLAUDE.md` koyun: `@AGENTS.md`. Güncel sürümler `CLAUDE.md` yokken `AGENTS.md`'yi kendisi de okur, ama içe aktarma satırı sürümden bağımsız çalışır. Her makinede bir kez, oturumun başında ajana talimat dosyasında ne yazdığını sorarak yüklendiğini doğrulayın.
 2. **İş başına okunacak bölüm.** Oturumu "şu bölümleri baştan sona oku, sonra şu dosyayı yaz" diye açın (tablo aşağıda).
 3. **Talimat bağlamdır, kilit değildir.** Aynı doküman, talimat dosyasının zorunlu ayar değil bağlam olarak işlendiğini ve bir eylemi kesin engellemek için PreToolUse hook kullanılması gerektiğini söylüyor. İki sınıf dosya için mekanik önlem alın:
-    - **Kapalı** (ajan açmaz): `dev/holdout.json`, hold-out görevlerinin içeriği ve görev bazındaki sonuçları, vekil benchmark'ın test bölmesi.
-    - **Kilitli** (ajan okur; siz o oturumda açıkça istemeden değiştirmez): `AGENTS.md`, `CLAUDE.md`, `docs/plan.md`, `Makefile` ve guard betiği, `config/`, `builder/compile/templates/`, `builder/spec/universal_rules.py`, `builder/optimize/select.py`, `builder/eval/`, `tests/invariants/`, `tests/fixtures/`, `dev/mock_freya/`.
+    - **Kapalı** (ajan açmaz): `dev/holdout.json`, hold-out görevlerinin içeriği ve görev bazındaki sonuçları, vekil benchmark'ın test bölmesi; v1.4: mutasyon brief'lerinin hold-out kısmı (Bölüm 10.4).
+    - **Kilitli** (ajan okur; siz o oturumda açıkça istemeden değiştirmez): `AGENTS.md`, `CLAUDE.md`, `docs/plan.md`, `Makefile` ve guard betiği, `config/`, `builder/compile/templates/`, `builder/spec/universal_rules.py`, `builder/optimize/select.py`, `builder/eval/`, `tests/invariants/`, `tests/fixtures/`, `dev/mock_freya/`; v1.5: kit'ten kopyalanan dosyalar (`freya.py`, `tools/run_cases.py`, `tools/score.py`, `tools/openapi.json`, kit'in `docs/`'u).
     - Bir dosya, sahibi ilk taslağını kabul edip `guard.txt` listesine yazdığında kilitlenir; o ana kadar ajan serbestçe yazar (Cuma günü bu dosyaların çoğu yeni doğuyor). `make guard` pre-commit'e bağlıdır: listedeki bir dosya değişmiş ya da silinmişse hata verir; `dev/experiments.csv`'de yalnız satır eklemeye izin verir. Kilitli dosyada kabul ettiğiniz değişikliği siz `GUARD_OK=1 git commit` ile işlersiniz; ajan bu anahtarı ve `--no-verify`'ı kullanmaz.
     - Claude Code kullanıyorsanız aynı iki listeyi deponun ayarlarında izin kuralı olarak da yazabilirsiniz (kapalı dosyalar için `Read`, kilitli dosyalar için `Edit` deny kuralları). Doküman bu kuralların yerleşik dosya araçlarını ve tanıdığı kabuk komutlarını kapsadığını, dosya adı vermeden okuyan komutları (ör. `grep -r`) kapsamadığını söylüyor: tam bir güvenlik sınırı değil, kazayı önleyen bir çit. Karar sizin.
 4. **Yazan ile denetleyen ayrı.** Bir oturum yazar; taze bağlamlı ikinci bir oturum, tercihen başka bir model, farkı planın ilgili bölümüne ve değişmezlere karşı gözden geçirir. Testi birinin yazıp diğerinin onayladığı kuralın (Bölüm 9.1) kod tarafındaki karşılığı bu.
@@ -1665,15 +1970,15 @@ toplu yeniden adlandırma gerekiyor.
 | İş | Dosyalar | Önce okunacak bölümler |
 | --- | --- | --- |
 | LLM istemcisi | `builder/llm/` | 2.4, 10 (önbellek), 11.1, 11.4 |
-| Intake, statik tool analizi | `builder/intake/`, `builder/analysis/` | 6.1, 7, 8.3 (uzun kaynak) |
-| Spec modelleri, sentez, lint, yama | `builder/spec/` | 6, 7.3, 9.5, 11.1, 17.2 |
-| Prompt derleyicisi, şablon, Freya config'i | `builder/compile/` | 5.4, 6.1, 6.3, 7.3, 8.1, 8.2, 8.3, Ek A |
-| Freya adaptörü, sahte sunucu, probe | `builder/backends/freya.py`, `dev/mock_freya/`, `dev/freya_probe.py` | 2.1, 5.4, 8.1, 8.2, 9.2, 11.3, 11.4, Ek B |
-| Test üretimi ve onayı | `builder/tests_ir/` | 5.3, 7.1, 7.2, 9.1, 9.2, 11.1, 17.2, 17.3 |
+| Intake, statik tool analizi | `builder/intake/`, `builder/analysis/` | 2.7, 2.8, 6.1, 7, 8.3 (uzun kaynak) |
+| Spec modelleri, sentez, lint, yama | `builder/spec/` | 2.8, 6, 7.3, 9.5, 11.1, 17.2 |
+| Prompt derleyicisi, şablon, Freya config'i | `builder/compile/` | 2.7, 2.8, 5.4, 6.1, 6.3, 7.3, 8.1, 8.2, 8.3, 8.4, Ek A |
+| Freya adaptörü, sahte sunucu | `builder/backends/freya.py` (taban kit'in `freya.py`'si), `dev/mock_freya/`; v1.4: probe yok | 2.1, 2.7, 2.8, 5.4, 8.1, 8.2, 9.2, 11.3, 11.4, Ek B |
+| Test üretimi ve onayı | `builder/tests_ir/` | 2.7, 2.8, 5.3, 7.1, 7.2, 9.1, 9.2, 11.1, 17.2, 17.3 |
 | Skor, seçim, onarım | `builder/eval/`, `builder/optimize/`, `builder/spec/patch.py` | 5.3, 9.3, 9.4, 9.5, 9.6, 10.1, 12.5 |
-| Vekil düzenek, karar noktası koşucusu | `dev/proxy/`, `builder/backends/local.py` | 9.1, 9.2, 9.3, 10.1, 10.2, 10.4 |
-| Ölçüm, izleme, depolama | `dev/practice_runner.py`, `builder/trace/`, `builder/store/` | 10, 11.3 |
-| Akış, bütçe, komut satırı | `builder/pipeline.py`, `builder/cli.py` | 5.2, 5.3, 5.4, 9.4, 11.4 |
+| Vekil düzenek, mutasyon brief'leri, karar noktası koşucusu | `dev/proxy/`, `dev/mutations/`, `builder/backends/local.py` | 2.7, 2.8, 9.1, 9.2, 9.3, 10.1, 10.2, 10.4 |
+| Ölçüm, izleme, depolama | `dev/practice_runner.py`, `builder/trace/`, `builder/store/` | 2.7, 2.8, 10, 11.3, 11.4 |
+| Akış, bütçe, komut satırı | `builder/pipeline.py`, `builder/cli.py`, `builder/build.py` | 2.7, 5.2, 5.3, 5.4, 9.4, 11.4 |
 | Değişmez testleri, guard | `tests/invariants/`, `Makefile` | 17.4, 17.5 |
 | Kendi runtime'ımız (yalnız H3) | `builder/runtime/` | 8.5, 9.2 |
 
@@ -1760,23 +2065,34 @@ Lint: dört alıntı kaynakta birebir var; `5` ve `2,000` kaynakta geçiyor; alt
 
 ## Ek B. Freya API kopya kâğıdı
 
-Taban: `https://app.freyavoice.ai/api/v2` · `Authorization: Bearer <anahtar>` · yanıt zarfı `{success, data: {message, result}}`. Yollar public dokümandan; hackathon ortamında farklı olabilir.
+**v1.5: kit'e göre yeniden yazıldı** (`docs/api.md`, `freya.py`, `tools/`). v1.4'e kadarki tablo public dokümandan geliyordu (`/agents`, `/unit-tests`, branch ve fork uç noktaları); hackathon'da kullanılmaz.
 
-| Amaç | Uç nokta |
+Taban `$FREYA_API_URL` = `https://staging-app.freyavoice.ai` · `Authorization: Bearer fak_…` · `Content-Type: application/json` · tarayıcı benzeri `User-Agent` zorunlu (yoksa "error code: 1010") · yanıt zarfı `{success, data: {message, result}}`, yük `data.result`'ta · workflow ve call yolları tekil, persona ve simulation yolları çoğul. Persona, simülasyon ve çağrı alanlarının tamamı `https://docs.freyavoice.ai`'de; workflow orada belgelenmemiş, kit esas. Platformu probe etmek yasak: yalnız aşağıdaki çağrılar, dokümandaki gibi.
+
+| Amaç | Çağrı | `freya.py` |
+| --- | --- | --- |
+| Workspace kimliği | `GET /api/v2/workspaces` → `result.workspaces[].id` | `workspace_id()` |
+| Workflow yarat (ajan da yaratılır) | `POST /api/v2/workflow` `{"name", "workflow"}` → `workflow.id`, `workflow.agentId` | `create_workflow` |
+| Yalnız doğrula | `POST /api/v2/workflow?dryRun=true` (aynı gövde) | `validate_workflow` |
+| Güncelle (yayınlamaz; tanımın tamamı gönderilir) | `PUT /api/v2/workflow/{id}` `{"workflow"}` | — |
+| Sürümler ve yayın | `GET /api/v2/versions/workflow/{id}?workspaceId=…` → `versions[]` (`id`, `versionNumber`, `isPublished`) · `POST /api/v2/versions/workflow/{id}/publish` `{"versionId"}` | `update_workflow` (günceller, modeli düzeltir, yayınlar) |
+| Yarat ya da güncelle (önerilen) | — | `save_workflow(slot, wf)`; eşleme `.freya-agents.json`'da |
+| Workflow'u oku, dosyaya aktar (teslim) | `GET /api/v2/workflow/{id}?workspaceId=…` | `export_workflow(id, path)` → `{workflow_id, agent_id, updated_at, workflow}` |
+| Tek tur sohbet (kuyruksuz) | `POST /api/v2/chat/message` `{"workflowId", "message", "customerVariables"}` → `response`, `callId`; sonraki tur aynı `callId` ile; bitiş `POST /api/v2/chat/end` `{"callId"}` | — |
+| Persona | `POST /api/v2/personas` `{"personas": [{name, prompt, successCriteria, tags}]}` → `result.personas[].id` | `create_personas` |
+| Simülasyon | `POST /api/v2/simulations` (`agentId`, `name`, `mode: "chat"`, `selectedPersonaIds`, `customerVariablesMap`, `maxConcurrentCalls`, `runsPerPersona`, `maxCallDurationSeconds`, üç ajan override'ı, persona ve analiz override'ı) · `GET /api/v2/simulations/{id}` (10 sn'de bir; `completed`, `failed`, `paused`) | `run_simulation` (420 sn, 5 eşzamanlı, kuyrukta bekler) |
+| Koşular | `GET /api/v2/simulations/{id}/iterations` · `GET /api/v2/simulations/{id}/iterations/{itId}?limit=100&offset=…` → `runs[]` (`callId`, `personaId`, `outcome`, `reason`, `turnCount`) | `get_iteration` |
+| Çağrı detayı | `GET /api/v2/call/{callId}` → `call.messages` (`role`, `message`, `nodeId`; `system` rolündeki olaylar `node_enter`, `function_call_start`, `function_call_complete`, `route_evaluated`, `error`), `transcript`, `endedReason`, `duration`, `successCriteriaResult` | `get_call` |
+| Ajan modeli | `{"provider": "experimental-5", "model": "experimental-5"}`; persona ve judge `gemini-3-flash-preview` | `AGENT_LLM`, `SIM_LLM` |
+
+**Pratik banka** (`$FREYA_BANK_HOST` = `https://freya-bank-mock.freyavoice.workers.dev`; `tools/score.py`, `tools/openapi.json`):
+
+| Amaç | Çağrı |
 | --- | --- |
-| Platformun varsayılan config'i | `GET /agents/defaults?workspaceId=…` |
-| Ajan oluştur, güncelle | `POST /agents` · `PUT /agents/{agentId}` (`commitMessage`) |
-| Config anlık görüntüsü uygula | `POST /versions/{entityType}/{entityId}` (`entityType`: agent ya da workflow; geçersizse 422) |
-| Sürüm kaydı alanları | `name` (commit başlığı), `sourceRunId`, `isPublished` |
-| Dalı ana hatta birleştir | `POST /branches/{branchId}/rebase` (dokümandaki başlığı "Merge branch"; `publish`: uygula ya da uygula ve yayınla; ana hat değiştiyse 409) |
-| Ajanı metinle sür | `POST /chat/message` (`agentId` ile başlat, dönen `callId` ile sürdür) |
-| Konuşmayı çatalla, kapat | `POST /chat/fork` · `POST /chat/end` |
-| Persona | `POST /personas` · `POST /personas/preview` (ajandan persona önerisi) |
-| Simülasyon | `POST /simulations` · `POST /simulations/{id}/rerun` · `GET /simulations/{id}` · `GET /simulations/{id}/iterations` |
-| Sürüm başına persona sonuçları | `GET /simulations/version-persona-runs?workspaceId=…&entityVersionId=…` |
-| Çağrı detayı | `GET /call/{callId}?workspaceId=…` → `messages`, `assertionResults`, `successCriteriaResult`, `problems`, `turnLatencyStats` |
-| Unit test | `POST /unit-tests` · `POST /unit-tests/run-all` (`mockToolResults`, `repeat`, `judgeLlmOverride`) · `GET /unit-tests/runs/{runId}` |
-| Doküman dizini | `https://docs.freyavoice.ai/llms.txt` |
+| Yedi tool | `POST /v1/<tool>`, anahtarsız; gövdedeki `customer_id` o çağrının sırrı |
+| Pratik oturumu | `POST /v1/practice/sessions` `{"case": "<vaka kimliği>"}`, başlık `x-team-key: $FREYA_BANK_TEAM_KEY` → `variables` (çağrı değişkenleri) |
+| Ledger | `GET /v1/practice/ledger/<customer_id>`, aynı başlıkla → `outcome`, `reason`, `promises`, `notes`, `callbacks`, `transfers`, `calls` |
+| Vakaları koş | `python3 tools/run_cases.py <agent_id> [--brief A\|B] [--cases f.json] [--only ID,…] [--reps N] [--style …] [--out f.json] [--rerun-if-slow N]` |
 
 ---
 
@@ -1817,6 +2133,8 @@ Bu ek bir tahmindir [ÇIKARIM]. Dayanağı Tunga Bayrak'ın duyurudaki anlatım�
 
 Raylar döşenmiş görünüyor; eksik parça, malzemeden ajanı ve testleri kendisi çıkaran motor [ÇIKARIM].
 
+**Kickoff toplantısında anlatılanlar [OLGU, 10 Ekim].** Freya'nın tahsilat ajanı bir bankanın çağrı merkezinde insan temsilcinin tahsilat oranını geçmiş (%51'e karşı %53); bunu çok sayıda A/B testi ve müşteriye göre özelleştirilmiş ajanlarla yapmışlar. Her çağrıdan sonra transkript, tool çağrıları, gecikme ölçümleri ve bir geri bildirim bölümü çıkıyor; ajan o çağrıdaki hataları (transkripsiyon hatası, yanlış anlama) kendisi işaretliyor. Binlerce çağrının hataları kök nedene göre gruplanıyor (LLM, STT, TTS, VAD); sistem her grup için ajanın bir sonraki sürümüne değişiklik öneriyor ("bu on sorunu çözmek için şunları değiştir"), sürümler git gibi numaralanıyor (gösterilen ajanda 36 sürüm). Yukarıdaki akışın 5. adımı (sorunlu çağrılardan düzeltme önerisi) Freya'da bugün çalışıyor; hackathon döngünün ilk kurulum ayağını soruyor: müşterinin dağınık malzemesinden ajanı kuran motor.
+
 **Bu plandan production'a aynen taşınanlar.**
 
 - Her kuralın yanında kaynak alıntısı: onaylayan kişi belgeyi baştan okumak zorunda kalmaz.
@@ -1829,12 +2147,14 @@ Raylar döşenmiş görünüyor; eksik parça, malzemeden ajanı ve testleri ken
 
 ## Kaynaklar
 
-Organizatör e-postası (10 Ekim) dışında hepsi 8 Ekim 2026'da okundu. Makale tam metinlerindeki ayrıntı rakamlar otomatik okumayla çıkarıldı; dışarıya alıntılamadan önce kaynağından bir kez daha kontrol edin.
+Organizatör e-postası, challenge sayfası, kickoff toplantısı ve kit (10 Ekim) dışında hepsi 8 Ekim 2026'da okundu. Makale tam metinlerindeki ayrıntı rakamlar otomatik okumayla çıkarıldı; dışarıya alıntılamadan önce kaynağından bir kez daha kontrol edin.
 
 **Hackathon ve Freya**
 
 - [Build the Builder etkinlik sayfası](https://events.ycombinator.com/AI-FDE-Build-the-Builder) · Tunga Bayrak'ın duyuru gönderisi ve videosu (metnini ekip aktardı)
 - Organizatör e-postası: Yavuz Alp Sencer Öztürk (Freya), 10 Ekim 2026, 00:16; görev, takvim ve 13:00'te paylaşılacaklar (Bölüm 2.6)
+- [Challenge sayfası](https://www.freyavoice.ai/hackathon): Overview, Data, Evaluation, Submit, Leaderboard ve Rules sekmeleri ve şemaları, 10 Ekim 13:50 civarında okundu (Bölüm 2.7) · [kit](https://www.freyavoice.ai/hackathon/build-the-builder.zip) (depoda `build-the-builder-v3/`, sürüm 3; v1.5'te on altı dosyanın tamamı okundu, Bölüm 2.8) · `public-test-set.json` (Data sekmesindeki "Download JSON") · [YC kayıt sayfası](https://events.ycombinator.com/AI-FDE-Build-the-Builder26)
+- Kickoff toplantısının dökümü (10 Ekim; Tunga Bayrak, Yavuz Alp Sencer Öztürk): Freya'nın geçmişi ve ürünü, demo ajanlar, default workflow, soru-cevap (Bölüm 2.7, Ek C)
 - [Freya — Y Combinator şirket sayfası](https://www.ycombinator.com/companies/freya) · [freyavoice.ai](https://www.freyavoice.ai/)
 - [Freya doküman dizini](https://docs.freyavoice.ai/llms.txt) · [Kimlik doğrulama](https://docs.freyavoice.ai/api-reference/authentication.md) · [API girişi](https://docs.freyavoice.ai/api-reference/introduction.md)
 - [Create agent](https://docs.freyavoice.ai/api-reference/agents/create-agent.md) · [Default agent config](https://docs.freyavoice.ai/api-reference/agents/get-default-agent-config.md) · [Update agent](https://docs.freyavoice.ai/api-reference/agents/update-agent.md) · [Create version](https://docs.freyavoice.ai/api-reference/versions/create-version.md) · [Merge branch](https://docs.freyavoice.ai/api-reference/branches/merge-branch.md) · [List feedbacks](https://docs.freyavoice.ai/api-reference/feedbacks/list-feedbacks.md)

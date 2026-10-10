@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "FreyaVoice-MCP": {
+      "type": "http",
+      "url": "https://docs.freyavoice.ai/mcp"
+    }
+  }
+}
