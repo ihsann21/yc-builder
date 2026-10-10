@@ -183,7 +183,7 @@ A step's first words come from `on_enter=wf.say(TEXT)` with the fixed sentence t
 questions. First, <the brief's first question>?". Use `wf.llm` only when the words cannot be fixed: the
 model that writes them does not see the brief (measured: it invented a security question about a pet).
 
-Customers give answers in pieces over several turns ("14 March", then "1988"; "4 4", then "7 1") and
+Customers give answers in pieces over several turns ("2 May", then "1979"; "3 9", then "0 6") and
 correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in
 pieces over several turns, put the pieces together and call the tool once with the complete answer; if a
 part is missing, ask only for that part. If the customer corrects a part, use the corrected part. Never
@@ -195,8 +195,8 @@ A ban alone does not hold; give the model the sentence to say instead. When the 
 proposes every amount and never asks the customer for one, the negotiation task message must say what
 comes right after a date is agreed: "Can you pay the full past-due amount of <amount> on <date>?" (or the
 brief's own next offer), and that the agent never asks the customer how much they will pay (measured:
-with the ban only, the agent asked "how much of the 540.00 will you be paying?", the customer said
-"five hundred", and 500.00 was recorded instead of 540.00).
+with the ban only, the agent asked "how much of the <full amount> will you be paying?", the customer
+said a round lower figure, and that figure was recorded instead of the full amount).
 
 A failed HTTP call (e.g. a 500 from the bank) reaches the model as a plain error, and the post hook
 does not run on it (measured: "API request failed: {...}" with no what_to_do_next; the model said

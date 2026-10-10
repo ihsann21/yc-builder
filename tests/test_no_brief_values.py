@@ -105,3 +105,32 @@ def test_no_brief_date_in_words(kit):
             if re.search(r"(?<![0-9])" + re.escape(form) + r"(?![0-9])", text):
                 hits.append((path.relative_to(ROOT).as_posix(), form))
     assert hits == []
+
+
+def test_no_practice_case_value_in_builder(kit):
+    """Values of the practice customers (names, identity answers, card digits, amounts) stay out of builder/:
+    the builder must not see the test set, not even as an example in the skill."""
+    import datetime
+    cases = json.loads((kit / "public-test-set.json").read_text(encoding="utf-8"))
+    tokens = set()
+    for case in cases:
+        tokens.update({case["variables"]["first_name"], case["variables"]["last_name"]})
+        for key, value in case.get("identity", {}).items():
+            tokens.add(str(value))
+            if key == "date_of_birth":
+                day = datetime.date.fromisoformat(value)
+                tokens.add(str(day.day) + " " + day.strftime("%B"))
+        for product in case.get("products", []):
+            if product.get("card_last4"):
+                tokens.add(product["card_last4"])
+            for field in ("past_due", "minimum_payment", "instalment_amount"):
+                if product.get(field) is not None:
+                    tokens.add("%.2f" % float(product[field]))
+    assert "4471" in tokens and "14 March" in tokens and "540.00" in tokens          # the extraction works
+    hits = []
+    for path in builder_files():
+        text = path.read_text(encoding="utf-8")
+        for token in tokens:
+            if re.search(r"(?<![A-Za-z0-9.])" + re.escape(token) + r"(?![A-Za-z0-9])", text):
+                hits.append((path.relative_to(ROOT).as_posix(), token))
+    assert hits == []

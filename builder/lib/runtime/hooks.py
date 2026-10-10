@@ -77,7 +77,7 @@ def small_number(words, index):
 
 def spoken_numbers(words):
     """The numbers in a list of words, in order: '14' -> 14, 'twenty second' -> 22,
-    'nineteen eighty eight' -> 19, 88, 'one nine eight eight' -> 1988, 'two thousand and five' -> 2005."""
+    'nineteen seventy nine' -> 19, 79, 'one nine seven nine' -> 1979, 'two thousand and five' -> 2005."""
     out = []
     run = ""
     index = 0
@@ -176,7 +176,7 @@ def normalize_digits(text, last=0):
     """The digits of one number in a text, the last `last` of them if asked; None if unsure.
 
     One run of digits (spaces, dots, dashes, brackets and + allowed inside) or only digit words.
-    Two numbers ('4821 ... in 2019') or other words between digit words give None.
+    Two numbers ('3906 ... in 2019') or other words between digit words give None.
     """
     text = as_text(text)
     if re.search(r"[A-Za-z][0-9]|[0-9][A-Za-z]", text):
