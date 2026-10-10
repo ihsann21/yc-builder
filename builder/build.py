@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import pathlib
@@ -27,6 +28,7 @@ KIT = ROOT / "build-the-builder-v3" / "build-the-builder"
 SKILL = ROOT / "builder" / "skill" / "SKILL.md"
 WORK = ROOT / "builder" / "work"
 STATE_FILE = WORK / ".freya-agents.json"
+SLOTS_FILE = WORK / ".slot-inputs.json"      # slot -> hash of the inputs it was built from
 SECRET_VARS = ("FREYA_API_KEY", "FREYA_BANK_TEAM_KEY", "ANTHROPIC_API_KEY")
 # Any tool call whose input mentions one of these is refused: the agent never reads keys, and never
 # reads practice answers or practice-brief configs (dev/, tests/, the kit builder's out/, the test set).
@@ -179,6 +181,23 @@ def export(slot: str, before: dict, trace: Trace) -> bool:
     return True
 
 
+def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE) -> str:
+    """The slot: the last brief's file name, made safe. A name already used for other inputs (two hidden
+    briefs both called brief.md) gets a short hash of the inputs, so one build never overwrites the other."""
+    digest = hashlib.sha256(b"".join(pathlib.Path(f).read_bytes() for f in briefs + [api])).hexdigest()[:6]
+    slot = re.sub(r"[^A-Za-z0-9_-]", "_", pathlib.Path(briefs[-1]).stem) or "brief"
+    try:
+        known = json.loads(slots_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        known = {}
+    if known.get(slot, digest) != digest:
+        slot = slot + "-" + digest
+    known[slot] = digest
+    slots_file.parent.mkdir(parents=True, exist_ok=True)
+    slots_file.write_text(json.dumps(known, indent=1), encoding="utf-8")
+    return slot
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build a Freya phone agent from a brief.")
     parser.add_argument("files", nargs="+", help="brief file(s), then the tool API file")
@@ -191,7 +210,7 @@ def main() -> int:
             stream.reconfigure(encoding="utf-8", errors="replace")
     briefs = [existing(f) for f in args.files[:-1]]
     api = existing(args.files[-1])
-    slot = pathlib.Path(briefs[-1]).stem
+    slot = slot_for(briefs, api)
     deadline = int(os.environ.get("BUILD_DEADLINE_S", "1500"))
     trace = Trace(slot)
     start = time.time()

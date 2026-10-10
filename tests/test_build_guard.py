@@ -72,3 +72,21 @@ def test_export_refuses_a_run_that_saved_nothing(tmp_path, monkeypatch):
     assert build.export("s", {"workflow_id": "w", "agent_id": "a", "version": 3}, trace) is False
     assert "saved no new version" in lines[-1]
     assert build.export("t", {}, trace) is False and "no workflow was saved" in lines[-1]
+
+
+def test_slot_is_the_brief_name_unless_that_name_was_built_from_other_inputs(tmp_path):
+    from builder.build import slot_for
+    slots = tmp_path / "work" / ".slot-inputs.json"
+    api = tmp_path / "api.json"
+    api.write_text("{}")
+    (tmp_path / "clean").mkdir()
+    (tmp_path / "raw").mkdir()
+    clean, raw = tmp_path / "clean" / "brief (final).md", tmp_path / "raw" / "brief (final).md"
+    clean.write_text("clean spec")
+    raw.write_text("raw material")
+    first = slot_for([str(clean)], str(api), slots)
+    assert first == "brief__final_"
+    assert slot_for([str(clean)], str(api), slots) == first              # same inputs: same slot, updated in place
+    second = slot_for([str(raw)], str(api), slots)
+    assert second.startswith("brief__final_-") and second != first       # same name, other inputs: own slot
+    assert slot_for([str(raw)], str(api), slots) == second
