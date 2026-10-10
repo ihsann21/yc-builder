@@ -99,3 +99,45 @@ def test_every_model_call_gets_a_purpose_line():
     assert call_purpose([NS(name="Bash", input={"command": "x", "description": "Run generator"}),
                          NS(name="Read", input={"file_path": "/a/b.md"})]) == "tool call: Bash (Run generator); Read (/a/b.md)"
     assert call_purpose([]) == "(no text)"
+
+
+def decide_tool(tool: str, tool_input: dict) -> str:
+    import asyncio
+    from builder.build import guard
+    out = asyncio.run(guard({"tool_name": tool, "tool_input": tool_input}, None, None))
+    return out.get("hookSpecificOutput", {}).get("permissionDecision", "allow")
+
+
+@pytest.mark.parametrize("tool,tool_input", [
+    ("Read", {"file_path": f"{ROOT_TEXT}/builder/work/brief-x/inputs/brief-x.md"}),
+    ("Read", {"file_path": "builder/lib/calc.py"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/build-the-builder-v3/build-the-builder/docs/api.md"}),
+    ("Grep", {"pattern": "def products_code", "path": "builder/lib"}),
+    ("Glob", {"pattern": "*.py", "path": f"{ROOT_TEXT}/builder/lib/runtime"}),
+    ("Bash", {"command": f'cd "{ROOT_TEXT}" && python3 builder/work/brief-x/gen.py'}),
+    ("Bash", {"command": "grep -rn shifts builder/lib"}),
+])
+def test_the_builder_can_still_do_its_work(tool, tool_input):
+    assert decide_tool(tool, tool_input) == "allow"
+
+
+@pytest.mark.parametrize("tool,tool_input", [
+    ("Read", {"file_path": f"{ROOT_TEXT}/submission/brief-a.workflow.json"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/PROGRESS.md"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/brief-d.md"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/build-the-builder-v3/build-the-builder/briefs/brief-a.md"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/build-the-builder-v3/build-the-builder/examples/base-agent.json"}),
+    ("Grep", {"pattern": "holiday"}),
+    ("Grep", {"pattern": "holiday", "path": "."}),
+    ("Glob", {"pattern": "**/*.workflow.json"}),
+    ("Bash", {"command": "cat brief-d.md"}),
+    ("Bash", {"command": f'cat "{ROOT_TEXT}/brief-d.md"'}),
+    ("Bash", {"command": "cat PROGRESS.md"}),
+    ("Bash", {"command": "cat submission/brief-a.workflow.json"}),
+    ("Bash", {"command": "cd build-the-builder-v3/build-the-builder && cat out/gen_brief_a.py"}),
+    ("Bash", {"command": "ls build-the-builder-v3/build-the-builder/briefs/"}),
+    ("Bash", {"command": "grep -rn Reyes ."}),
+    ("Bash", {"command": f'rg holiday "{ROOT_TEXT}"'}),
+])
+def test_the_builder_cannot_reach_other_briefs_or_practice_data(tool, tool_input):
+    assert decide_tool(tool, tool_input) == "deny"

@@ -38,7 +38,16 @@ BLOCKED = re.compile(r"env\.sh|printenv|environ|declare -x|export -p|(^|[\s;&|(]
                      + r"|public-test-set|(^|[\s'\"\\/])(results|traces)[\\/]"
                      # dev/ and tests/ by absolute path too; a space in the repo path may be written as "\ "
                      + "|" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")
-                     + r"[\\/]+(dev|tests)([\\/\"'\s]|$)")
+                     + r"[\\/]+(dev|tests)([\\/\"'\s]|$)"
+                     # other briefs, practice exports, the kit's briefs and examples, the repo's notes
+                     + r"|(^|[\s'\"=\\/])(submission|briefs|out|examples|mutations)[\\/]|\.personas|PROGRESS"
+                     + r"|build_the_builder_final_plan|Teknik Strateji|(^|[\s'\"=])brief-[A-Za-z0-9_-]*\.md"
+                     + "|" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )") + r"[\\/]+[^\\/\"']*\.md"
+                     # a recursive search from the repo root
+                     + r"|\b(grep|rg|find)\b[^|;&\n]*\s(\.|\./|(\\?\")?" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")
+                     + r"(\\?\")?)(\s|$|\\|\")")
+# Read, Grep and Glob may only look under these (resolved) folders and files.
+READABLE = (ROOT / "builder", KIT / "docs", KIT / "freya.py", KIT / "tools")
 
 
 class Trace:
@@ -86,6 +95,21 @@ def existing(path: str) -> str:
 GUARDED_FIELDS = ("command", "file_path", "path", "pattern", "glob", "notebook_path")
 
 
+def outside_readable(tool: str, tool_input: dict) -> str:
+    """For Read, Grep and Glob: the path outside READABLE they would look at ('' when allowed).
+    A search without a path would start at the repo root, so it is outside too."""
+    if tool not in ("Read", "Grep", "Glob", "NotebookRead"):
+        return ""
+    target = tool_input.get("file_path") or tool_input.get("path") or tool_input.get("notebook_path") or ""
+    if not target:
+        return "the repo root"
+    resolved = (ROOT / target).resolve() if not pathlib.Path(target).is_absolute() else pathlib.Path(target).resolve()
+    for root in READABLE:
+        if resolved == root or root in resolved.parents:
+            return ""
+    return str(target)
+
+
 async def guard(hook_input: dict, tool_use_id: str | None, context: object) -> dict:
     """PreToolUse hook: refuse any tool call whose command or path touches keys, env.sh or practice answers.
 
@@ -93,6 +117,11 @@ async def guard(hook_input: dict, tool_use_id: str | None, context: object) -> d
     ordinary prose ("environment", "results/") in a generator or notes must not be refused."""
     tool_input = hook_input.get("tool_input", {})
     fields = {k: v for k, v in tool_input.items() if k in GUARDED_FIELDS} if isinstance(tool_input, dict) else tool_input
+    outside = outside_readable(hook_input.get("tool_name", ""), tool_input if isinstance(tool_input, dict) else {})
+    if outside:
+        return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
+                                       "permissionDecisionReason": "Read only your inputs, builder/ and the kit's "
+                                       "docs/ (not " + outside + ")."}}
     found = BLOCKED.search(json.dumps(fields))
     if found:
         return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
