@@ -176,3 +176,11 @@ Ders ve düzeltme: kapanış tool'u çağrıdan sonra bir kez koşuyor; kısa bi
 C'nin insan sayacı: builder "konuşma boyunca insan isteklerini say" kuralını system prompt'ta modele bıraktı (deterministik sayaç yok). Kendi vakalarımız (`dev/cases/brief-c-cases*.json`) kuyrukta ölçecek.
 
 Brief D build'i: 629 sn (ajan süresi 626 sn; model yavaştı), $0,95, 18 tur; workflow `ee96c670-025f-4d40-b8d6-796e18abb44b`, agent `29f8eaaf-2a44-45e8-bc18-c416ee902767`. A vakalarıyla ölçümü koşuyor.
+
+## 10 Ekim, 23:04–00:00: Brief D (A vakaları, 1. tekrar 7/10), takılan simülasyon, iki skill dersi
+
+D ölçümünün 1. tekrarı (`b50e64e5`): 10 çağrının hepsi 23:08'de bitti ve sonuçlandı, ama simülasyonun durumu "running"de kaldı; `run_cases.py` 44 dk bekledi. Kit belgelerinde simülasyonu durduran çağrı yok (README yalnız "çağrı hiç başlamazsa running'de kalır" vakasını anlatıyor). Sonuç Freya ve ledger'dan salt okuma yeniden puanlandı: **7/10**. Bekleyen süreç durduruldu; İhsan'dan takılan simülasyonu panelden silmesi istendi (aynı anda tek simülasyon kuralı yüzünden kuyruk ondan sonra başlayabilir). D'nin A vakalarındaki 2. ve 3. tekrarı yok; D yeniden kurulunca tam ölçülecek.
+
+D'nin üç kalması: PUB-07 hakem gürültüsü ("All criteria met" yazıp `inconclusive` verdi). PUB-05 gerçek: işini kaybeden müşteriye iki ikna denemesi ve taban teklifi (D'nin "sıkıntıyı kısaca kabul et, sonra somut sonraki adım ver" üslup kuralı, zor durumda ikna yasağını ezdi). PUB-10 gerçek: `create_promise` ilk hatasında tekrar yok, `no_promise/service_error` (builder D'nin "önce müşteriye açıkla, sonra tekrar dene" cümlesini retry mesajına "müşteriye söyle …, sonra tekrar çağır" sırasıyla yazdı; model konuşup turu bitirdi, tekrarı unuttu).
+
+Skill'e iki mekanizma (ölçülmedi): (1) her "retry" mesajında tekrar çağrı aynı turda ve önce; müşteriye söylenecek kısa cümle çağrıyla birlikte (B'nin çağrı sonu dersinin genellemesi); (2) üslup kuralı ile bir durumda bir eylemi yasaklayan kural çatışırsa yasaklayan kazanır; görev mesajında yasaklayan kuralın yanına yazılır. Testler: 468 yeşil.

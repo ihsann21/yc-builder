@@ -168,6 +168,17 @@ Respect the brief's exceptions (a call that ends in a transfer may forbid such r
 Give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing.
 
+The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
+retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced
+"tell the customer ..., then call the tool again", and the call closed without the retry). Write it as
+"Call <tool> again now with the same values, in this same turn, without waiting for the customer. While
+you call it you may say one short sentence: <what the brief wants said>."
+
+When a brief's style rule (give a next step, keep the conversation moving, one action per turn) meets
+a rule that forbids an action in a situation (no persuasion after hardship, nothing about the account
+before identity), the forbidding rule wins: say so in that step's task message, next to the
+forbidding rule (measured: a style rule made the model offer a payment after the customer lost their job).
+
 ## Template: WORK/gen.py
 
 ```python
