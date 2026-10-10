@@ -19,7 +19,8 @@ write the prompts, and assemble the workflow.
   Never hand-write tool JSON.
 - Read the whole brief. Most failures come from one skipped rule. When the brief is raw bank
   material (mail, policy extract, memo, code list), the memo's change wins over the older text and
-  the code list gives the outcome and reason names.
+  the code list gives the outcome and reason names. Where the tool API file lists enum values, its
+  spelling wins: map the code list onto the enum (close_hook with op= refuses names outside it).
 
 ## Steps
 
@@ -93,17 +94,19 @@ calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, M
 hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": "DMY"} | {"kind": "digits", "last": 4}
                | {"kind": "time"} | {"kind": "amount"} | {"by": OTHER_FIELD, "cases": {VALUE: SPEC}}},
                refs=[ID_FIELD], key_field=ID_FIELD,
-               guard={DATE_FIELD: {"min": "today", "max_var": "bb_deadline__{key}", "calendar": CAL, "roll": "forward"}})
+               guard={DATE_FIELD: {"min": "today", "max_var": "bb_deadline__{key}", "calendar": CAL, "roll": "forward"}},
+               op=ops[TOOL])
 hooks.post_hook(TOOL, rules=[{"when": [[F, "true"|"false"|"missing"|"present"|"equals"|"lte"|..., V]],
                 "say": TEXT, "set": {"bb_identity": "verified"}}], messages={"ok", "retry", "give_up",
                 "error", "default": TEXT}, ok_when=[[F, "true"], ...], key_field=F, retries=N,
-                fail_mark=[F, False], log_fields=[F])
+                fail_mark=[F, False], log_fields=[F], op=ops[TOOL])
 #   message placeholders: {key} {tries} {retries_left} {adjusted} {open:TOOL:TOOL} (products not yet
 #   written by any of those tools, or "none") and any response field or variable
 closing.close_hook(outcome_field=F, reason_field=F, outcomes={OUTCOME: [REASONS] or []},
                    rules=[{"if": [[FACT, OP, V]], "outcome": O, "reason": R | {"fact": FACT, "map": {...}}
                           | {"first_logged": "TOOL.FIELD", "skip": [...]} | {"model": True}}, {"keep_model": True}],
-                   default={"outcome": O, "reason": R})
+                   default={"outcome": O, "reason": R}, op=ops[CLOSE_TOOL])
+#   always pass op=: every field and outcome/reason name is then checked against the tool API file
 #   facts: count:TOOL  gave_up:TOOL  last:TOOL.FIELD  logged:TOOL.FIELD  all_logged:TOOL.FIELD
 #          var:NAME (e.g. var:bb_identity)  model:outcome  model:reason
 wf.code_node(NAME, CODE, NEXT); wf.api_request_node(NAME, TOOL, NEXT, mapping=[...])

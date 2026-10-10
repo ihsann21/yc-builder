@@ -29,8 +29,22 @@ MESSAGE_KEYS = ("ok", "retry", "give_up", "error", "default")
 ADJUSTED_NOTE = "Note: {adjusted}. Tell the customer the value that was recorded."
 
 
+def check_fields(op, request: list | tuple = (), response: list | tuple = (), where: str = "") -> None:
+    """With a tools.Operation, every named request field and the first part of every response path
+    must exist in the tool API file: a field renamed in a new API would otherwise fail silently."""
+    if op is None:
+        return
+    known_req = {f.name for f in op.request}
+    known_resp = {f.name for f in op.response}
+    wrong = [n for n in request if n and n not in known_req]
+    wrong += [n for n in response if n and str(n).split(".")[0] not in known_resp]
+    if wrong:
+        raise ValueError(where + " of " + op.name + ": unknown field(s) " + repr(wrong) + "; request fields "
+                         + repr(sorted(known_req)) + ", response fields " + repr(sorted(known_resp)))
+
+
 def pre_hook(tool: str, *, normalize: dict | None = None, refs: list[str] | tuple = (),
-             guard: dict | None = None, key_field: str = "", now_var: str = "now") -> str:
+             guard: dict | None = None, key_field: str = "", now_var: str = "now", op=None) -> str:
     """Snippet of a pre hook.
 
     normalize  {field: spec}; spec is {"kind": "date"|"digits"|"time"|"amount"|"text", ...} or
@@ -44,6 +58,7 @@ def pre_hook(tool: str, *, normalize: dict | None = None, refs: list[str] | tupl
                "roll": "forward"|"backward"}}: keep the date in range and on a business day.
                {key} is the value of key_field. If a bound cannot be read, the value stays.
     key_field  the field that identifies what is written (e.g. a product id), for per-key counts.
+    op         the tool's tools.Operation: every field named above must be one of its request fields.
     """
     check_var(tool)
     check_var(now_var)
@@ -55,6 +70,8 @@ def pre_hook(tool: str, *, normalize: dict | None = None, refs: list[str] | tupl
     guard = dict(guard or {})
     for field, spec in guard.items():
         check_guard(field, spec)
+    by = [spec.get("by") for spec in normalize.values() if isinstance(spec, dict) and spec.get("by")]
+    check_fields(op, request=list(normalize) + by + list(refs) + list(guard) + [key_field], where="pre_hook")
     cfg = {"tool": tool, "normalize": normalize, "refs": list(refs), "guard": guard,
            "key_field": key_field, "now_var": now_var}
     check_no_double_braces(cfg)
@@ -65,7 +82,7 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
               ok_when: list | None = None, key_field: str = "", retries: int = 0,
               log_fields: list[str] | tuple = (), fail_mark: list | None = None,
               next_key: str = "what_to_do_next", strip_header: bool = True,
-              adjusted_note: str = ADJUSTED_NOTE) -> str:
+              adjusted_note: str = ADJUSTED_NOTE, op=None) -> str:
     """Snippet of a post hook.
 
     rules      [{"when": [[field, op, value?], ...], "say": template, "set": {var: value}}]: the first
@@ -81,6 +98,8 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
     log_fields request fields to keep as 'key:value' for each successful write.
     fail_mark  [field, value] written into a failed response so the model cannot read it as success.
     next_key   the result field that carries the message; the system prompt must tell the model to obey it.
+    op         the tool's tools.Operation: rule, ok_when and fail_mark fields must be response fields,
+               key_field and log_fields request fields.
     """
     check_var(tool)
     for rule in rules:
@@ -99,6 +118,10 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
         raise ValueError("fail_mark must be [field, value]")
     if isinstance(log_fields, str) or not isinstance(next_key, str) or not next_key:
         raise ValueError("log_fields must be a list of field names and next_key a field name")
+    response = [c[0] for c in list(ok_when or []) if isinstance(c, (list, tuple)) and c]
+    response += [c[0] for r in rules for c in r.get("when", []) if isinstance(c, (list, tuple)) and c]
+    response += [fail_mark[0]] if fail_mark else []
+    check_fields(op, request=[key_field] + list(log_fields), response=response, where="post_hook")
     cfg = {"tool": tool, "rules": [dict(r) for r in rules], "messages": messages, "ok_when": list(ok_when or []),
            "key_field": key_field, "retries": retries, "log_fields": list(log_fields),
            "fail_mark": list(fail_mark) if fail_mark else [], "next_key": next_key,

@@ -325,3 +325,27 @@ def test_open_placeholder_lists_products_no_listed_tool_has_written():
     state["bb_key__book"] = "a3"
     state, result = post(state, {"done": "true", "ref": "r"}, **cfg)
     assert result["data"]["what_to_do_next"] == "Still open: none."
+
+
+def test_hook_fields_are_checked_against_the_tool_api(kit_api):
+    from builder.lib import closing, tools
+    ops, _ = tools.operations(kit_api)
+    promise, verify, close = ops["create_promise"], ops["verify_identity"], ops["close_call"]
+    hooks.pre_hook("create_promise", refs=["product_id"], key_field="product_id",
+                   normalize={"amount": {"kind": "amount"}}, op=promise)
+    hooks.post_hook("create_promise", ok_when=[["ok", "true"], ["promise_id", "present"]], key_field="product_id",
+                    log_fields=["date"], fail_mark=["ok", False], op=promise)
+    hooks.pre_hook("verify_identity", normalize={"answer": {"by": "field", "cases": {"x": {"kind": "time"}}}}, op=verify)
+    hooks.post_hook("verify_identity", rules=[{"when": [["all_verified", "true"]], "say": "x"}], op=verify)
+    with pytest.raises(ValueError, match="unknown field"):
+        hooks.post_hook("create_promise", ok_when=[["success", "true"]], op=promise)       # renamed response field
+    with pytest.raises(ValueError, match="unknown field"):
+        hooks.pre_hook("create_promise", refs=["account_id"], op=promise)                  # renamed request field
+    closing.close_hook(outcome_field="outcome", reason_field="reason", outcomes={"promise": [], "paid": []},
+                       rules=[], default={"outcome": "promise"}, op=close)
+    with pytest.raises(ValueError, match="not in the API enum"):
+        closing.close_hook(outcome_field="outcome", reason_field="reason", outcomes={"no_contact": []},
+                           rules=[], default={"outcome": "no_contact"}, op=close)
+    with pytest.raises(ValueError, match="unknown field"):
+        closing.close_hook(outcome_field="result", reason_field="reason", outcomes={"promise": []},
+                           rules=[], default={"outcome": "promise"}, op=close)

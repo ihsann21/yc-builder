@@ -10,14 +10,14 @@ import re
 
 from builder.lib import embed
 from builder.lib.calc import check_no_double_braces, check_var
-from builder.lib.hooks import OPS
+from builder.lib.hooks import OPS, check_fields
 
 FACT = re.compile(r"^(count|gave_up|logged|all_logged|last|var|model):(.+)$")
 NEEDS_FIELD = ("logged", "all_logged", "last")
 
 
 def close_hook(*, outcome_field: str, reason_field: str, outcomes: dict[str, list[str]], rules: list[dict],
-               default: dict, products_var: str = "bb_products") -> str:
+               default: dict, products_var: str = "bb_products", op=None) -> str:
     """Snippet of the close tool's pre hook.
 
     outcome_field, reason_field  the close tool's body fields (from the tool API file).
@@ -25,6 +25,8 @@ def close_hook(*, outcome_field: str, reason_field: str, outcomes: dict[str, lis
                names from the tool API enum and the reasons from the brief's table.
     rules      ordered; the first that holds and names an allowed outcome and reason wins.
     default    {"outcome", "reason"} when no rule applies (e.g. the model sent nothing usable).
+    op         the close tool's tools.Operation: both fields must exist, and the outcome and reason names
+               must be among the fields' enum values where the API lists them (the API's spelling wins).
     """
     for name in (outcome_field, reason_field):
         check_var(name)
@@ -36,6 +38,14 @@ def close_hook(*, outcome_field: str, reason_field: str, outcomes: dict[str, lis
     for rule in rules:
         check_rule(rule, outcomes)
     check_choice(default.get("outcome"), default.get("reason", ""), outcomes, "default")
+    check_fields(op, request=[outcome_field, reason_field], where="close_hook")
+    if op is not None:
+        enums = {f.name: set(f.enum) for f in op.request}
+        reasons = {r for rs in outcomes.values() for r in rs}
+        for name, values in ((outcome_field, set(outcomes)), (reason_field, reasons)):
+            if enums.get(name) and not values <= enums[name]:
+                raise ValueError("close_hook: " + repr(sorted(values - enums[name])) + " not in the API enum of "
+                                 + repr(name) + ": " + repr(sorted(enums[name])))
     cfg = {"outcome_field": outcome_field, "reason_field": reason_field,
            "outcomes": {k: list(v) for k, v in outcomes.items()}, "rules": [dict(r) for r in rules],
            "default": dict(default), "products_var": products_var}
