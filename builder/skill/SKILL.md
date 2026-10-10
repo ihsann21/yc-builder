@@ -175,6 +175,18 @@ message: "... Ask nothing else. Then say exactly this sentence and nothing after
 tool result a quoted sentence reaches the model as \" and was copied with the escape (measured: the
 required sentence came out with a stray <"> after it).
 
+A step's first words come from `on_enter=wf.say(TEXT)` with the fixed sentence the brief allows
+(variables in `{{...}}`), e.g. the security step: "To protect your account I need to ask you two security
+questions. First, <the brief's first question>?". Use `wf.llm` only when the words cannot be fixed: the
+model that writes them does not see the brief (measured: it invented a security question about a pet).
+
+Customers give answers in pieces over several turns ("14 March", then "1988"; "4 4", then "7 1") and
+correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in
+pieces over several turns, put the pieces together and call the tool once with the complete answer; if a
+part is missing, ask only for that part. If the customer corrects a part, use the corrected part. Never
+ask for the whole answer again because it came in pieces." (measured: an agent asked six times for the
+full date in one sentence and ended the call unverified).
+
 The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
 retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced
 "tell the customer ..., then call the tool again", and the call closed without the retry). Write it as
