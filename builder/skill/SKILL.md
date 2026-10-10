@@ -126,6 +126,18 @@ measured to fail: the model offered the deadline for a holiday before it):
  Use <the brief's sentence for a day after the deadline> only for a day the guide marks AFTER."
 Fill in the brief's own rules; when the brief gives other handling for one of these cases, its rule wins.
 
+Persuasion attempts are miscounted when there are several products: the model copies one product's
+attempts to the next, or ends a product the customer refused up front without any attempt (both
+measured). So: end every band's `offers` text with an explicit stop ("This product has ONE attempt
+only: after attempt 1 is refused, stop for this product." / "After attempt N is refused, stop for this
+product."), and add to the task message's refusal rule: "Every offer or question you make about a
+product after the customer refused it counts as one attempt. Before each offer, check that product's
+own line: make exactly its listed attempts, never the number another product has. A product the
+customer refused before you reached it (for example in answer to the first question) still gets its
+attempts: your first message about it is its attempt 1 offer. Never end a product as refused before its
+listed attempts are used." Adapt the words to the brief's own counting rules; when the brief counts
+attempts differently, its rule wins.
+
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
 applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
