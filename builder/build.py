@@ -81,11 +81,22 @@ def existing(path: str) -> str:
     raise SystemExit("input file not found: " + path)
 
 
+GUARDED_FIELDS = ("command", "file_path", "path", "pattern", "glob", "notebook_path")
+
+
 async def guard(hook_input: dict, tool_use_id: str | None, context: object) -> dict:
-    """PreToolUse hook: refuse any tool call that touches env.sh or the key variables."""
-    if BLOCKED.search(json.dumps(hook_input.get("tool_input", {}))):
+    """PreToolUse hook: refuse any tool call whose command or path touches keys, env.sh or practice answers.
+
+    Only commands, paths and search patterns are checked, never the content of a file being written:
+    ordinary prose ("environment", "results/") in a generator or notes must not be refused."""
+    tool_input = hook_input.get("tool_input", {})
+    fields = {k: v for k, v in tool_input.items() if k in GUARDED_FIELDS} if isinstance(tool_input, dict) else tool_input
+    found = BLOCKED.search(json.dumps(fields))
+    if found:
         return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
-                                       "permissionDecisionReason": "Keys and env.sh are off limits."}}
+                                       "permissionDecisionReason": "Off limits for the builder (matched "
+                                       + repr(found.group(0).strip()) + "): keys, env.sh, dev/, tests/, "
+                                       "practice answers and results."}}
     return {}
 
 
@@ -134,12 +145,27 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
                   f"duration={message.duration_ms / 1000:.0f}s")
 
 
-def export(slot: str, trace: Trace) -> bool:
-    """Export the slot's saved workflow to submission/<slot>.workflow.json and trace what it holds."""
-    if not STATE_FILE.exists() or slot not in json.loads(STATE_FILE.read_text(encoding="utf-8")):
+def saved_entry(slot: str) -> dict:
+    """The slot's entry in the state file ({workflow_id, agent_id, version}), or {}."""
+    try:
+        return json.loads(STATE_FILE.read_text(encoding="utf-8")).get(slot, {})
+    except (OSError, ValueError):
+        return {}
+
+
+def export(slot: str, before: dict, trace: Trace) -> bool:
+    """Export the slot's saved workflow to submission/<slot>.workflow.json and trace what it holds.
+
+    Only a workflow this run saved is exported: if the state entry did not change, the run saved
+    nothing and the file of an earlier run must not pass for this run's agent."""
+    saved = saved_entry(slot)
+    if not saved:
         trace("[export] FAILED: no workflow was saved for slot", slot)
         return False
-    saved = json.loads(STATE_FILE.read_text(encoding="utf-8"))[slot]
+    if saved == before:
+        trace("[export] FAILED: this run saved no new version (still", saved.get("workflow_id"),
+              "version", str(saved.get("version")) + "); nothing exported")
+        return False
     sys.path.insert(0, str(KIT))
     import freya
     out = ROOT / "submission" / (slot + ".workflow.json")
@@ -188,14 +214,20 @@ def main() -> int:
     briefs = [str(inputs / pathlib.Path(b).name) for b in briefs]
     api = str(inputs / pathlib.Path(api).name)
     trace("[inputs] copied to", inputs.relative_to(ROOT))
+    before = saved_entry(slot)
     try:
         asyncio.run(asyncio.wait_for(run_agent(briefs, api, slot, args.cases, deadline, trace), timeout=deadline))
     except asyncio.TimeoutError:
         trace(f"[deadline] stopped the agent after {deadline} s; exporting what was saved")
     except Exception as error:  # the agent failed: still export whatever it saved
         trace("[agent error]", type(error).__name__, str(error)[:300])
-    ok = export(slot, trace)
-    trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S"), f"build time {time.time() - start:.0f} s")
+    ok = False
+    try:
+        ok = export(slot, before, trace)
+    except Exception as error:  # noqa: BLE001 - the trace must still get its end line
+        trace("[export] FAILED:", type(error).__name__, str(error)[:300])
+    finally:
+        trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S"), f"build time {time.time() - start:.0f} s")
     return 0 if ok else 1
 
 

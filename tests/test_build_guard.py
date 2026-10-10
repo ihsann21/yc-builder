@@ -41,3 +41,34 @@ def test_blocked(command):
 ])
 def test_allowed(command):
     assert not BLOCKED.search(seen(command))
+
+
+def decide(tool_input: dict) -> str:
+    """The guard's decision for one tool call: 'deny' or 'allow'."""
+    import asyncio
+    from builder.build import guard
+    out = asyncio.run(guard({"tool_input": tool_input}, None, None))
+    return out.get("hookSpecificOutput", {}).get("permissionDecision", "allow")
+
+
+def test_guard_checks_commands_and_paths_not_written_content():
+    assert decide({"command": "cat env.sh"}) == "deny"
+    assert decide({"file_path": f"{ROOT_TEXT}/dev/practice.py"}) == "deny"
+    assert decide({"pattern": "x", "path": "tests/"}) == "deny"
+    prose = "The customer names the environment of the call; see results/ of the check. Use env vars? no."
+    assert decide({"file_path": f"{ROOT_TEXT}/builder/work/s/notes.md", "content": prose}) == "allow"
+    assert decide({"file_path": f"{ROOT_TEXT}/builder/work/s/gen.py", "old_string": "a", "new_string": prose}) == "allow"
+
+
+def test_export_refuses_a_run_that_saved_nothing(tmp_path, monkeypatch):
+    from builder import build
+    state = tmp_path / ".freya-agents.json"
+    state.write_text(json.dumps({"s": {"workflow_id": "w", "agent_id": "a", "version": 3}}))
+    monkeypatch.setattr(build, "STATE_FILE", state)
+    lines = []
+
+    def trace(*parts):
+        lines.append(" ".join(map(str, parts)))
+    assert build.export("s", {"workflow_id": "w", "agent_id": "a", "version": 3}, trace) is False
+    assert "saved no new version" in lines[-1]
+    assert build.export("t", {}, trace) is False and "no workflow was saved" in lines[-1]
