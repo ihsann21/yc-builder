@@ -349,3 +349,8 @@ def test_hook_fields_are_checked_against_the_tool_api(kit_api):
     with pytest.raises(ValueError, match="unknown field"):
         closing.close_hook(outcome_field="result", reason_field="reason", outcomes={"promise": []},
                            rules=[], default={"outcome": "promise"}, op=close)
+
+
+@pytest.mark.parametrize("text", ["AB1234", "SW1A 2AA", "company 12345678X", "4821b"])
+def test_digits_leave_codes_with_letters_alone(text):
+    assert rt.normalize_digits(text, 0) is None and rt.normalize_digits(text, 4) is None

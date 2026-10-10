@@ -179,6 +179,8 @@ def normalize_digits(text, last=0):
     Two numbers ('4821 ... in 2019') or other words between digit words give None.
     """
     text = as_text(text)
+    if re.search(r"[A-Za-z][0-9]|[0-9][A-Za-z]", text):
+        return None                      # a code with letters in it ('AB1234', 'SW1A'): not only digits
     groups = DIGIT_GROUP.findall(text)
     if groups:
         if len(groups) != 1:

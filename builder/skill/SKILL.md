@@ -92,6 +92,8 @@ calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, M
 #   placeholders: {id} {name} {full} {floor} {floor_label} {days} {band} {deadline} {deadline_spoken}
 #   {deadline_shifts} {attempts} {offers} {field:F} {date:N} {date_spoken:N} {shifts:N};
 #   writes bb_products, bb_deadline__<id>, ...
+# normalize kinds: "digits" only for answers that are digits alone; "text" (optionally "upper": True)
+#   for codes with letters (postcodes, company numbers); a value that cannot be read for sure is sent as given
 hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": "DMY"} | {"kind": "digits", "last": 4}
                | {"kind": "time"} | {"kind": "amount"} | {"by": OTHER_FIELD, "cases": {VALUE: SPEC}}},
                refs=[ID_FIELD], key_field=ID_FIELD,
