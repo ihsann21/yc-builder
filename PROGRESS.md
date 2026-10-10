@@ -198,3 +198,11 @@ Kökteki `brief-d.md` 23:49'da Codex tarafından güncellenmiş (14,9 KB → 17,
 ## 11 Ekim, 00:17: Brief D v2, A vakaları: 10/10
 
 D v2 ajanı (`41001003…`, yeni skill: aynı turda retry, yasaklayan kural kazanır) `--brief A --reps 3`: **10/10** (koşular 10, 10, 10; 636 sn; `dev/out/q-D2-A-reps3.out`). İlk D build'inin 1. tekrarındaki PUB-05 (zor durumda teklif) ve PUB-10 (retry yok) kapandı. Katkı ayrılamıyor: brief v2 bu iki konuyu netleştirdi, skill de değişti. Ayırmak için D v1'in yeni skill'le ölçümü kuyrukta.
+
+## 11 Ekim, 00:17–00:50: stil testi `pieces` (A), iki tur
+
+İlk tur (A ajanı v5, eski skill): 1. tekrar 8/10, 2. tekrar 9/10 (simülasyon "running"de takıldı, `dev/rescore.py` ile puanlandı; 3. tekrar koşulmadı). Bulgular: (1) kimlik adımının girişi `wf.llm` ile üretiliyordu; model brief'te olmayan "ilk evcil hayvanınızın adı" sorusunu uydurdu; (2) "14 March" + "1988" iki turda gelince ajan birleştirmedi, altı kez tam tarihi istedi, doğrulanamadı diye kapattı; (3) PUB-03'te müşteri modeli parçaları karıştırıp gerçek tarihi söyledi (test artığı, ajan doğru). Skill: sabit `wf.say` girişleri; parça parça cevabı birleştirme kuralı.
+
+İkinci tur (A v7, yeni skill; build 236 sn, $1,13): `--style pieces --reps 3` **7/10** (koşular 9, 9, 8; 26/30; `dev/out/q-A5-pieces-reps3.out`). PUB-01 ve PUB-03 3/3 (kimlik düzeldi). Kalanlar tutarda: PUB-07 500 ve 180 (beklenen 540), PUB-04 400 (beklenen 1250), PUB-06 taban iki kez. Kök neden: ajan tarih anlaşıldıktan sonra tutarı **soruyor** ("how much of the 540.00 will you be paying?"), brief kural 24 yasaklıyor; parça parça konuşan müşteri ilk parçayı söylüyor ("Twelve", "5"). Skill: yasak yerine söylenecek cümle (tarih anlaşılınca "Can you pay the full past-due amount of <amount> on <date>?"), sayı parçaları da birleştirilir. A yeniden build ediliyor, `pieces` yeniden ölçülecek.
+
+Takılan simülasyonlar: hakemin `inconclusive` verdiği çağrı olunca simülasyon "running"de kalıyor (iki kez; `maxRetries: 3`). `dev/rescore.py <sim>` takılan simülasyonu Freya çağrıları ve ledger'dan puanlıyor; simülasyon panelden silinmeden yenisi başlamıyor.
