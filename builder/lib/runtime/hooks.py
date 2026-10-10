@@ -77,7 +77,7 @@ def small_number(words, index):
 
 def spoken_numbers(words):
     """The numbers in a list of words, in order: '14' -> 14, 'twenty second' -> 22,
-    'nineteen seventy nine' -> 19, 79, 'one nine seven nine' -> 1979, 'two thousand and five' -> 2005."""
+    'nineteen sixty three' -> 19, 63, 'one nine six three' -> 1963, 'two thousand and five' -> 2005."""
     out = []
     run = ""
     index = 0

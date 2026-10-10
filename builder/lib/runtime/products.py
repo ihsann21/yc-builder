@@ -156,6 +156,7 @@ def write_products(state, cfg):
     """Find the products, write per-product variables and the facts text."""
     ids = []
     lines = []
+    said = []
     for item in find_items(state, cfg):
         values, get = item_values(item, cfg, state)
         key = var_key(values["id"])
@@ -168,7 +169,11 @@ def write_products(state, cfg):
         state["bb_type__" + key] = values["type"]
         state["bb_name__" + key] = values["name"]
         lines.append(fill(cfg.get("line", ""), get))
+        if cfg.get("say_line"):
+            said.append(fill(cfg.get("say_line"), get))
     state["bb_products"] = ",".join(ids)
+    if cfg.get("say_line"):
+        state[cfg.get("say_var", "debt_statement")] = " ".join(said)
     state["bb_product_count"] = len(ids)
     state["bb_single_product"] = ids[0] if len(ids) == 1 else ""
     facts_var = cfg.get("facts_var", "account_facts")

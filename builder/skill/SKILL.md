@@ -14,7 +14,10 @@ write the prompts, and assemble the workflow.
 - Every value comes from the brief or the tool API file given to you: holidays, workdays, deadlines,
   bands, limits, attempt counts, identity questions, outcome and reason names, queues, sentences the
   customer must hear, the closing phrase. Do not reuse values from any other brief or example.
-- Do not open `dev/`, `tests/`, the kit's `out/`, `public-test-set.json`, `results/` or `traces/`.
+- Read only the brief and tool API files given to you (their copies in `WORK/inputs/`), `builder/`
+  and the kit's `docs/`. Do not open or search anything else: not `dev/`, `tests/`, `submission/`, other
+  briefs, the kit's `briefs/`, `out/`, `examples/`, `public-test-set.json`, `results/`, `traces/` or the
+  repo's notes. Do not search from the repo root. (Such tool calls are refused.)
 - Tool names, field names, types and enums come from the OpenAPI file through `builder.lib.tools`.
   Never hand-write tool JSON.
 - Read the whole brief. Most failures come from one skipped rule. When the brief is raw bank
@@ -41,13 +44,18 @@ write the prompts, and assemble the workflow.
    against `WORK/notes.md` and the prompts once, and fix what is missing.
 7. Finish with one line: workflow_id, agent_id, and the last test result.
 
-## How the workflow is built (proven on the practice briefs)
+## How the workflow is built (the default for a brief with this flow)
+
+This is the default layout for a brief whose call goes: who is on the line, identity, the debt and the
+promises, closing. Add, drop or reorder steps when the brief's flow differs. Give each step every tool
+the brief allows in that step (from `WORK/notes.md`), plus end_call; never a tool the brief forbids there.
 
 - `setup` (code node, initial): date facts from `now` for the whole call (`calc.dates_code`).
-- `greet` (conversation): fixed opening line; who is on the line (extraction enum); callback for
-  someone else; tools: the callback tool and the end_call tool only.
-- `identity` (conversation): ask the security questions one at a time; tools: the identity tool,
-  the transfer tool (a customer insisting on a human), end_call. Leave on the identity result:
+- `greet` (conversation): the brief's opening; who is on the line (extraction enum); what the brief
+  says to do when someone else answers (e.g. a callback); tools: those the brief allows before identity.
+- `identity` (conversation): ask the brief's security questions, in its order and as it says (one at a
+  time when it says so); tools: the identity tool, any tool the brief allows here (e.g. a transfer
+  for a human request), end_call. Leave on the identity result:
   `wf.any_of(wf.when_true("<identity tool>_response.data.<all-verified field>"), wf.when_equals("bb_identity", "verified"))`.
 - `load_account` (api_request): the account lookup, mapping `data.<list field>` to a variable.
 - `account_facts` (code node): product facts (`calc.products_code`).
@@ -72,13 +80,14 @@ write the prompts, and assemble the workflow.
 from builder.lib import calc, closing, hooks, tools, workflow as wf
 ops, warnings = tools.operations(tools.load_api(API)); op = ops["<tool>"]
 tools.api_tool(op, description=TEXT, bake={"<field>": "{{<call variable>}}"}, notes={"<field>": TEXT},
-               pre=CODE, post=CODE, retries=0, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call")
+               pre=CODE, post=CODE, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call")
 tools.end_call_tool(description=TEXT, trigger_phrase=PHRASE, polite_replies=[...])
-calc.dates_code(calendar={"workdays": [0, 1, 2, 3, 4], "holidays": ["YYYY-MM-DD", ...]},
+calc.dates_code(calendar={"workdays": [WORKDAYS, Monday = 0], "holidays": ["YYYY-MM-DD", ...]},
                 dates=[{"name": N, "rule": R, ...params, "label": TEXT,
-                        "shifts": "forward" | "backward"}],   # bb_date__N, bb_date__N__spoken, bb_shifts__N
-                windows=[{"name": N, "days": [rules], "from": "HH:MM", "to": "HH:MM", "after_now": True,
-                          "var": "<var for the prompt>", "label": TEXT}],
+                        "shifts": SHIFT}],   # bb_date__N, bb_date__N__spoken, bb_shifts__N; SHIFT forward|backward
+                windows=[{"name": N, "days": [rules], "from": "HH:MM", "to": "HH:MM", "after_now": BOOL,
+                          "inclusive": BOOL, "var": "<var for the prompt>", "label": TEXT}],
+#   one window per time range the brief allows; every value from the brief
                 weekday_mode="following_week" | "first_after_today" | "", calendar_days=40)
 #   rules: today | next_business_day | business_days_after n | calendar_days_after n (+roll)
 #          | end_of_month months_ahead (+roll) | last_business_day_of_week (weeks_ahead, after_today)
@@ -88,16 +97,19 @@ calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, M
                    "floor_field": F, "floor_label": TEXT}}   # or, with no floor field:
                    #   "floor_percent": P (of the full amount), "floor_min": N (computed floor never above full), bands=[{"name", "min", "max", "deadline": DATE_NAME,
                    "attempts": N, "offers": TEMPLATE}], line=TEMPLATE, header="...{count}...",
-                   known_dates=(...DATE_NAMEs))
+                   known_dates=(...DATE_NAMEs), band_field=F, default_type={...},
+                   say_line=TEMPLATE)   # say_line: what is said about one product -> {{debt_statement}}
+#   band_field: the item field the brief's band table is keyed on (days_field by default);
+#   default_type: the spec for a product type the brief names that the API enum does not list
 #   placeholders: {id} {name} {full} {floor} {floor_label} {days} {band} {deadline} {deadline_spoken}
 #   {deadline_shifts} {attempts} {offers} {field:F} {date:N} {date_spoken:N} {shifts:N};
 #   writes bb_products, bb_deadline__<id>, ...
 # normalize kinds: "digits" only for answers that are digits alone; "text" (optionally "upper": True)
 #   for codes with letters (postcodes, company numbers); a value that cannot be read for sure is sent as given
-hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": "DMY"} | {"kind": "digits", "last": 4}
+hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": ORDER} | {"kind": "digits", "last": N}
                | {"kind": "time"} | {"kind": "amount"} | {"by": OTHER_FIELD, "cases": {VALUE: SPEC}}},
                refs=[ID_FIELD], key_field=ID_FIELD,
-               guard={DATE_FIELD: {"min": "today", "max_var": "bb_deadline__{key}", "calendar": CAL, "roll": "forward"}},
+               guard={DATE_FIELD: {"min": "today", "max_var": "bb_deadline__{key}", "calendar": CAL, "roll": SHIFT}},
                op=ops[TOOL])
 hooks.post_hook(TOOL, rules=[{"when": [[F, "true"|"false"|"missing"|"present"|"equals"|"lte"|..., V]],
                 "say": TEXT, "set": {"bb_identity": "verified"}}], messages={"ok", "retry", "give_up",
@@ -134,25 +146,23 @@ measured to fail: the model offered the deadline for a holiday before it):
  Use <the brief's sentence for a day after the deadline> only for a day the guide marks AFTER."
 Fill in the brief's own rules; when the brief gives other handling for one of these cases, its rule wins.
 
-Persuasion attempts are miscounted when there are several products: the model copies one product's
-attempts to the next, or ends a product the customer refused up front without any attempt (both
-measured). So: end every band's `offers` text with an explicit stop ("This product has ONE attempt
+When the brief limits persuasion attempts, the model miscounts them with several products: it copies one
+product's count to the next, or ends a product refused early without the attempts the brief gives it
+(both measured). So end every band's `offers` text with an explicit stop ("This product has ONE attempt
 only: after attempt 1 is refused, stop for this product." / "After attempt N is refused, stop for this
-product."), and add to the task message's refusal rule: "Every offer or question you make about a
-product after the customer refused it counts as one attempt. Before each offer, check that product's
-own line: make exactly its listed attempts, never the number another product has. A product the
-customer refused before you reached it (for example in answer to the first question) still gets its
-attempts: your first message about it is its attempt 1 offer. Never end a product as refused before its
-listed attempts are used." Adapt the words to the brief's own counting rules; when the brief counts
-attempts differently, its rule wins.
+product."), and tell the model to check that product's own line before each offer, never another
+product's count. Then write the brief's own counting rule in if-then form: what uses an attempt (an
+offer, a question, the opening question or not), whether a refusal given before the agent reached a
+product uses one, and what happens when they are used up. Do not assume another brief's answer.
 
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
 applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
 field the reason name only. The close rules decide everything the tool results can decide; after
 `{"keep_model": True}` add rules keyed on the identity state (`var:bb_identity`), so that a call
-with a verified customer never ends in an outcome meant for calls where the customer was not
-reached or not verified, whatever the model sent. The `default` is the outcome for a call where
+with a verified customer never ends in an outcome the brief's table reserves for calls where the
+customer was not reached or not verified, whatever the model sent; build these rules from the table's
+own conditions. The `default` is the outcome for a call where
 nothing at all happened.
 
 Track every write tool with a post hook (`ok_when` from the tool's success field), give it a pre hook
@@ -160,14 +170,14 @@ too (the pre hook records the request the post hook and the close hook read). Re
 brief allows after a failed write. The hook messages are the next step the brief prescribes after
 that result, including any sentence the customer must hear.
 
-The end of a call with several steps left (record the agreed promises, then write per-product
-records such as notes, then the goodbye) is where the model drops tool calls: it says goodbye and
-the remaining calls never happen (measured). So in every message that can come before the end, put
-the tool calls still due first and the words to the customer last, never the other way round, and
-name the products still due with `{open:<tool>:<tool>...}` (products none of those tools has
-written yet, or "none"), e.g. "Products with neither a promise nor a <record>: {open:<promise tool>:<record tool>}.
-If that is not none, call <record tool> for each of them now, before you say anything. Then ...".
-Respect the brief's exceptions (a call that ends in a transfer may forbid such records).
+The end of a call with several steps left (the writes the brief requires per product, in its order,
+then the goodbye) is where the model drops tool calls: it says goodbye and the remaining calls never
+happen (measured). So in every message that can come before the end, put the tool calls still due
+first and the words to the customer last, never the other way round, and name the products still due
+with `{open:<tool>:<tool>...}` (products none of those tools has written yet, or "none"): list the tools
+whose successful write completes a product under the brief, e.g. "Products not yet completed:
+{open:<tool A>:<tool B>}. If that is not none, call <the tool the brief requires for them> for each now,
+before you say anything. Then ...". Respect the brief's exceptions (e.g. a transfer that forbids them).
 Give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the
@@ -178,32 +188,39 @@ message: "... Ask nothing else. Then say exactly this sentence and nothing after
 tool result a quoted sentence reaches the model as \" and was copied with the escape (measured: the
 required sentence came out with a stray <"> after it).
 
-A step's first words come from `on_enter=wf.say(TEXT)` with the fixed sentence the brief allows
-(variables in `{{...}}`), e.g. the security step: "To protect your account I need to ask you two security
-questions. First, <the brief's first question>?". Use `wf.llm` only when the words cannot be fixed: the
-model that writes them does not see the brief (measured: it invented a security question about a pet).
+A step's first words come from `on_enter=wf.say(TEXT)` with the fixed words the brief allows
+(variables in `{{...}}`), e.g. the security step: "<the brief's lead-in, if it gives one> <its first
+question>?" (state a number of questions or an order only if the brief does). The step that states the
+debt says `{{debt_statement}}` from `products_code(say_line=...)`: one sentence per product with what
+the brief says must be stated (e.g. "Your {name} is {full} past due and {days} days late."), so no
+product is skipped. Use `wf.llm` only when the words cannot be fixed: the model that writes them does not
+see the brief (measured: it invented a security question; it stated three products without amounts).
 
-Customers give answers in pieces over several turns ("2 May", then "1979"; "3 9", then "0 6") and
-correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in
+Customers give answers in pieces over several turns (the day and month, then the year; two digits, then
+two more) and correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in
 pieces over several turns, put the pieces together and call the tool once with the complete answer; if a
 part is missing, ask only for that part. If the customer corrects a part, use the corrected part. Never
 ask for the whole answer again because it came in pieces." (measured: an agent asked six times for the
 full date in one sentence and ended the call unverified). The same for amounts: a number that may be
-the start of a larger one ("twelve", "5") is a piece; ask for the rest before you judge it.
+the first part of a larger one is a piece; ask for the rest before you judge it.
 
 A ban alone does not hold; give the model the sentence to say instead. When the brief says the agent
-proposes every amount and never asks the customer for one, the negotiation task message must say what
-comes right after a date is agreed: "Can you pay the full past-due amount of <amount> on <date>?" (or the
-brief's own next offer), and that the agent never asks the customer how much they will pay (measured:
-with the ban only, the agent asked "how much of the <full amount> will you be paying?", the customer
-said a round lower figure, and that figure was recorded instead of the full amount).
+proposes the amounts (and never asks the customer for one), the negotiation task message gives the
+brief's next offer for each state as a fixed sentence, in the brief's order: e.g. date agreed, no amount
+yet -> "<the brief's first amount> on <date>?"; that amount refused as too much -> the brief's fallback
+amount; never an amount the customer already refused (measured: with the ban only, the agent asked
+"how much ... will you be paying?" and a lower figure was recorded). Also say: "A customer who says
+they will pay a product on a day and names no lower amount agrees to the amount on offer: go to the
+read-back." and, in the system prompt: "Never ask the same question a third time; if the customer's
+answer has not changed, act on what they said." (measured: a fixed offer sentence asked 70 times in a
+row while the customer kept saying "I will pay the card tomorrow").
 
 A failed HTTP call (e.g. a 500 from the bank) reaches the model as a plain error, and the post hook
 does not run on it (measured: "API request failed: {...}" with no what_to_do_next; the model said
 goodbye and the brief's retry never happened). So the system prompt must also say: "If a tool call
-returns an error and no what_to_do_next, that call failed and nothing was saved: follow the brief's
-rule for a failed call of that tool (usually: call it once more with the same values, in the same turn),
-and never say it worked."
+returns an error and no what_to_do_next, that call failed and nothing was saved; never say it worked."
+followed by the brief's rule for a failed call of each tool that has one, named (e.g. "<tool>: <the
+brief's rule>"). Add no retry the brief does not give.
 
 The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
 retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced

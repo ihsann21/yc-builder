@@ -86,7 +86,8 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
                   days_field: str, item_fields: list[str], types: dict[str, dict], bands: list[dict],
                   line: str, header: str = "", default_type: dict | None = None, band_field: str = "",
                   known_dates: tuple[str, ...] = (), facts_var: str = "account_facts",
-                  empty: str = ACCOUNT_FALLBACK, fallback: str = ACCOUNT_FALLBACK) -> str:
+                  empty: str = ACCOUNT_FALLBACK, fallback: str = ACCOUNT_FALLBACK,
+                  say_line: str = "", say_var: str = "debt_statement") -> str:
     """Snippet of the product code node (place it after the account lookup node).
 
     sources      variables that may hold the list (see product_sources); a scan of the table follows.
@@ -98,6 +99,10 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
     bands        [{"name", "min", "max", "deadline": named date of dates_code, "attempts", "offers": template}],
                  matched on band_field (days_field by default), inclusive, first match wins.
     line, header templates for the facts text; header may use {count}.
+    say_line     optional template of what the agent says about one product when it states the debt
+                 (e.g. "Your {name} is {full} past due and {days} days late."); the sentences of all
+                 products, in order, go into the variable say_var, to be spoken word for word with
+                 on_enter=wf.say("... {{debt_statement}} ..."), so no product, amount or day count is skipped.
     Template placeholders: {id} {type} {type_words} {name} {full} {floor} {floor_label} {days} {band}
     {deadline} {deadline_spoken} {deadline_shifts} {attempts} {offers} {field:<item field>} {date:<named date>}
     {date_spoken:<named date>} {shifts:<named date>}. {deadline_shifts} is the shifts text of the band's
@@ -126,15 +131,17 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
                 raise ValueError(key + " must be a number above " + str(low)
                                  + (" and at most " + str(high) if high else "") + ": " + repr(value))
     check_bands(bands, known_dates)
-    templates = [line, header] + [t.get("name", "") for t in type_list] + [b.get("offers", "") for b in bands]
+    templates = [line, header, say_line] + [t.get("name", "") for t in type_list] + [b.get("offers", "") for b in bands]
     for template in templates:
         check_tokens(template, fields, known_dates)
     check_var(facts_var)
+    check_var(say_var)
     cfg = {"sources": list(sources), "list_field": list_field, "id_field": id_field, "type_field": type_field,
            "amount_field": amount_field, "days_field": days_field, "band_field": band_field,
            "item_fields": list(fields), "types": {k: dict(v) for k, v in types.items()},
            "default_type": dict(default_type or {}), "bands": [dict(b) for b in bands], "line": line,
-           "header": header, "facts_var": facts_var, "empty": empty, "fallback": fallback}
+           "header": header, "facts_var": facts_var, "empty": empty, "fallback": fallback,
+           "say_line": say_line, "say_var": say_var}
     check_no_double_braces(cfg)
     return embed.snippet(("common", "products"), "run_products", cfg, "code")
 

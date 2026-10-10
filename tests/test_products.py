@@ -187,3 +187,12 @@ def test_computed_floor_percent_min_and_cap():
 def test_computed_floor_options_are_checked(bad):
     with pytest.raises(ValueError):
         code(types={"loan": dict({"name": "loan"}, **bad)})
+
+
+def test_say_line_gives_one_sentence_per_product_in_order():
+    state = run({"accounts": ITEMS}, say_line="Your {name} is {full} past due, {days} days late.")
+    assert state["debt_statement"] == ("Your store card ending 9911 is 120.50 past due, 3 days late. "
+                                       "Your loan is 300.00 past due, 40 days late.")
+    assert "debt_statement" not in run({"accounts": ITEMS})                 # only with a say_line
+    with pytest.raises(ValueError):
+        code(say_line="{nonsense}")
