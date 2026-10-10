@@ -191,3 +191,12 @@ def test_shifts_give_a_day_guide_up_to_a_named_date():
 def test_shifts_option_is_checked():
     with pytest.raises(ValueError):
         calc.dates_code(calendar=CAL, dates=[{"name": "limit", "rule": "today", "shifts": "sideways"}])
+
+
+def test_day_guide_names_the_month_when_a_day_number_repeats():
+    cfg = dict(calendar=CAL, dates=[{"name": "far", "rule": "calendar_days_after", "n": 30, "shifts": "forward"}])
+    state = embed.run(calc.dates_code(**cfg), state={"now": "2030-01-02T10:00"})
+    guide = state["bb_shifts__far"].splitlines()
+    assert any(line.startswith("  the 2nd of January = ") for line in guide)
+    assert any(line.startswith("  the 2nd of February = ") for line in guide)
+    assert any(line.startswith("  the 20th = ") for line in guide)        # once in the span: no month

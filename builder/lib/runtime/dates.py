@@ -223,9 +223,11 @@ def shifts_text(today, last, direction, cal, after_days=7):
     customer's day up instead of working it out.
     """
     lines = ["Day guide up to " + spoken(last) + " (" + last.isoformat() + "), the latest date; look up the day the customer names:"]
-    for offset in range((last - today).days + 1 + after_days):
-        day = today + datetime.timedelta(days=offset)
-        head = "  the " + ordinal(day.day) + " = " + spoken(day) + " (" + day.isoformat() + "): "
+    span = [today + datetime.timedelta(days=offset) for offset in range((last - today).days + 1 + after_days)]
+    numbers = [day.day for day in span]
+    for day in span:
+        name = ordinal(day.day) + (" of " + MONTH_NAMES[day.month - 1] if numbers.count(day.day) > 1 else "")
+        head = "  the " + name + " = " + spoken(day) + " (" + day.isoformat() + "): "
         if day > last:
             lines.append(head + "AFTER the latest date " + spoken(last) + ".")
             continue
