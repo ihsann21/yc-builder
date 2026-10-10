@@ -166,7 +166,14 @@ written yet, or "none"), e.g. "Products with neither a promise nor a <record>: {
 If that is not none, call <record tool> for each of them now, before you say anything. Then ...".
 Respect the brief's exceptions (a call that ends in a transfer may forbid such records).
 Give the end_call tool a description that it is only for after the closing phrase, never while an
-agreed promise is not yet read back and recorded or a required record is missing.
+agreed promise is not yet read back and recorded or a required record is missing, and never in the same
+turn as another tool call (measured: a transfer and end_call called together closed the call before the
+sentence the brief requires after a transfer was said).
+
+A sentence the brief makes mandatory goes into a hook message without quotes, as the last thing in the
+message: "... Ask nothing else. Then say exactly this sentence and nothing after it: <sentence>". Inside a
+tool result a quoted sentence reaches the model as \" and was copied with the escape (measured: the
+required sentence came out with a stray <"> after it).
 
 The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
 retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced
