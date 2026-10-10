@@ -220,3 +220,9 @@ A v9 `--style in_words --reps 3`: **8/10** (koşular 8, 9, 9; 26/30; 770 sn; `de
 Deney (`exp-retry` slot'u, workflow `bb579de0-5707-4364-96d2-35d7eb04ca2d`, A v9 + `create_promise` `maxRetries: 1`, hook retries 0): `--only PUB-10 --reps 3` 2/3; olaylarda platform tekrarı yok (`function_call_start` → `function_call_error` → model konuşuyor); geçen iki koşuda ikinci çağrıyı model bir sonraki turda kendi yaptı. Sonuç: `maxRetries` bu banka hatasında tekrar etmiyor; yaşam döngüsü tool'larının varsayılan `maxRetries: 2`'si de kesintiye karşı koruma sayılmamalı (docstring düzeltildi). Skill: system prompt'a "tool hata döndürür ve what_to_do_next yoksa çağrı başarısızdır; brief'in o tool için başarısızlık kuralını uygula (çoğunlukla aynı turda aynı değerlerle bir kez daha)". A yeniden build edilip normal A ile ölçülüyor. Not: `exp-retry` workflow'u workspace'te bir yer tutuyor (7/10); panelden silinebilir.
 
 Repo kökünde yeni dosyalar: `brief-e.md` … `brief-h.md` ve bir plan dosyası (kim eklediği soruldu).
+
+## 11 Ekim, 01:16–01:28: A v11 (hata yedeği kuralıyla): 10/10
+
+Build 194 sn, $0,99, 18 tur; v11; system prompt'ta "If a tool call returns an error and no what_to_do_next, that call failed …: call it once more with the same values, in the same turn". `--brief A --reps 3`: **10/10** (koşular 10, 10, 10; 480 sn; `dev/out/q-A7-reps3.out`). PUB-10 3/3. Gecenin bütün skill değişiklikleri (sabit giriş, parçalı cevap, tutar önerme, retry) A'da gerileme yapmadı.
+
+`dev/mutations/brief-e.md` … `brief-h.md` (Codex, 00:52, kökten kopya): E tek ürün + eyleme özel onay (özellikle geri arama), F tek ürün + ek belge yok / iç bilgi açıklanmaz, G 1–3 ürün + C'nin insan sayacı, H 1–3 ürün + D'nin konuşma kuralları. Sıradaki: G ve H build + `--brief B --reps 3`.
