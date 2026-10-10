@@ -488,9 +488,9 @@ def api_tool(
     pre / post: hook code, written only when not blank.
     mapping: (path, variable) pairs for a tool-level response_mapping; every path starts with 'data.'.
     lifecycle: '' for a normal tool, or start_of_call / end_of_call for a lifecycle tool.
-    retries: platform retries after a failed call. Default 0 for a normal tool (the brief decides what
-        happens after a failed write) and 2 for a lifecycle tool: it runs once, outside the conversation,
-        and a short outage of the bank must not lose the call's close (a 500 means nothing was recorded).
+    retries: config.maxRetries. Default 0 for a normal tool (the brief decides what happens after a
+        failed write) and 2 for a lifecycle tool. Measured: the platform did not retry a create_promise
+        that the bank answered with a 500 (the call ended in function_call_error), so do not count on it.
     Raises ValueError for a key that is not a request field, a field both baked and given a
     placeholder, an unknown lifecycle, or a mapping path outside 'data.'.
     """
