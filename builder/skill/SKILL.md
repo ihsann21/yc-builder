@@ -70,7 +70,8 @@ tools.api_tool(op, description=TEXT, bake={"<field>": "{{<call variable>}}"}, no
                pre=CODE, post=CODE, retries=0, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call")
 tools.end_call_tool(description=TEXT, trigger_phrase=PHRASE, polite_replies=[...])
 calc.dates_code(calendar={"workdays": [0, 1, 2, 3, 4], "holidays": ["YYYY-MM-DD", ...]},
-                dates=[{"name": N, "rule": R, ...params, "label": TEXT}],   # bb_date__N, bb_date__N__spoken
+                dates=[{"name": N, "rule": R, ...params, "label": TEXT,
+                        "shifts": "forward" | "backward"}],   # bb_date__N, bb_date__N__spoken, bb_shifts__N
                 windows=[{"name": N, "days": [rules], "from": "HH:MM", "to": "HH:MM", "after_now": True,
                           "var": "<var for the prompt>", "label": TEXT}],
                 weekday_mode="following_week" | "first_after_today" | "", calendar_days=40)
@@ -83,7 +84,8 @@ calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, M
                    "attempts": N, "offers": TEMPLATE}], line=TEMPLATE, header="...{count}...",
                    known_dates=(...DATE_NAMEs))
 #   placeholders: {id} {name} {full} {floor} {floor_label} {days} {band} {deadline} {deadline_spoken}
-#   {attempts} {offers} {field:F} {date:N} {date_spoken:N}; writes bb_products, bb_deadline__<id>, ...
+#   {deadline_shifts} {attempts} {offers} {field:F} {date:N} {date_spoken:N} {shifts:N};
+#   writes bb_products, bb_deadline__<id>, ...
 hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": "DMY"} | {"kind": "digits", "last": 4}
                | {"kind": "time"} | {"kind": "amount"} | {"by": OTHER_FIELD, "cases": {VALUE: SPEC}}},
                refs=[ID_FIELD], key_field=ID_FIELD,
@@ -105,6 +107,22 @@ wf.transition(TARGET, TEXT, wf.when_equals(VAR, V) | wf.when_true(VAR) | wf.any_
 wf.workflow(initial=..., nodes={...}, system_prompt=TEXT, tools=[close tool], test_variables={...})
 wf.check(workflow, CALL_VARIABLES)    # [] or problems; builder.save runs it too
 ```
+
+The model must read every date decision, never work it out. When the brief says what to do with a
+day that is not a business day (offer the next one, or the previous one), give each deadline date
+`"shifts"` in that direction and put `{deadline_shifts}` at the end of the product line: a day guide,
+one line per day up to a week past that product's deadline ("the 26th = Monday 26 October ...: holiday,
+not a business day -> use ... instead", "... AFTER the latest date"). Tell the model in the task message
+to look up every day the customer names in the product's day guide and follow it.
+
+The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
+Its description must carry the brief's whole closing table: every outcome and reason with when it
+applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
+field the reason name only. The close rules decide everything the tool results can decide; after
+`{"keep_model": True}` add rules keyed on the identity state (`var:bb_identity`), so that a call
+with a verified customer never ends in an outcome meant for calls where the customer was not
+reached or not verified, whatever the model sent. The `default` is the outcome for a call where
+nothing at all happened.
 
 Track every write tool with a post hook (`ok_when` from the tool's success field), give it a pre hook
 too (the pre hook records the request the post hook and the close hook read). Retries: what the

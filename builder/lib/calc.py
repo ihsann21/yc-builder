@@ -29,7 +29,7 @@ ACCOUNT_FALLBACK = ("The account details could not be loaded. Do not state or in
                     "say you do not have the information right now.")
 TOKEN = re.compile(r"\{([A-Za-z0-9_.:]+)\}")
 ITEM_TOKENS = ("id", "type", "type_words", "name", "full", "floor", "floor_label", "days", "band",
-               "deadline", "deadline_spoken", "attempts", "offers")
+               "deadline", "deadline_spoken", "deadline_shifts", "attempts", "offers")
 
 
 def dates_code(*, calendar: dict, dates: list[dict] | tuple = (), windows: list[dict] | tuple = (),
@@ -38,8 +38,13 @@ def dates_code(*, calendar: dict, dates: list[dict] | tuple = (), windows: list[
     """Snippet of the date code node.
 
     calendar      {"workdays": [0..6, Monday = 0], "holidays": ["YYYY-MM-DD", ...]} from the brief.
-    dates         named dates: {"name", "rule", rule parameters, optional "roll", optional "label"};
-                  each lands in bb_date__<name> and bb_date__<name>__spoken, and in the facts text if it has a label.
+    dates         named dates: {"name", "rule", rule parameters, optional "roll", optional "label",
+                  optional "shifts": "forward" | "backward"}; each lands in bb_date__<name> and
+                  bb_date__<name>__spoken, and in the facts text if it has a label. With "shifts", a day guide
+                  goes into bb_shifts__<name> (for the product facts: {deadline_shifts}): one line per day
+                  from today to a week past that date, saying whether the day can be used, which business
+                  day to use instead (the next one or the previous one, as the brief says), or that it is
+                  after the date. The model looks the customer's day up instead of working it out.
     windows       {"name", "days": [rules], "from": "HH:MM", "to": "HH:MM", "after_now", "inclusive",
                   "var", "label"}: allowed slots, written as text into `var` and as data into bb_window__<name>.
     weekday_mode  how the brief defines "next <weekday>": "following_week", "first_after_today", or "" for no lines.
@@ -50,6 +55,8 @@ def dates_code(*, calendar: dict, dates: list[dict] | tuple = (), windows: list[
     for item in dates:
         check_named(item, "dates")
         check_rule(item, "dates entry " + repr(item.get("name")))
+        if item.get("shifts", "") not in ROLLS:
+            raise ValueError("dates entry " + repr(item.get("name")) + ": shifts must be one of " + repr(ROLLS))
     for window in windows:
         check_window(window)
     if weekday_mode not in WEEKDAY_MODES:
@@ -89,8 +96,9 @@ def products_code(*, sources: list[str], list_field: str, id_field: str, type_fi
                  matched on band_field (days_field by default), inclusive, first match wins.
     line, header templates for the facts text; header may use {count}.
     Template placeholders: {id} {type} {type_words} {name} {full} {floor} {floor_label} {days} {band}
-    {deadline} {deadline_spoken} {attempts} {offers} {field:<item field>} {date:<named date>}
-    {date_spoken:<named date>}. Amounts are written with two decimals.
+    {deadline} {deadline_spoken} {deadline_shifts} {attempts} {offers} {field:<item field>} {date:<named date>}
+    {date_spoken:<named date>} {shifts:<named date>}. {deadline_shifts} is the shifts text of the band's
+    deadline (needs "shifts" on that date in dates_code). Amounts are written with two decimals.
     Writes bb_products, bb_product_count, bb_single_product, bb_account_state and per product
     bb_full__/bb_floor__/bb_days__/bb_band__/bb_deadline__/bb_type__/bb_name__<id>.
     """
@@ -150,7 +158,7 @@ def check_tokens(template: str, fields: tuple[str, ...], known_dates: tuple[str,
             continue
         if kind == "field" and rest in fields:
             continue
-        if kind in ("date", "date_spoken") and rest and (not known_dates or rest in known_dates):
+        if kind in ("date", "date_spoken", "shifts") and rest and (not known_dates or rest in known_dates):
             continue
         raise ValueError("unknown placeholder {" + token + "} in template " + repr(template))
 

@@ -57,6 +57,8 @@ Bağımsız inceleme (python-reviewer): kritik yok; 1 yüksek (telefon hanesi no
 - **Düzeltme kuralı:** düzeltme brief'e değil mekanizmaya yapılır; brief değeri (tatil, tutar, sonuç adı) koda yazılmaz.
 - **Genelleme testi, sınırlı:** 1 biçim mutasyonu (Brief A ham malzeme biçiminde: e-posta, politika alıntısı, memo, kod listesi; beklenen sonuçlar aynı) + 2–3 kural mutasyonu (aynı 13 müşteri, farklı kurallar, beklenen sonuçlar elle). Müşteri verisi bankada sabit; kimlik soruları ve görüşme tarihi değiştirilemez.
 - **Tesisat kitaplıktan gelir:** builder (ajan) Freya içinde koşan kodu kendisi yazmaz; `builder/lib/` fonksiyonlarına brief'ten okuduğu config'i verir. Normalizasyon asla tahmin etmez: emin olunamayan değer olduğu gibi gider (yanlış güvenlik cevabı müşterinin aleyhine sayılır, okunamayan sayılmaz). Pratik brief değerleri yalnız `dev/` ve `tests/` altında (`dev/practice.py`).
+- **Planın geçersiz kısımları (20:05):** Yol B yüzünden planın §5–7, §9.1–9.5, §10.4'ün τ kısmı, §11.1–11.3, AgentSpec, iki sağlayıcı, V0/V1/V2 merdiveni, E1–E15 kuyruğu ve §16'daki Cuma/Day 1 checklist'lerinin çoğu kullanılmıyor. Geçerli olanlar: §2.5–2.8 (kurallar, kit olguları), §12.4 (Pazar takvimi), §13 (açık sorular), §14'ün workflow riskleri, §16 "Day 2 — kilitle ve teslim et".
+- **Ölçüm kuralı (20:05):** gürültü (σ) bilinene kadar iki build toplam skorla değil, kalan vakaların geçme sayısıyla (ör. 1/3 → 3/3) karşılaştırılır.
 
 ## Açık sorular (destek kanalı)
 
@@ -70,9 +72,33 @@ Bağımsız inceleme (python-reviewer): kritik yok; 1 yüksek (telefon hanesi no
 
 ## Sıradaki
 
-1. **Kitaplığı platformda doğrulamak (onay gerekiyor).** `python -m dev.practice_a` çıktısını `freya.validate_workflow` (dry run) ile doğrula: 191 KB kabul ediliyor mu, alan silinmesi var mı. Sonra `lib-a` yuvasına kaydet, bir chat turu, ardından `run_cases.py --brief A --reps 3` ile kit ajanına (B0 A: 10/10) karşı ölç. Aynısını B için `dev/practice_b.py` ile (not tabanlı kapanış dahil).
-2. `builder/` iskeleti: `build.py` (tek komut, 25 dk sınırı, temiz trace, export) ve kitaplığın kullanımını anlatan skill: builder ajanı brief'ten config çıkarır, `builder/lib` çağırır, `workflow.check` ve yerel snippet koşusunu trace'e yazar.
-3. Gizli brief provası: test cevaplarına erişimi olmayan builder + ham malzeme biçiminde Brief A. Stil testleri (`--style pieces`, `in_words`).
-4. Akşam: planı yeni yola göre sadeleştirmek.
+Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olmadan.
+
+1. **A, güncel kodla:** yeniden build + `--brief A --reps 3`. Hedef PUB-05/07/10 3/3; kalırsa `dev/replay.py` ile o karar anını sına, mekanizmaya düzelt.
+2. **B, ilk kez (en büyük boşluk):** `build.py brief-a.md brief-b.md openapi.json` → `--brief B --reps 3`, aynı ajanla `--brief A --reps 3`. Finalde iki gizli brief'te de müşterilerin 1–3 ürünü var.
+3. **Ham malzeme:** `build.py dev/mutations/brief-a-raw.md openapi.json` → `--brief A --reps 3`.
+4. **Gece kuyruğu:** `--style pieces`, `--style in_words`, ikinci bir A build'i (build'den build'e σ); en sık hataya tek evrensel düzeltme.
+5. **Pazar:** 16:00–18:00 temiz klon provası (A ve A+B, brief başına < 25 dk, trace içeriği, export, anahtar taraması); 19:00 kod dondurma; 20:00 gizli brief'ler; 23:00'ten önce form.
+6. Düşük öncelik: destek kanalına 19, 23, 24; 1–2 kural mutasyonu.
 
 - 2026-10-10: brief-a rebuilt from builder/work/brief-a/gen.py, saved (workflow c6a42d6d-1d07-45fc-b20a-e1397a49c55a, agent 9d00c85e-128a-463f-88a8-df1783a3f9b8, v2). run_cases blocked: practice server HTTP 500 on /v1/practice/sessions (3 tries).
+
+## 10 Ekim, 18:50: Mac'e geçiş, temiz çalışma klasörü
+
+Oturum İhsan'ın Mac'inde sürüyor (önceki koşular Windows'taydı). Python 3.14 (Homebrew); repo kökünde `.venv` açıldı (`claude-agent-sdk` 0.2.165, `pytest`), `.gitignore`'a eklendi. Testler venv'de: 429 yeşil. İnceleme bulgusu: 18:31 koşusu sıfırdan kurmadı; ajan önceki koşunun `builder/work/brief-a/gen.py`'sini bulup yeniden kullandı (trace'te yazıyor; dosyada Windows mutlak yolları var, Mac'te çalışmaz bile). Organizatör temiz klonda koşacağı için bu ölçümü şişirir. Düzeltme: `build.py` her koşuda dolu çalışma klasörünü ajanın okuyamadığı `dev/out/work-archive/<slot>-<zaman>/`'a taşıyor ve trace'e yazıyor; `.freya-agents.json` yerinde kalıyor (aynı workflow yerinde güncellenir). Ayrıca görüldü: üretilen `gen.py`'de `OUTCOME_EXTRACT` tanımlı ama hiçbir düğüme bağlı değil; sonuç ve nedeni yine çağrı bittikten sonra modelin doldurduğu alan belirliyor (PUB-05'in kaldığı yer). Ölçülmedi: Mac'te hiçbir build ya da simülasyon koşmadı; pratik sunucusunun 500'ü düzelip düzelmediği bilinmiyor.
+
+**Karar (İhsan):** ölçüm döngüsü gizli brief koşulunda: builder `--cases` olmadan kurar, ölçüm ayrı `run_cases.py --reps 3` ile; önce A, sonra A+B. **Hesap değişimi:** İhsan kendi Freya hesabını kullanacak (takım arkadaşının workspace'i bırakıldı). Eski workspace'e bağlı üç durum dosyası silinmeden `dev/out/old-workspace/`'a taşındı: `builder/work/.freya-agents.json` (brief-a → c6a42d6d…), kit'in `.freya-agents.json`'u ve `.personas.json`'u (git'te takipli; `run_cases` personaları yeni workspace'te yeniden yaratıp dosyayı yeniden yazacak). Kit'teki `env.sh`'i (yeni `fak_` anahtarı) İhsan kendisi düzenliyor.
+
+## 10 Ekim, 19:17–19:50: döngü 1 (gizli brief koşulu), A: 9/10
+
+Yeni hesap ve workspace (İhsan). Build `--cases` olmadan, brief ve OpenAPI'den: 177 sn, $1,04, 14 tur; workflow `f2e31736…`, agent `f847f92e…` (v1), 6 düğüm, 10 tool, dry run geçti. Ölçüm `run_cases.py --brief A --reps 3`: **9/10** (koşular 9, 9, 9; 440 sn; en yavaş tur medyanı 10, 6, 7 sn; kapatan müşteri yok). Sonuçlar kit'te `results/c1-A-reps3.json`, çıktı `dev/out/c1-A-reps3.out`. Kalan tek vaka PUB-07, 3/3 aynı: müşteri tatil olan "Monday the 26th"i (son tarihten önce) söyleyince ajan "kaydedebileceğim en geç tarih 2 Kasım" dedi ve 2 Kasım'ı kaydetti; beklenen bir sonraki iş günü (27 Ekim). Kod gerçekleri doğruydu (takvimde 26 = X holiday, son tarih 2 Kasım); hata modelin üç gerçeği birleştirmesinde. Önceki Windows koşusunda (8/10) da aynı vaka kalmıştı.
+
+Düzeltme (mekanizma, brief değeri yok): `calc.dates_code`'da adlandırılmış tarihe `"shifts": "forward" | "backward"`; runtime bugünden o tarihe kadar iş günü olmayan her günü yerine kullanılacak iş günüyle `bb_shifts__<ad>`'a ve tarih metnine yazıyor; ürün şablonuna `{deadline_shifts}` ve `{shifts:<ad>}`. Yön brief'ten config. Skill'e iki paragraf: tarih kararını model okusun, hesaplamasın (`shifts` + `{deadline_shifts}`); kapanış tool'unu çağrıdan sonra bir model dolduruyor, açıklamasında kapanış tablosunun tamamı "ne zaman" sütunuyla olmalı (kit builder'ı böyle yapıyor; bizim builder'ın açıklaması yalnız nedenleri sayıyordu; PUB-05 bu koşuda 3/3 geçti, satır ölçülmeden girdi). Testler: 432 yeşil (3 yeni).
+
+## 10 Ekim, 19:30–20:05: döngü 2 (A: 7/10), ölçülmemiş düzeltmeler, durum değerlendirmesi
+
+İlk `shifts` sürümüyle yeniden build (19:30, 150 sn, $0,86, 11 tur; aynı workflow `f2e31736…`, v2, 6 düğüm, 9 tool, dry run geçti). Ölçüm `--brief A --reps 3` (19:41): **7/10** (koşular 7, 9, 8; 419 sn). Kalanlar: PUB-05 1/3 (kapanış `not_reached/unclear`, beklenen `no_promise/hardship`), PUB-07 1/3 (yine 2 Kasım kaydedildi), PUB-10 1/3 (judge, başarılı yazmadan önce "recorded" sözcüğünü gördü; bir koşuda açılıştaki "This call is recorded" cümlesini saydı). Aynı v2'de yalnız PUB-07, reps 3 (19:55): 2/3. Sonuçlar kit'te `results/c2-A-reps3.json`, `results/c2-PUB07-reps3.json`, çıktı `dev/out/c2-A-reps3.out`. Okuma: c1 9/10 ile c2 7/10 iki ayrı build; build'den build'e ve koşudan koşuya oynama ±2 vaka, σ bilinmiyor.
+
+Kodda, ölçülmemiş: (1) gün rehberi v2 (`runtime/dates.py` `shifts_text`): bugünden son tarihin bir hafta sonrasına kadar her gün için tek satır ("the 26th = …: holiday, not a business day -> use … instead", "AFTER the latest date"), ürün satırına `{deadline_shifts}`; (2) kapanışta `read_model`: modelin seçimini büyük/küçük harf, tek alana yazılmış iki değer, yalnız nedenle anılan sonuç gibi durumlarda toleranslı okur; `bb_close_model` artık modelin gönderdiğini ham yazar; (3) SKILL.md: tarih kararını model okusun, hesaplamasın; kapanış tool açıklamasında tablonun tamamı; `keep_model`'den sonra `var:bb_identity` kuralları (doğrulanmış müşteri `not_reached` ile kapanmaz); (4) `build.py`: girdiler çalışma klasöründe `inputs/`'a kopyalanıyor, kanca `dev/` ve `tests/`'i mutlak yolla da kesiyor (`tests/test_build_guard.py`); (5) `dev/replay.py`: bir pratik vakanın turlarını chat API'den gönderip ajanın cevaplarını basan karar anı testi (yalnız dev); (6) `dev/mutations/brief-a-raw.md`: Brief A ham malzeme biçiminde (e-posta, politika alıntısı, memo, kod listesi), koşulmadı. Testler: **457 yeşil**. Yerel `builder/work/brief-a/workflow.json` 19:57'de yeni kitaplıkla yeniden üretilmiş; platforma kaydedilip kaydedilmediği bilinmiyor, ölçülmedi.
+
+Durum değerlendirmesi: en büyük boşluk Brief B. Finalde iki gizli brief'te de müşterilerin 1–3 ürünü var, bizim builder'la B hiç build edilmedi, ölçülmedi. Sonra ham malzeme biçimi, `--style` koşuları ve temiz klon provası. "Sıradaki" buna göre yeniden yazıldı; planın geçersiz kısımları "Kararlar"da.

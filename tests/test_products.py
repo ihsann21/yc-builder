@@ -163,3 +163,9 @@ def test_same_facts_as_the_kit_account_code(kit, brief, line, bands, header, max
                 pid = item["product_id"]
                 kit_deadline = k.get("deadline_" + pid, k.get("deadline_p"))
                 assert o["bb_deadline__" + pid] == kit_deadline
+
+
+def test_deadline_shifts_placeholder():
+    shifts = {"bb_shifts__limit_soft": "SOFT SHIFTS", "bb_shifts__limit_hard": "HARD SHIFTS"}
+    state = run(dict(shifts, accounts=ITEMS), line="{id} {deadline_shifts} {shifts:limit_soft}")
+    assert state["account_facts"].splitlines()[1:] == ["a1 SOFT SHIFTS SOFT SHIFTS", "a2 HARD SHIFTS SOFT SHIFTS"]

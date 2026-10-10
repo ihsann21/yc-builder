@@ -112,6 +112,7 @@ def item_values(item, cfg, state):
     values["band"] = band.get("name", "")
     values["deadline"] = as_text(lookup(state, "bb_date__" + deadline)) if deadline else ""
     values["deadline_spoken"] = as_text(lookup(state, "bb_date__" + deadline + "__spoken")) if deadline else ""
+    values["deadline_shifts"] = as_text(lookup(state, "bb_shifts__" + deadline)) if deadline else ""
     values["attempts"] = as_text(band.get("attempts"))
 
     def get(name):
@@ -123,6 +124,8 @@ def item_values(item, cfg, state):
             return lookup(state, "bb_date__" + name[5:])
         if name.startswith("date_spoken:"):
             return lookup(state, "bb_date__" + name[12:] + "__spoken")
+        if name.startswith("shifts:"):
+            return lookup(state, "bb_shifts__" + name[7:])
         return None
 
     values["name"] = fill(tcfg.get("name", "{type_words}"), get)

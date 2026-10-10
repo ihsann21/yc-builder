@@ -165,3 +165,29 @@ def test_same_dates_as_the_kit_setup_code(kit):
             slots = o["bb_window__callback"].split(";")
             assert slots[-1].startswith(kit_next_business_day(k["callback_facts"])), now
         day += dt.timedelta(days=1)
+
+
+def test_shifts_give_a_day_guide_up_to_a_named_date():
+    # Wednesday 2 Jan 2030; holidays 7 and 15 Jan; the limit is Wednesday 9 Jan
+    cfg = dict(calendar=CAL, dates=[{"name": "limit", "rule": "business_days_after", "n": 4, "shifts": "forward",
+                                     "label": "Limit"}])
+    state = embed.run(calc.dates_code(**cfg), state={"now": "2030-01-02T10:00"})
+    assert state["bb_date__limit"] == "2030-01-09"
+    guide = state["bb_shifts__limit"].splitlines()
+    assert guide[0].startswith("Day guide up to Wednesday 9 January 2030 (2030-01-09)")
+    assert guide[1] == "  the 2nd = Wednesday 2 January 2030 (2030-01-02): today, business day, can be used."
+    assert "  the 5th = Saturday 5 January 2030 (2030-01-05): weekend, not a business day -> use Tuesday 8 January 2030 (2030-01-08) instead." in guide
+    assert "  the 7th = Monday 7 January 2030 (2030-01-07): holiday, not a business day -> use Tuesday 8 January 2030 (2030-01-08) instead." in guide
+    assert guide[-1] == "  the 16th = Wednesday 16 January 2030 (2030-01-16): AFTER the latest date Wednesday 9 January 2030."
+    assert len(guide) == 1 + 8 + 7
+    assert "Day guide" not in state["date_facts"]               # it goes into the product facts, per deadline
+    # backward: a weekend whose earlier business day is before today has nothing to use instead
+    cfg["dates"][0]["shifts"] = "backward"
+    state = embed.run(calc.dates_code(**cfg), state={"now": "2030-01-05T10:00"})
+    assert "  the 7th = Monday 7 January 2030 (2030-01-07): holiday, not a business day, no business day to use instead." in state["bb_shifts__limit"]
+    assert dates.ordinal(1) == "1st" and dates.ordinal(12) == "12th" and dates.ordinal(22) == "22nd" and dates.ordinal(23) == "23rd"
+
+
+def test_shifts_option_is_checked():
+    with pytest.raises(ValueError):
+        calc.dates_code(calendar=CAL, dates=[{"name": "limit", "rule": "today", "shifts": "sideways"}])

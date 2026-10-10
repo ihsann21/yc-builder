@@ -18,6 +18,7 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import sys
 import time
 
@@ -32,7 +33,10 @@ SECRET_VARS = ("FREYA_API_KEY", "FREYA_BANK_TEAM_KEY", "ANTHROPIC_API_KEY")
 BLOCKED = re.compile(r"env\.sh|printenv|environ|declare -x|export -p|(^|[\s;&|(])env(\s|$)|"
                      + "|".join(SECRET_VARS)
                      + r"|(^|[\s'\"=]|yc-builder[\\/]+)(dev|tests)[\\/]|build-the-builder[\\/]+out[\\/]"
-                     + r"|public-test-set|(^|[\s'\"\\/])(results|traces)[\\/]")
+                     + r"|public-test-set|(^|[\s'\"\\/])(results|traces)[\\/]"
+                     # dev/ and tests/ by absolute path too; a space in the repo path may be written as "\ "
+                     + "|" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")
+                     + r"[\\/]+(dev|tests)([\\/\"'\s]|$)")
 
 
 class Trace:
@@ -163,10 +167,24 @@ def main() -> int:
     api = existing(args.files[-1])
     slot = pathlib.Path(briefs[-1]).stem
     deadline = int(os.environ.get("BUILD_DEADLINE_S", "1500"))
-    (WORK / slot).mkdir(parents=True, exist_ok=True)
     trace = Trace(slot)
     start = time.time()
     trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S"), "briefs:", briefs, "tool API:", api, "slot:", slot)
+    if (WORK / slot).exists() and any((WORK / slot).iterdir()):
+        # every run starts from an empty work folder, as on a fresh clone; the old one goes where the agent cannot read
+        archive = ROOT / "dev" / "out" / "work-archive" / (slot + "-" + time.strftime("%Y%m%d-%H%M%S"))
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        (WORK / slot).rename(archive)
+        trace("[work] previous work folder moved to", archive.relative_to(ROOT))
+    (WORK / slot).mkdir(parents=True, exist_ok=True)
+    # the agent works on copies in its work folder, so an input kept anywhere (even under dev/) stays readable
+    inputs = WORK / slot / "inputs"
+    inputs.mkdir()
+    for source in briefs + [api]:
+        shutil.copyfile(source, inputs / pathlib.Path(source).name)
+    briefs = [str(inputs / pathlib.Path(b).name) for b in briefs]
+    api = str(inputs / pathlib.Path(api).name)
+    trace("[inputs] copied to", inputs.relative_to(ROOT))
     try:
         asyncio.run(asyncio.wait_for(run_agent(briefs, api, slot, args.cases, deadline, trace), timeout=deadline))
     except asyncio.TimeoutError:

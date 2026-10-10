@@ -208,6 +208,39 @@ def calendar_lines(today, count, cal):
     return lines
 
 
+def ordinal(n):
+    """1 -> '1st', 2 -> '2nd', 11 -> '11th', 23 -> '23rd'."""
+    if 10 <= n % 100 <= 20:
+        return str(n) + "th"
+    return str(n) + ("st" if n % 10 == 1 else "nd" if n % 10 == 2 else "rd" if n % 10 == 3 else "th")
+
+
+def shifts_text(today, last, direction, cal, after_days=7):
+    """A day guide from today to a week past `last`: one line per day with what that day means for a promise.
+
+    A business day up to `last` is fine; a weekend day or holiday up to `last` gives the business day to
+    use instead (`direction` forward or backward); a day after `last` is after it. The model looks the
+    customer's day up instead of working it out.
+    """
+    lines = ["Day guide up to " + spoken(last) + " (" + last.isoformat() + "), the latest date; look up the day the customer names:"]
+    for offset in range((last - today).days + 1 + after_days):
+        day = today + datetime.timedelta(days=offset)
+        head = "  the " + ordinal(day.day) + " = " + spoken(day) + " (" + day.isoformat() + "): "
+        if day > last:
+            lines.append(head + "AFTER the latest date " + spoken(last) + ".")
+            continue
+        if is_business_day(day, cal):
+            lines.append(head + ("today, " if day == today else "") + "business day, can be used.")
+            continue
+        why = "holiday" if day.isoformat() in cal.get("holidays", []) else "weekend"
+        other = roll(day, direction, cal)
+        if other is None or other < today or other > last:
+            lines.append(head + why + ", not a business day, no business day to use instead.")
+        else:
+            lines.append(head + why + ", not a business day -> use " + spoken(other) + " (" + other.isoformat() + ") instead.")
+    return "\n".join(lines)
+
+
 def add_minute(clock):
     """'HH:MM' one minute later; '24:00' after '23:59'."""
     hour = int(clock[:2])
@@ -284,6 +317,8 @@ def write_dates(state, cfg):
             farthest = day
         if day and item.get("label"):
             lines.append(item.get("label") + ": " + spoken(day) + " (" + day.isoformat() + ").")
+        if day and item.get("shifts"):
+            state["bb_shifts__" + var_key(item.get("name"))] = shifts_text(today, day, item.get("shifts"), cal)
     if cfg.get("weekday_mode"):
         lines.extend(weekday_lines(today, cfg.get("weekday_mode"), week_start))
     count = int(cfg.get("calendar_days", 40))

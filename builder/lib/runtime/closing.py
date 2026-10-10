@@ -149,6 +149,45 @@ def apply_rule(rule, state, model, cfg):
     return choice
 
 
+def words(text):
+    """The lower-case name-like words of a text: 'Handed_Over / Desk.' -> ['handed_over', 'desk']."""
+    out = []
+    word = ""
+    for char in as_text(text).lower() + " ":
+        if char.isalnum() or char == "_":
+            word = word + char
+        elif word:
+            out.append(word)
+            word = ""
+    return out
+
+
+def read_model(outcome_text, reason_text, outcomes):
+    """The model's choice read leniently: case, both values in one field, an outcome named only by its reason."""
+    outcome = as_text(outcome_text).strip()
+    reason = as_text(reason_text).strip()
+    names = dict()
+    for name in outcomes:
+        names[name.lower()] = name
+    reasons = dict()
+    for name in outcomes:
+        for item in outcomes.get(name) or []:
+            reasons[item.lower()] = item
+    if outcome not in outcomes:
+        found = [names[w] for w in words(outcome) if w in names]
+        if found:
+            if not reason:
+                rest = [reasons[w] for w in words(outcome) if w in reasons and (outcomes.get(found[0]) or []).count(reasons[w])]
+                reason = rest[0] if rest else ""
+            outcome = found[0]
+    if reason and reason not in reasons.values() and reason.lower() in reasons:
+        reason = reasons[reason.lower()]
+    if outcome not in outcomes and reason:
+        owners = [name for name in outcomes if (outcomes.get(name) or []).count(reason)]
+        outcome = owners[0] if len(owners) == 1 else ""
+    return {"outcome": outcome, "reason": reason}
+
+
 def run_close(state, request, cfg):
     """Entry point of the close tool's pre hook. Never raises; an error is kept in bb_close_error."""
     try:
@@ -157,9 +196,8 @@ def run_close(state, request, cfg):
             return
         outcome_field = cfg["outcome_field"]
         reason_field = cfg["reason_field"]
-        model = dict()
-        model["outcome"] = as_text(body.get(outcome_field)).strip()
-        model["reason"] = as_text(body.get(reason_field)).strip()
+        body_in = [body.get(outcome_field), body.get(reason_field)]
+        model = read_model(body.get(outcome_field), body.get(reason_field), cfg["outcomes"])
         chosen = None
         for rule in cfg.get("rules", []):
             chosen = apply_rule(rule, state, model, cfg)
@@ -173,6 +211,6 @@ def run_close(state, request, cfg):
         else:
             body.pop(reason_field, None)
         state["bb_close"] = chosen[0] + ("/" + chosen[1] if chosen[1] else "")
-        state["bb_close_model"] = model["outcome"] + "/" + model["reason"]     # what the model chose, for diagnosis
+        state["bb_close_model"] = as_text(body_in[0]) + "/" + as_text(body_in[1])     # what the model sent, for diagnosis
     except Exception as error:
         state["bb_close_error"] = str(error)

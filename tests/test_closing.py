@@ -153,3 +153,23 @@ def test_same_outcome_as_the_kit_close_hook(kit, brief, rules):
         else:   # the kit sent an outcome the bank does not know; ours falls back to the default
             assert our_out == (PRACTICE_DEFAULT["outcome"], PRACTICE_DEFAULT["reason"])
     assert compared > 1000
+
+
+@pytest.mark.parametrize("model,expected", [
+    (("lost / argued", ""), ("lost", "argued")),            # outcome and reason written into one field
+    (("Lost", "Argued"), ("lost", "argued")),               # case
+    (("lost + argued", "argued"), ("lost", "argued")),
+    (("handed_over: desk", ""), ("handed_over", "desk")),
+    (("", "argued"), ("lost", "argued")),                   # a reason that belongs to one outcome only
+    (("nonsense", "gone"), ("nobody", "gone")),
+    (("won.", ""), ("won", None)),
+])
+def test_model_choice_is_read_leniently(model, expected):
+    body = close({}, *model, rules=[{"keep_model": True}])
+    assert (body["result"], body.get("why")) == expected
+
+
+def test_a_reason_shared_by_two_outcomes_does_not_pick_one():
+    outcomes = {"a": ["x"], "b": ["x"], "c": []}
+    assert rt.read_model("", "x", outcomes) == {"outcome": "", "reason": "x"}
+    assert rt.read_model("a/x", "", outcomes) == {"outcome": "a", "reason": "x"}
