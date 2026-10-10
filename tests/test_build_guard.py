@@ -90,3 +90,12 @@ def test_slot_is_the_brief_name_unless_that_name_was_built_from_other_inputs(tmp
     second = slot_for([str(raw)], str(api), slots)
     assert second.startswith("brief__final_-") and second != first       # same name, other inputs: own slot
     assert slot_for([str(raw)], str(api), slots) == second
+
+
+def test_every_model_call_gets_a_purpose_line():
+    from types import SimpleNamespace as NS
+    from builder.build import call_purpose
+    assert call_purpose([NS(text="Saving now.\nThen testing.")]) == "Saving now. Then testing."
+    assert call_purpose([NS(name="Bash", input={"command": "x", "description": "Run generator"}),
+                         NS(name="Read", input={"file_path": "/a/b.md"})]) == "tool call: Bash (Run generator); Read (/a/b.md)"
+    assert call_purpose([]) == "(no text)"

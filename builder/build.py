@@ -114,7 +114,7 @@ def task_prompt(briefs: list[str], api: str, slot: str, cases: str, minutes: int
 
 async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline: int, trace: Trace) -> None:
     """Run the agent; print every model call and tool use to the trace."""
-    from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, HookMatcher, ResultMessage, TextBlock,
+    from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, HookMatcher, ResultMessage,
                                   ToolResultBlock, ToolUseBlock, UserMessage, query)
     model = os.environ.get("BUILDER_MODEL", "claude-opus-5-5")
     options = ClaudeAgentOptions(
@@ -129,10 +129,9 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
     watched = {}   # tool_use_id -> command, for the checks and tests whose output belongs in the trace
     async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
+            trace("[model call]", (getattr(message, "model", "") or model) + ":", call_purpose(message.content))
             for block in message.content:
-                if isinstance(block, TextBlock) and block.text.strip():
-                    trace("[model call]", model + ":", block.text.strip().replace("\n", " ")[:300])
-                elif isinstance(block, ToolUseBlock):
+                if isinstance(block, ToolUseBlock):
                     trace("  [tool]", block.name, str(block.input)[:200].replace("\n", " "))
                     command = str(block.input.get("command", "")) if isinstance(block.input, dict) else ""
                     if TESTS.search(command):
@@ -144,7 +143,23 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
                         trace("  [test output]", line[:240])
         elif isinstance(message, ResultMessage):
             trace(f"[agent done] turns={message.num_turns} cost=${message.total_cost_usd or 0:.2f} "
-                  f"duration={message.duration_ms / 1000:.0f}s")
+                  f"duration={message.duration_ms / 1000:.0f}s result={message.subtype}"
+                  + (" ERROR " + str(getattr(message, "errors", "") or "")[:200] if message.is_error else ""))
+            for name, use in (getattr(message, "model_usage", None) or {}).items():
+                trace("[model usage]", name, json.dumps(use)[:200])
+
+
+def call_purpose(content: list) -> str:
+    """One line on what a model call did: its text, else the tools it called and why."""
+    texts = [b.text.strip() for b in content if hasattr(b, "text") and str(getattr(b, "text", "")).strip()]
+    if texts:
+        return " ".join(texts).replace("\n", " ")[:300]
+    tools = []
+    for block in content:
+        if hasattr(block, "name") and isinstance(getattr(block, "input", None), dict):
+            why = block.input.get("description") or block.input.get("file_path") or block.input.get("pattern") or ""
+            tools.append(block.name + (" (" + str(why)[:120] + ")" if why else ""))
+    return ("tool call: " + "; ".join(tools)) if tools else "(no text)"
 
 
 def saved_entry(slot: str) -> dict:
