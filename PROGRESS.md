@@ -154,3 +154,9 @@ Açık kalan denetim bulguları (orta): hook ve close-hook ayarları OpenAPI iş
 Yeni skill'le (çağrı sonu sırası, `{open:…}`, `end_call` açıklaması) izolasyonlu temiz build: 206 sn, $0,99, 14 tur, v8, 11 tool. Ölçüm `--brief B --reps 3`: **3/3** (koşular 3, 3, 3; 673 sn; `results/c8-B-reps3.json`). Önceki izolasyonlu sonuç 1/3'tü (PUB-12 notlar atlanıyor, PUB-13 söz kaydedilmeden kapanıyor); ikisi de kapandı. Bu, kopyasız ilk B 3/3.
 
 Bu arada (ölçülmedi, builder davranışını etkileyebilir): `op=` ile hook ve kapanış alan denetimi, kancanın yalnız komut ve yollara bakması, export'un yalnız bu koşunun kaydını yazması, slot'a girdi özeti. Sıradaki: en güncel kodla izolasyonlu yalnız-A build'i → `--brief A --reps 3`.
+
+## 10 Ekim, 22:14–22:28: izolasyonlu yalnız-A build'i, en güncel kodla: A 10/10
+
+Build (yalnız brief-a, bütün çalışma klasörleri arşivde, `op=` denetimi, dar kanca): 183 sn, $0,98, 16 tur; workflow `5ef7910f…`, agent `853f6728…`, v5, 6 düğüm, 9 tool; gen.py'de 9 `op=ops[…]`. Ölçüm `--brief A --reps 3`: **10/10** (koşular 10, 10, 10; 655 sn; `results/c9-A-reps3.json`). Kopyasız ilk A tam puanı; kit builder'ının B0 10/10'u test setini görerek kurulmuştu.
+
+Özet (22:28), hepsi izolasyonlu temiz build, `--reps 3`: **A 10/10, B 3/3, ham malzeme A 9/10** (PUB-06 2/3). Kuyruk (`dev/out/queue.log`, betik scratchpad'de): Brief C ve Brief D (repo kökünde, A'nın kural değiştirilmiş, tek başına verilen kopyaları: C insan isteğinde 4. talepte devir ve devir duyurusu; D on iki konuşma kuralı) build + A vakaları; sonra `--style pieces`/`in_words` (A), `--style pieces` (B), ikinci B build'i. Not: A vakaları C ve D'nin yeni kurallarını sınamıyor (insan isteyen müşteri yok); o kurallar için kendi vaka dosyamız gerekir.
