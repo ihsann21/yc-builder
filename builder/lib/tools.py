@@ -474,7 +474,7 @@ def api_tool(
     notes: dict[str, str] | None = None,
     pre: str = "",
     post: str = "",
-    retries: int = 0,
+    retries: int | None = None,
     timeout_ms: int = 12000,
     mapping: list[tuple[str, str]] | None = None,
     lifecycle: str = "",
@@ -488,6 +488,9 @@ def api_tool(
     pre / post: hook code, written only when not blank.
     mapping: (path, variable) pairs for a tool-level response_mapping; every path starts with 'data.'.
     lifecycle: '' for a normal tool, or start_of_call / end_of_call for a lifecycle tool.
+    retries: platform retries after a failed call. Default 0 for a normal tool (the brief decides what
+        happens after a failed write) and 2 for a lifecycle tool: it runs once, outside the conversation,
+        and a short outage of the bank must not lose the call's close (a 500 means nothing was recorded).
     Raises ValueError for a key that is not a request field, a field both baked and given a
     placeholder, an unknown lifecycle, or a mapping path outside 'data.'.
     """
@@ -497,6 +500,8 @@ def api_tool(
     if both:
         raise ValueError(f"{op.name}: {', '.join(both)} cannot be both baked and model-filled")
     entries = _mapping_entries(mapping or [])
+    if retries is None:
+        retries = 2 if lifecycle else 0
     tool = {
         "type": "function",
         "config": _config(timeout_ms, retries, lifecycle, bool(entries)),

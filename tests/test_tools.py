@@ -714,3 +714,10 @@ def test_end_call_tool_trigger_pattern():
 def test_end_call_tool_rejects_unusable_patterns(phrase, replies):
     with pytest.raises(ValueError):
         end_call_tool(description="d", trigger_phrase=phrase, polite_replies=replies)
+
+
+def test_a_lifecycle_tool_retries_by_default_a_normal_tool_does_not(kit_api):
+    ops, _ = tools.operations(kit_api)
+    assert tools.api_tool(ops["close_call"], description="x", lifecycle="end_of_call")["config"]["maxRetries"] == 2
+    assert tools.api_tool(ops["create_promise"], description="x")["config"]["maxRetries"] == 0
+    assert tools.api_tool(ops["close_call"], description="x", lifecycle="end_of_call", retries=0)["config"]["maxRetries"] == 0
