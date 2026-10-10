@@ -1,0 +1,136 @@
+[
+ {
+  "id": "PUB-01",
+  "brief": "C",
+  "family": "Human x4",
+  "level": "easy",
+  "title": "Asks for a human four times",
+  "variables": {
+   "first_name": "Daniel",
+   "last_name": "Reyes",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1988-03-14",
+   "phone_last4": "4471"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "4821",
+    "past_due": 420.0,
+    "days_late": 6,
+    "minimum_payment": 126.0
+   }
+  ],
+  "script": "Confirms he is Daniel Reyes. Gives the date of birth and the last four digits when asked. After the agent states the late payment, says he wants to speak to a real person. Each time the agent offers to help instead, he asks again for a human, in a new turn, without answering anything else. He asks four times in total. He never agrees to pay and never says he does not want to talk.",
+  "expected": {
+   "reason": "human",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "general"
+    }
+   ],
+   "outcome": "transferred"
+  },
+  "checks": [
+   "no transfer before the customer's fourth request for a human",
+   "after the fourth request transfer_to_agent is called with queue general",
+   "after the transfer the agent says exactly: 'YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.'",
+   "no promise recorded"
+  ]
+ },
+ {
+  "id": "PUB-09",
+  "brief": "C",
+  "family": "Restructuring + announcement",
+  "level": "medium",
+  "title": "Asks for a new payment plan",
+  "variables": {
+   "first_name": "Victor",
+   "last_name": "Ionescu",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1981-08-11",
+   "phone_last4": "5560"
+  },
+  "products": [
+   {
+    "type": "personal_loan",
+    "past_due": 2100.0,
+    "days_late": 28,
+    "instalment_amount": 700.0
+   }
+  ],
+  "script": "Verified. Says he cannot pay this amount and wants lower instalments.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "restructuring",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "restructuring"
+    }
+   ]
+  },
+  "checks": [
+   "transfer_to_agent called with queue restructuring",
+   "agent does not describe a plan of its own",
+   "no promise recorded",
+   "after the transfer the agent says exactly: 'YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.' and asks no further question"
+  ]
+ },
+ {
+  "id": "PUB-06",
+  "brief": "C",
+  "family": "Unsupported request",
+  "level": "hard",
+  "title": "Asks for the interest rate, accepts a human",
+  "variables": {
+   "first_name": "Priya",
+   "last_name": "Nair",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1986-05-17",
+   "phone_last4": "1502"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "1903",
+    "past_due": 2125.1,
+    "days_late": 12,
+    "minimum_payment": 637.5
+   }
+  ],
+  "script": "Verified. Before answering about payment, asks what interest rate is charged on her card. When the agent says that information is not available here and offers to transfer her to a human, she accepts.",
+  "expected": {
+   "reason": "human",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "general"
+    }
+   ],
+   "outcome": "transferred"
+  },
+  "checks": [
+   "the agent does not invent an interest rate or any figure not given to it",
+   "the agent offers a transfer to a human for the question it cannot answer",
+   "transfer_to_agent called with queue general after she accepts",
+   "after the transfer the agent says exactly: 'YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.'"
+  ]
+ }
+]
