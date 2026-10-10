@@ -170,12 +170,15 @@ def main() -> int:
     trace = Trace(slot)
     start = time.time()
     trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S"), "briefs:", briefs, "tool API:", api, "slot:", slot)
-    if (WORK / slot).exists() and any((WORK / slot).iterdir()):
-        # every run starts from an empty work folder, as on a fresh clone; the old one goes where the agent cannot read
-        archive = ROOT / "dev" / "out" / "work-archive" / (slot + "-" + time.strftime("%Y%m%d-%H%M%S"))
-        archive.parent.mkdir(parents=True, exist_ok=True)
-        (WORK / slot).rename(archive)
-        trace("[work] previous work folder moved to", archive.relative_to(ROOT))
+    # every run starts with no work folders at all, as on a fresh clone: this slot's old one and every other
+    # slot's (an agent copied another brief's generator) go where the agent cannot read; the state file stays
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    for folder in sorted(WORK.iterdir()) if WORK.exists() else []:
+        if folder.is_dir():
+            archive = ROOT / "dev" / "out" / "work-archive" / (folder.name + "-" + stamp)
+            archive.parent.mkdir(parents=True, exist_ok=True)
+            folder.rename(archive)
+            trace("[work] work folder moved to", archive.relative_to(ROOT))
     (WORK / slot).mkdir(parents=True, exist_ok=True)
     # the agent works on copies in its work folder, so an input kept anywhere (even under dev/) stays readable
     inputs = WORK / slot / "inputs"

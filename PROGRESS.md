@@ -74,9 +74,11 @@ Bağımsız inceleme (python-reviewer): kritik yok; 1 yüksek (telefon hanesi no
 
 Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olmadan.
 
-1. **A, güncel kodla:** yeniden build + `--brief A --reps 3`. Hedef PUB-05/07/10 3/3; kalırsa `dev/replay.py` ile o karar anını sına, mekanizmaya düzelt.
-2. **B, ilk kez (en büyük boşluk):** `build.py brief-a.md brief-b.md openapi.json` → `--brief B --reps 3`, aynı ajanla `--brief A --reps 3`. Finalde iki gizli brief'te de müşterilerin 1–3 ürünü var.
-3. **Ham malzeme:** `build.py dev/mutations/brief-a-raw.md openapi.json` → `--brief A --reps 3`.
+Yapıldı (21:17): A 8/10 → PUB-07/10 düzeltmesi; B ilk kez 2/3 → 3/3; ham malzeme A 9/10 (izolasyonlu). Ayrıntı son kayıtlarda.
+
+1. **İzolasyonlu temiz B build'i:** `build.py brief-a.md brief-b.md openapi.json` → `--brief B --reps 3` (tarih kuralının skill katkısını kopyasız görmek için). İsteğe bağlı: yalnız A brief'iyle temiz build → `--brief A --reps 3`.
+2. **PUB-06 kayması** ("what amount can you pay?"): tekrar ederse mekanizma ara (brief'in birebir yasak cümlesini görev mesajında öne almak gibi).
+3. **`dev/replay.py`:** chat yolunda uydurma cevaplar; düzeltilmeden kullanma.
 4. **Gece kuyruğu:** `--style pieces`, `--style in_words`, ikinci bir A build'i (build'den build'e σ); en sık hataya tek evrensel düzeltme.
 5. **Pazar:** 16:00–18:00 temiz klon provası (A ve A+B, brief başına < 25 dk, trace içeriği, export, anahtar taraması); 19:00 kod dondurma; 20:00 gizli brief'ler; 23:00'ten önce form.
 6. Düşük öncelik: destek kanalına 19, 23, 24; 1–2 kural mutasyonu.
@@ -118,3 +120,13 @@ Bulgular: (1) Skill'deki gün rehberi örneği Brief A'nın tatil gününü ("26
 İlk B build'i (A+B girdisi, `--cases` yok): 119 sn, $0,73, 14 tur; workflow `1dfbdfd9-de27-40ef-a930-b76a416ec0a2`, agent `19e0b5d6-ed94-4936-9f56-57ae8f1b5415`, v1, 6 düğüm, 11 tool, dry run geçti. Builder skill'e yeni giren iki kuralı uyguladı (tarih eğer-ise satırları, "we record this call" açılışı). Ölçüm `--brief B --reps 3`: **2/3** (PUB-11 3/3, PUB-13 3/3 (kit ajanının kaldığı vaka), PUB-12 0/3; 212 sn; `results/c4-B-reps3.json`). PUB-12'de ledger doğru, judge kaldırıyor: ajan erken banttaki ürüne de iki deneme yapıyor (önceki ürünün desenini kopyalıyor), ürün satırında "No attempt 2 in this band" yazmasına rağmen.
 
 Elle deneme, aynı workflow: (v3) bant `offers` metinleri açık durmayla bitiyor ("ONE attempt only: after attempt 1 is refused, stop for this product" / "After attempt 2 is refused, stop"), görev mesajına "her teklif bir deneme; o ürünün kendi satırındaki sayı, başka ürününki değil" → PUB-12 **2/3** (`results/c4x-12-reps3.json`); kalan koşuda ters hata: müşteri baştaki soruya "kişisel krediyi ve arabayı ödemiyorum" deyince ajan iki ürünü hiç denemeden not etti. (v4) "baştan reddedilen ürün de denemelerini alır, ilk mesajı attempt 1 teklifidir; denemeler bitmeden reddedildi diye kapatma" → **B 3/3** (PUB-11, 12, 13 hepsi 3/3; 185 sn; `results/c4y-B-reps3.json`). Mekanizma skill'e paragraf olarak taşındı (brief değeri yok; brief'in kendi sayma kuralı önceliklidir). Skill'e taşınmış hali **henüz ölçülmedi**; sıradaki: temiz build A+B → `--brief B` ve aynı ajanla `--brief A`, ikisi de `--reps 3`.
+
+## 10 Ekim, 20:46–21:17: temiz build'ler, çalışma klasörü sızıntısı, ham malzeme brief'i (A: 9/10)
+
+**Temiz B build'i (skill'deki deneme kuralıyla):** 121 sn, $0,75, 17 tur; aynı workflow `1dfbdfd9…`, v5. Builder skill'deki üç kuralı da uyguladı. Ölçüm: **B 3/3** (`results/c5-B-reps3.json`, 267 sn); aynı ajan `--brief A --reps 3`: **9/10** (PUB-07 3/3, PUB-10 3/3; PUB-05 1/3: tek ürünlü zor durumda `add_note` hardship yazıyor. Brief B kural 8'e göre bu doğru, Brief A ise "never uses add_note" diyor; yani B ajanını A vakalarıyla ölçünce PUB-05'in not kontrolü anlamsız. `results/c5-A-reps3.json`, 287 sn).
+
+**Sızıntı bulgusu:** ham malzeme build'inin ilki 7 turda, 53 sn'de bitti; trace: builder `builder/work/brief-a/gen.py`'yi okuyup `sed` ile kopyalamış. Geriye bakınca iki B build'i de `builder/work/brief-a/gen.py`'yi okumuş; ikincisi (B 3/3'ü veren) benim elle tarih kuralı ve açılış eklediğim dosyayı. Yani c5'te tarih kuralı ve açılış için skill'in katkısı ayrılamıyor; deneme kuralı ise yalnız arşivlenmiş `brief-b` klasöründeydi, skill'den geldi. Organizatörün temiz klonunda `builder/work/` boş olacağı için bu, ölçümü şişirir. **Düzeltme:** `build.py` her koşuda `builder/work/` altındaki **bütün** slot klasörlerini (yalnız kendi slot'unu değil) okunamayan `dev/out/work-archive/`'a taşıyor; durum dosyası yerinde kalıyor.
+
+**Ham malzeme brief'i, temiz izolasyonla** (`dev/mutations/brief-a-raw.md`: e-posta + politika alıntısı + memo + kod listesi): build 200 sn, $1,02, 18 tur; workflow `3b9c4693-986c-41c4-b8ca-9c5db791b55e`, agent `e450b416-fbec-4e98-b435-18a59cda9249`, v3, 6 düğüm, 9 tool. Memo doğru uygulandı (erken bant 12. iş günü, kodda "C7 + MEMO 1"). Ölçüm `--brief A --reps 3`: **9/10** (koşular 10, 9, 10; 775 sn; 3. koşu 513 sn, model yavaştı). PUB-05, 07, 10 3/3: tarih kuralı ve açılış skill'den, kopyasız tutuyor. Kalan PUB-06 2/3: bir koşuda "what amount can you pay?" diye sordu (brief yasaklıyor; tek seferlik model kayması). Sonuçlar `results/c6-raw-A-reps3.json`, `dev/out/c6-raw-A-reps3.out`, build `dev/out/build-raw-run2.out`.
+
+Durum (21:17): yalnız A brief'iyle izolasyonlu temiz build ölçülmedi; ham malzeme A-eşdeğeri olarak 9/10 veriyor. B 3/3 (deneme kuralı skill'den; tarih kuralının kaynağı karışık). Sıradaki: izolasyonlu temiz B build'i (B ve A), sonra gece kuyruğu (`--style pieces`, `in_words`).
