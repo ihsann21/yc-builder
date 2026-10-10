@@ -198,6 +198,13 @@ brief's own next offer), and that the agent never asks the customer how much the
 with the ban only, the agent asked "how much of the 540.00 will you be paying?", the customer said
 "five hundred", and 500.00 was recorded instead of 540.00).
 
+A failed HTTP call (e.g. a 500 from the bank) reaches the model as a plain error, and the post hook
+does not run on it (measured: "API request failed: {...}" with no what_to_do_next; the model said
+goodbye and the brief's retry never happened). So the system prompt must also say: "If a tool call
+returns an error and no what_to_do_next, that call failed and nothing was saved: follow the brief's
+rule for a failed call of that tool (usually: call it once more with the same values, in the same turn),
+and never say it worked."
+
 The same holds for every "retry" message: a turn that ends in words waits for the customer, and the
 retry is then forgotten (measured: a brief that asks to tell the customer before retrying produced
 "tell the customer ..., then call the tool again", and the call closed without the retry). Write it as
