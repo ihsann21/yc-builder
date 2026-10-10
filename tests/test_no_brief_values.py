@@ -119,13 +119,15 @@ def test_no_practice_case_value_in_builder(kit):
             tokens.add(str(value))
             if key == "date_of_birth":
                 day = datetime.date.fromisoformat(value)
-                tokens.add(str(day.day) + " " + day.strftime("%B"))
+                tokens.update({str(day.day) + " " + day.strftime("%B"), day.strftime("%B") + " " + str(day.day),
+                               str(day.year), day.strftime("%d/%m/%Y")})
         for product in case.get("products", []):
             if product.get("card_last4"):
                 tokens.add(product["card_last4"])
             for field in ("past_due", "minimum_payment", "instalment_amount"):
                 if product.get(field) is not None:
-                    tokens.add("%.2f" % float(product[field]))
+                    amount = float(product[field])
+                    tokens.update({"%.2f" % amount, "{:,.2f}".format(amount)})
     assert "4471" in tokens and "14 March" in tokens and "540.00" in tokens          # the extraction works
     hits = []
     for path in builder_files():
