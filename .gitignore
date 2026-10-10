@@ -2,3 +2,8 @@ env.sh
 .freya-agents.json
 traces/
 results/
+__pycache__/
+.coverage
+.pytest_cache/
+dev/out/
+builder/work/
