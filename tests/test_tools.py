@@ -721,3 +721,12 @@ def test_a_lifecycle_tool_retries_by_default_a_normal_tool_does_not(kit_api):
     assert api_tool(ops["close_call"], description="x", lifecycle="end_of_call")["config"]["maxRetries"] == 2
     assert api_tool(ops["create_promise"], description="x")["config"]["maxRetries"] == 0
     assert api_tool(ops["close_call"], description="x", lifecycle="end_of_call", retries=0)["config"]["maxRetries"] == 0
+
+
+def test_end_call_takes_every_closing_sentence():
+    tool = end_call_tool(description="d", trigger_phrase=["Goodbye now.", "PLEASE HOLD ON."], polite_replies=["bye"])
+    assert tool["function"]["parameters"]["properties"]["trigger_pattern"]["default"] == "Goodbye now|goodbye now|PLEASE HOLD ON|please hold on"
+    single = end_call_tool(description="d", trigger_phrase="Bye.", polite_replies=["bye"])
+    assert single["function"]["parameters"]["properties"]["trigger_pattern"]["default"] == "Bye|bye"
+    with pytest.raises(ValueError):
+        end_call_tool(description="d", trigger_phrase=["Bye", " "], polite_replies=["bye"])

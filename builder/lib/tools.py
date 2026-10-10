@@ -605,27 +605,34 @@ def _mapping_entries(mapping: list[tuple[str, str]]) -> list[dict]:
 def end_call_tool(
     *,
     description: str,
-    trigger_phrase: str,
+    trigger_phrase: str | list[str] | tuple[str, ...],
     polite_replies: list[str],
     timeout_ms: int = 10000,
     trigger_timeout: int = 3,
 ) -> dict:
-    """The conversation tool that ends the call; saying `trigger_phrase` also ends it by itself.
+    """The conversation tool that ends the call; saying a trigger phrase also ends it by itself.
 
-    trigger_pattern is the phrase without a trailing period, and its lower-case form when that
-    differs. trigger_pattern_both lists the replies that do not cancel the close.
+    trigger_phrase: the closing phrase, or a list of every sentence the brief makes the last words of a
+    call (the goodbye, a transfer announcement, ...): a call that ends on a sentence that is not a
+    trigger stays open until the time limit. trigger_pattern holds each phrase without a trailing
+    period, and its lower-case form when that differs. trigger_pattern_both lists the replies that do
+    not cancel the close.
     Raises ValueError for an empty phrase, no replies, or a '|' inside a phrase or a reply.
     """
-    phrase = trigger_phrase.strip()
-    phrase = phrase[:-1].rstrip() if phrase.endswith(".") else phrase
+    phrases = [trigger_phrase] if isinstance(trigger_phrase, str) else list(trigger_phrase)
+    phrases = [p.strip()[:-1].rstrip() if p.strip().endswith(".") else p.strip() for p in phrases]
     replies = list(polite_replies)
-    if not phrase:
+    if not phrases or any(not phrase for phrase in phrases):
         raise ValueError("trigger_phrase is empty")
     if not replies or any(not reply.strip() for reply in replies):
         raise ValueError("polite_replies needs at least one reply and no empty one")
-    if any("|" in text for text in [phrase, *replies]):
+    if any("|" in text for text in [*phrases, *replies]):
         raise ValueError("'|' separates the patterns; it cannot appear inside a phrase or a reply")
-    variants = [phrase] if phrase.lower() == phrase else [phrase, phrase.lower()]
+    variants = []
+    for phrase in phrases:
+        for form in (phrase, phrase.lower()):
+            if form not in variants:
+                variants.append(form)
     return {
         "type": "function",
         "config": {"timeoutMs": timeout_ms},

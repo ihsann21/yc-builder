@@ -81,7 +81,10 @@ from builder.lib import calc, closing, hooks, tools, workflow as wf
 ops, warnings = tools.operations(tools.load_api(API)); op = ops["<tool>"]
 tools.api_tool(op, description=TEXT, bake={"<field>": "{{<call variable>}}"}, notes={"<field>": TEXT},
                pre=CODE, post=CODE, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call")
-tools.end_call_tool(description=TEXT, trigger_phrase=PHRASE, polite_replies=[...])
+tools.end_call_tool(description=TEXT, trigger_phrase=[PHRASE, ...], polite_replies=[...])
+#   trigger_phrase: EVERY sentence the brief makes the last words of a call (the goodbye, an announcement
+#   after a transfer, ...): a call that ends on a sentence that is not listed stays open until the time
+#   limit (measured: a transfer announcement left the call open and the case failed)
 calc.dates_code(calendar={"workdays": [WORKDAYS, Monday = 0], "holidays": ["YYYY-MM-DD", ...]},
                 dates=[{"name": N, "rule": R, ...params, "label": TEXT,
                         "shifts": SHIFT}],   # bb_date__N, bb_date__N__spoken, bb_shifts__N; SHIFT forward|backward
