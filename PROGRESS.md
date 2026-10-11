@@ -473,3 +473,7 @@ Kökteki `brief-d.md` slotu `brief-d` değil `brief-d-518c5c` (aynı ad, farklı
 ## 11 Ekim, 15:05: karar: akşam build'leri Claude Code girişiyle, `ANTHROPIC_API_KEY` provası yok
 
 İhsan: "şuanki durum iyi, key'e gerek yok". Gizli brief build'leri bu makinede Claude Code girişiyle koşulacak (bugünkü bütün build'ler böyle; trace `[setup] Claude access: no ANTHROPIC_API_KEY, using this machine's Claude Code login`). Ölçülmedi: `ANTHROPIC_API_KEY` ile build (organizatör yeniden koşarsa bu yol denenmemiş). Freya API 15:03'te hâlâ arada 503/504 veriyor; I ölçümü (`ea22ed90`, 14:52) `run_cases_retry` ile sürüyor.
+
+## 11 Ekim, 15:21: karar değişti: akşam build'leri `ANTHROPIC_API_KEY` ile; prova key ile
+
+İhsan bir `ANTHROPIC_API_KEY` verecek; sohbete yazılmayacak, kendisi kit'in `env.sh`'ine (`export ANTHROPIC_API_KEY=...`) ekleyecek; env.sh yalnız komut içinde `source` edilir, okunmaz, yazdırılmaz. Kod değişmedi: `build.py` anahtar ortamdaysa onu kullanır (`build.py:312`, trace `[setup] Claude access: ANTHROPIC_API_KEY`), `SECRET_VARS` ve `sk-ant-` maskesi var. 15:05 kaydındaki "key'siz" kararının yerine geçer. Plan (İhsan onayladı): 15:25'te I'nın 2. koşusu (`f3d4b5ce`, 2 çağrı Freya hatasıyla düştü) biter ya da silinir, genelleme kuyruğu (`queue18`) durur; sonra temiz klon provası key ile, venv'siz `python3 builder/build.py`, trace ve export yolu, `fak_`/`sk-ant` taraması.
