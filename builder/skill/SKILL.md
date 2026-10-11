@@ -258,6 +258,10 @@ no hook reminds the model (measured twice: goodbye with no record at all). So th
 end-of-call rule names that case on its own: "If no promise was agreed, first call <the record tool> for
 every product, in order, with its reason, one call per message; only then the goodbye." (gated: "...
 one call per message; the call ends by itself after the last one.")
+Writes in a row after the read-back are silent turns; with a slow model the customer hung up before
+the last one (measured: three products confirmed, two recorded). So the read-back rule and every hook
+message that calls the next write add: "In the same message as the call, say only: One moment, please."
+Never the saved word in it.
 Without the gate, give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the
