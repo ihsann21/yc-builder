@@ -73,16 +73,16 @@ Bağımsız inceleme (python-reviewer): kritik yok; 1 yüksek (telefon hanesi no
 
 ## Sıradaki
 
-Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olmadan.
+Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olmadan. Gizli brief'ler 20:00, teslim 23:00.
 
-Yapıldı (21:17): A 8/10 → PUB-07/10 düzeltmesi; B ilk kez 2/3 → 3/3; ham malzeme A 9/10 (izolasyonlu). Ayrıntı son kayıtlarda.
+**Durma kuralı (11 Ekim 09:50, önerildi):** 12:30'da ajan davranışı (skill, prompt, runtime) donar; sonrası yalnız çökme düzeltmesi. "Yeterince iyi": organizatör A ≥ 9/10, B ≥ 2/3, kendi vakalarda sabah tabanına göre gerileme yok (hepsi `--reps 3`); bunu sağlayan en iyi sürümle gidilir.
 
-1. **İzolasyonlu temiz B build'i:** `build.py brief-a.md brief-b.md openapi.json` → `--brief B --reps 3` (tarih kuralının skill katkısını kopyasız görmek için). İsteğe bağlı: yalnız A brief'iyle temiz build → `--brief A --reps 3`.
-2. **PUB-06 kayması** ("what amount can you pay?"): tekrar ederse mekanizma ara (brief'in birebir yasak cümlesini görev mesajında öne almak gibi).
-3. **`dev/replay.py`:** chat yolunda uydurma cevaplar; düzeltilmeden kullanma.
-4. **Gece kuyruğu:** `--style pieces`, `--style in_words`, ikinci bir A build'i (build'den build'e σ); en sık hataya tek evrensel düzeltme.
-5. **Pazar:** 16:00–18:00 temiz klon provası (A ve A+B, brief başına < 25 dk, trace içeriği, export, anahtar taraması); 19:00 kod dondurma; 20:00 gizli brief'ler; 23:00'ten önce form.
-6. Düşük öncelik: destek kanalına 19, 23, 24; 1–2 kural mutasyonu.
+1. **~10:40:** kuyruk (`queue9` A build + `--brief A`; `queue10` B build + own-b-2, own-b-1, `--brief B`) biter; sürüm seçilir.
+2. **10:40–12:30:** yalnız ölçümle kanıtlanmış hata. Tek yapısal istisna: B'de kapı yine model `end_call`'u yüzünden delinirse end_call aracı hiçbir adımda olmaz, bitişler rotayla `end_call` düğümüne.
+3. **12:30–16:00:** donmuş sürümle tam ölçüm (A, B, own-a-1/2, own-b-1/2, ham malzeme A, I).
+4. **16:00–18:00:** temiz klon provası `ANTHROPIC_API_KEY` ile, `python3 builder/build.py` (venv'siz kabuk), trace `submission/<slot>.trace.log`, export, `fak_`/`sk-ant` taraması.
+5. **19:00** kod dondurma, etiketli commit; **20:00** gizli brief'ler: `python3 builder/build.py <brief> <api> 2>&1 | tee traces/hidden-N.log`; **23:00'ten önce** form (team, repo, commit, run_command, workflows, traces).
+6. Açık sorular: destek kanalına 19, 23, 24 (workspace'te 11 workflow görüldü; sınır 10 değil gibi).
 
 - 2026-10-10: brief-a rebuilt from builder/work/brief-a/gen.py, saved (workflow c6a42d6d-1d07-45fc-b20a-e1397a49c55a, agent 9d00c85e-128a-463f-88a8-df1783a3f9b8, v2). run_cases blocked: practice server HTTP 500 on /v1/practice/sessions (3 tries).
 
