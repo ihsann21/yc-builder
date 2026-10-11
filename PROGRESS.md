@@ -511,3 +511,11 @@ Dökümler (zaman, sn): H PUB-11 3. koşu `fbbca7e1`: müşteri "Yes, I confirm"
 ## 11 Ekim, 17:03–17:15: H (yeni tarih kuralı) 3/3 (9/9)
 
 H yeniden build (16:54–17:03, yeni skill'in tarih kuralı; gen'de "DAY TABLE"/"day named" 4 eşleşme; bekleme cümlesinden önce) `brief-h-cases.json --reps 3`: **3/3** (koşular 3, 3, 3; 9/9; 375 sn). Eski skill'le aynı vakalar 16:41'de **1/3** (7/9): PUB-13 ("ikisini de 30 Ekim'de") 2/3 → **3/3**, PUB-11 (üç ürün) 2/3 → **3/3**. Bu ölçümde yavaş tur uyarısı yok (Freya hızlanmış). B build'i (iki değişiklik birlikte) 17:09'da başladı. Freya'yı düzenli izlemek için `watch_freya.py` (scratchpad, salt okuma): durum değişimi, 10 dk'yı geçen simülasyon, kuyruk satırları.
+
+## 11 Ekim, 17:16–17:31: B (iki skill değişikliğiyle) own-b-2 3/3 (9/9), organizatör B 0/3 (6/9)
+
+B yeniden build (17:09–17:16, 424 sn, $1,73; gen'de tarih kuralı ve "One moment, please." read-back ile hook mesajlarında). own-b-2: **3/3** (koşular 3, 3, 3; 9/9; v18: 7/9; PUB-12 "Cumartesi" 1/3 → 3/3). Organizatör `--brief B`: **0/3** (koşular 2, 2, 1; 6/9; v18: 8/8):
+- PUB-12 1. ve 3. koşu: araba kredisine (erken bant, 1 deneme) iki teklif (tam tutar, sonra taksit); 1. koşuda kişisel krediye 1. deneme atlandı (bilinen deneme sayısı ailesi; v14–v17'de de 2/3).
+- PUB-11 2. koşu: araba kredisi `create_promise` banka tarafında "connection reset"; ajan kurala göre tekrar denedi, `service_error` notu yazdı (altyapı). Bekleme cümlesine bağlı sorun görülmedi; PUB-11 diğer iki koşuda üç kayıt tam.
+- PUB-13 3. koşu: kayıtlar doğru (kart 30, kredi 23) ama read-back ikisi için de "30 October" dedi (judge). Yeni tarih kuralının yan etkisi olabilir; ölçülmedi.
+Karar kuralı (B ≥ 2/3) şu an sağlanmıyor; gürültü mü skill mi ayırmak için aynı ajanla `--brief B` yeniden (`queue22`, own-b-1 ve A kontrolünden sonra, ~18:00).
