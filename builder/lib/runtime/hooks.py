@@ -18,7 +18,7 @@ import json
 import re
 
 from builder.lib.runtime.common import (  # embed: drop
-    add_csv, as_text, decode, fill, holds, lookup, split_csv, to_int, var_key,  # embed: drop
+    add_csv, as_text, decode, fill, holds, lookup, split_csv, to_float, to_int, var_key,  # embed: drop
 )  # embed: drop
 from builder.lib.runtime.dates import is_business_day, on_or_after, on_or_before, parse_day  # embed: drop
 
@@ -40,6 +40,7 @@ CLOCK = re.compile(r"^\s*(\d{1,2})(?:\s*[:.h]\s*(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.
 DIGIT_GROUP = re.compile(r"\d[\d\s().+\-]*\d|\d")
 AMOUNT_GROUP = re.compile(r"\d[\d.,]*")
 NAMED_TIMES = {"noon": "12:00", "midday": "12:00", "midnight": "00:00"}
+QUEUE_STALE_S = 25
 
 
 # --- values --------------------------------------------------------------------------------------
@@ -418,20 +419,37 @@ def ended_calls(state, tool):
 
 def enqueue(state, tool, key, body, adjusted):
     """Queue this request for its post hook, first in first out. The bb_key/bb_arg slots hold only
-    the newest request, which is wrong for calls that run side by side. With no call in flight a
-    queued entry is stale (its call got no post hook) and is dropped; so is an entry with this key."""
+    the newest request, which is wrong for calls that run side by side. An entry left over by a call
+    that got no post hook (an engine error) is dropped: when no call is in flight, when it is older
+    than QUEUE_STALE_S (calls sent together start within a second; a bank call takes seconds), or when
+    a new request has its key."""
     name = "bb_queue__" + tool
     queue = decode(state.get(name))
     started = to_int(state.get("bb_started__" + tool))
     if not isinstance(queue, list) or ended_calls(state, tool) >= started:
         queue = []
-    queue = [entry for entry in queue if isinstance(entry, dict) and entry.get("key") != key]
+    now = seconds_now()
+    kept = []
+    for entry in queue:
+        if not isinstance(entry, dict) or (key and entry.get("key") == key):
+            continue
+        if now is not None and to_float(entry.get("at")) is not None and now - to_float(entry.get("at")) > QUEUE_STALE_S:
+            continue
+        kept.append(entry)
     args = dict()
     for field in body:
         args[var_key(field)] = body[field]
-    queue.append({"key": key, "args": args, "adjusted": adjusted})
-    state[name] = json.dumps(queue)
+    kept.append({"key": key, "args": args, "adjusted": adjusted, "at": now})
+    state[name] = json.dumps(kept)
     state["bb_started__" + tool] = started + 1
+
+
+def seconds_now():
+    """Seconds since the epoch, or None when the clock cannot be read."""
+    try:
+        return datetime.datetime.now().timestamp()
+    except Exception:
+        return None
 
 
 def dequeue(state, tool):
@@ -481,10 +499,14 @@ def clean_entry(value):
 
 
 def open_items(state, tools):
-    """The products (bb_products, in order) that none of `tools` has written yet, or 'none'."""
+    """The products (bb_products, in order) that none of `tools` has written yet, or 'none'. A product the
+    last of `tools` (the record of last resort, e.g. a note) gave up on counts as done: nothing more can
+    be written for it, and a gate on this list must still open."""
     done = []
     for tool in tools:
         done = done + split_csv(state.get("bb_done__" + tool))
+    if tools:
+        done = done + split_csv(state.get("bb_failed_out__" + tools[-1]))
     items = [item for item in split_csv(state.get("bb_products")) if item not in done]
     return ", ".join(items) if items else "none"
 

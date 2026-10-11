@@ -1,3 +1,4 @@
+import json
 import copy
 import datetime as dt
 
@@ -419,3 +420,33 @@ def test_open_var_tracks_the_products_still_without_a_record():
 def test_open_var_needs_its_tools(bad):
     with pytest.raises(ValueError):
         hooks.post_hook("book", **bad)
+
+
+def test_an_entry_left_by_a_call_with_no_post_hook_expires():
+    # p1's call ended with no post hook and no failure count (e.g. cancelled); later p2 goes alone
+    state = {"bb_products": "a1,a2"}
+    state, _ = pre(state, {"account": "a1"}, key_field="account")
+    queue = json.loads(state["bb_queue__book"])
+    queue[0]["at"] -= 60
+    state["bb_queue__book"] = json.dumps(queue)
+    state, _ = pre(state, {"account": "a2"}, key_field="account")
+    state, result = post(state, {"done": "true", "ref": "r"}, **WRITE)
+    assert result["data"]["what_to_do_next"] == "Booked a2." and state["bb_done__book"] == "a2"
+
+
+def test_side_by_side_calls_without_a_key_keep_their_own_arguments():
+    state = {}
+    state, _ = pre(state, {"why": "first"})
+    state, _ = pre(state, {"why": "second"})
+    cfg = dict(WRITE, key_field="")
+    state, _ = post(state, {"done": "true", "ref": "r"}, **cfg)
+    assert state["bb_last__book__why"] == "first"
+    state, _ = post(state, {"done": "true", "ref": "r"}, **cfg)
+    assert state["bb_last__book__why"] == "second"
+
+
+def test_a_record_of_last_resort_that_gives_up_still_opens_the_gate():
+    note = dict(WRITE, retries=0, open_var="bb_open", open_tools=["promise", "book"])
+    state = {"bb_products": "a1,a2", "bb_done__promise": "a1", "bb_key__book": "a2"}
+    state, _ = post(state, {"done": False}, **note)            # the note for a2 fails, no retries left
+    assert state["bb_failed_out__book"] == "a2" and state["bb_open"] == "none"

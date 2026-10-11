@@ -244,3 +244,11 @@ def test_without_a_structured_guide_each_product_keeps_its_text():
         state.pop(name)
     state = embed.run(code(line="{id}: {deadline_shifts}"), state=state)
     assert "DAY TABLE" not in state["account_facts"] and "a2: Day guide up to Tuesday 8 January 2030" in state["account_facts"]
+
+
+def test_a_broken_day_guide_drops_the_table_not_the_facts():
+    state = embed.run(calc.dates_code(calendar=DAY_CAL, dates=DAY_DATES), state={"now": "2030-01-02T10:00"})
+    state["bb_shiftmap__limit_hard"] = json.dumps([["2030-01-02", "only two"]])
+    state["accounts"] = ITEMS
+    state = embed.run(code(line="{id}: {deadline_shifts}"), state=state)
+    assert state["bb_account_state"] == "ok" and "DAY TABLE" not in state["account_facts"]

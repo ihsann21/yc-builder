@@ -161,29 +161,33 @@ DAY_TABLE_POINTER = "see the DAY TABLE after the products (one line per day, eve
 
 def day_table(state, rows):
     """One line per day with what that day means for every product, from each deadline's day guide
-    (bb_shiftmap__<deadline>); "" when a product has no guide. rows: [(label, deadline name)]."""
-    guides = []
-    heads = dict()
-    order = []
-    for label, deadline in rows:
-        entries = decode(state.get("bb_shiftmap__" + deadline)) if deadline else None
-        if not isinstance(entries, list) or not entries:
-            return ""
-        verdicts = dict()
-        if len(entries) > len(order):
-            order = [entry[0] for entry in entries]       # every guide starts today, day by day
-        for entry in entries:
-            heads[entry[0]] = entry[1]
-            verdicts[entry[0]] = entry[2]
-        last = as_text(lookup(state, "bb_date__" + deadline + "__spoken"))
-        guides.append((label, verdicts, last))
-    lines = [DAY_TABLE_HEAD]
-    for day in order:
-        parts = []
-        for label, verdicts, last in guides:
-            parts.append(label + ": " + (verdicts.get(day) or "AFTER the latest date " + last + "."))
-        lines.append("  " + heads[day] + ": " + " | ".join(parts))
-    return "\n".join(lines)
+    (bb_shiftmap__<deadline>); "" when a product has no usable guide. rows: [(label, deadline name)].
+    Day labels come from the longest guide (a short guide names the 12th without its month)."""
+    try:
+        guides = []
+        longest = []
+        for label, deadline in rows:
+            entries = decode(state.get("bb_shiftmap__" + deadline)) if deadline else None
+            if not isinstance(entries, list) or not entries:
+                return ""
+            verdicts = dict()
+            for entry in entries:
+                if not isinstance(entry, list) or len(entry) < 3:
+                    return ""
+                verdicts[entry[0]] = entry[2]
+            if len(entries) > len(longest):
+                longest = entries                         # every guide starts today, day by day
+            last = as_text(lookup(state, "bb_date__" + deadline + "__spoken"))
+            guides.append((label, verdicts, last))
+        lines = [DAY_TABLE_HEAD]
+        for entry in longest:
+            parts = []
+            for label, verdicts, last in guides:
+                parts.append(label + ": " + (verdicts.get(entry[0]) or "AFTER the latest date " + last + "."))
+            lines.append("  " + entry[1] + ": " + " | ".join(parts))
+        return "\n".join(lines)
+    except Exception:
+        return ""
 
 
 def write_products(state, cfg):
