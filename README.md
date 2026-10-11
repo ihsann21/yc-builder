@@ -30,6 +30,20 @@ workflow), saves and publishes the workflow on Freya (updated in place on later 
 state in `builder/work/.freya-agents.json`) and exports it to `submission/<slot>.workflow.json`, where the
 slot is the brief's file name. Exit code 0 only when this run saved and exported a workflow.
 
+## Final briefs
+
+Put each final brief and its tool API file in `final/`, then run the builder once per brief:
+
+```bash
+source env.sh
+python3 builder/build.py final/<brief>.md final/<tool_api>.json 2>&1 | tee traces/final-<brief>.log
+```
+
+A good run ends with `[export] wrote submission/<slot>.workflow.json`, `[trace] copied to
+submission/<slot>.trace.log` and exit code 0. If a run fails (for example Freya returns 5xx), run the
+builder again: the submission is the phone agent of one run with that run's trace. Never edit a workflow
+by hand. Practice outputs of earlier runs are in `dev/practice-submissions/`.
+
 ## Tests
 
 ```bash
