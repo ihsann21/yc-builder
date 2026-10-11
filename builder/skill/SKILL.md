@@ -209,12 +209,6 @@ customer refused up front still gets all its attempts; write: "A product the cus
 you reached it still gets its attempts: your first message about it is its attempt 1 offer. Never end a
 product as refused before its listed attempts are used."
 
-A day the customer named, for one product or for all, beats the attempt 1 date (measured: the agent
-offered and recorded its attempt 1 date for a second product the customer had already named a day for).
-Write in the task message: "If the customer named a day for this product or for all products, offer
-that day for it, checked in the day guide; use the attempt 1 date only for a product with no day named."
-With several products the day guide is the DAY TABLE: name it so.
-
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
 applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
@@ -258,10 +252,6 @@ no hook reminds the model (measured twice: goodbye with no record at all). So th
 end-of-call rule names that case on its own: "If no promise was agreed, first call <the record tool> for
 every product, in order, with its reason, one call per message; only then the goodbye." (gated: "...
 one call per message; the call ends by itself after the last one.")
-Writes in a row after the read-back are silent turns; with a slow model the customer hung up before
-the last one (measured: three products confirmed, two recorded). So the read-back rule and every hook
-message that calls the next write add: "In the same message as the call, say only: One moment, please."
-Never the saved word in it.
 Without the gate, give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the
