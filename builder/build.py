@@ -33,20 +33,36 @@ SLOTS_FILE = WORK / ".slot-inputs.json"      # slot -> hash of the inputs it was
 SECRET_VARS = ("FREYA_API_KEY", "FREYA_BANK_TEAM_KEY", "ANTHROPIC_API_KEY")
 # Any tool call whose input mentions one of these is refused: the agent never reads keys, and never
 # reads practice answers or practice-brief configs (dev/, tests/, the kit builder's out/, the test set).
-BLOCKED = re.compile(r"env\.sh|printenv|environ|declare -x|export -p|(^|[\s;&|(])env(\s|$)|"
+# The generic patterns are matched with the repo's own path replaced by "<repo>", so a clone under a
+# folder such as /tmp/out/ or ~/results/ does not refuse every path; the patterns that name the repo
+# path itself are matched on the full text.
+ROOT_RE = re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")    # a space may be written as "\ "
+GENERIC = re.compile(r"env\.sh|printenv|environ|declare -x|export -p|(^|[\s;&|(])env(\s|$)|"
                      + "|".join(SECRET_VARS)
                      + r"|(^|[\s'\"=]|yc-builder[\\/]+)(dev|tests)[\\/]|build-the-builder[\\/]+out[\\/]"
                      + r"|public-test-set|(^|[\s'\"\\/])(results|traces)[\\/]"
-                     # dev/ and tests/ by absolute path too; a space in the repo path may be written as "\ "
-                     + "|" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")
-                     + r"[\\/]+(dev|tests)([\\/\"'\s]|$)"
                      # other briefs, practice exports, the kit's briefs and examples, the repo's notes
                      + r"|(^|[\s'\"=\\/])(submission|briefs|out|examples|mutations)[\\/]|\.personas|PROGRESS"
-                     + r"|build_the_builder_final_plan|Teknik Strateji|(^|[\s'\"=])brief-[A-Za-z0-9_-]*\.md"
-                     + "|" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )") + r"[\\/]+[^\\/\"']*\.md"
-                     # a recursive search from the repo root
-                     + r"|\b(grep|rg|find)\b[^|;&\n]*\s(\.|\./|(\\?\")?" + re.escape(str(ROOT)).replace(re.escape(" "), r"(?:\\+ | )")
-                     + r"(\\?\")?)(\s|$|\\|\")")
+                     + r"|build_the_builder_final_plan|Teknik Strateji|(^|[\s'\"=])brief-[A-Za-z0-9_-]*\.md")
+ROOTED = re.compile(ROOT_RE + r"[\\/]+(dev|tests)([\\/\"'\s]|$)"          # dev/ and tests/ by absolute path
+                    + "|" + ROOT_RE + r"[\\/]+[^\\/\"']*\.md"                 # notes and briefs at the repo root
+                    # a recursive search from the repo root
+                    + r"|\b(grep|rg|find)\b[^|;&\n]*\s(\.|\./|(\\?\")?" + ROOT_RE + r"(\\?\")?)(\s|$|\\|\")")
+
+
+def unrooted(text: str, root_re: str = ROOT_RE) -> str:
+    """The text with the repo's own path replaced by "<repo>"."""
+    return re.sub(root_re, "<repo>", text)
+
+
+class Blocked:
+    """BLOCKED.search(text): the first refused part of a tool call's command or paths, or None."""
+
+    def search(self, text: str) -> re.Match | None:
+        return ROOTED.search(text) or GENERIC.search(unrooted(text))
+
+
+BLOCKED = Blocked()
 # Read, Grep and Glob may only look under these (resolved) folders and files.
 READABLE = (ROOT / "builder", KIT / "docs", KIT / "freya.py", KIT / "tools")
 
@@ -228,11 +244,18 @@ def export(slot: str, before: dict, trace: Trace) -> bool:
     return True
 
 
+def blocked_name(name: str) -> bool:
+    """Whether a file or folder name alone would make the guard refuse a path that holds it."""
+    return bool(GENERIC.search("/" + name + "/") or GENERIC.search(" " + name))
+
+
 def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE) -> str:
     """The slot: the last brief's file name, made safe. A name already used for other inputs (two hidden
     briefs both called brief.md) gets a short hash of the inputs, so one build never overwrites the other."""
     digest = hashlib.sha256(b"".join(pathlib.Path(f).read_bytes() for f in briefs + [api])).hexdigest()[:6]
     slot = re.sub(r"[^A-Za-z0-9_-]", "_", pathlib.Path(briefs[-1]).stem) or "brief"
+    if blocked_name(slot):
+        slot = "wf-" + digest        # a folder named like a blocked one (out, results, ...) would lock the agent out
     try:
         known = json.loads(slots_file.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -245,7 +268,24 @@ def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE)
     return slot
 
 
+def use_the_venv() -> None:
+    """Re-run under the repo's .venv when this Python lacks the Agent SDK (the organizer's run command is a
+    bare `python3`); without a .venv the run goes on and the trace reports the missing package."""
+    try:
+        import claude_agent_sdk  # noqa: F401
+        return
+    except ImportError:
+        pass
+    if pathlib.Path(sys.prefix).resolve() == (ROOT / ".venv").resolve():
+        return                       # already the venv (its python is often a symlink to the system one)
+    for venv in (ROOT / ".venv" / "bin" / "python", ROOT / ".venv" / "Scripts" / "python.exe"):
+        if venv.is_file():
+            print("[python] claude_agent_sdk missing in", sys.executable, "- re-running with", venv, flush=True)
+            os.execv(str(venv), [str(venv), str(pathlib.Path(__file__).resolve()), *sys.argv[1:]])
+
+
 def main() -> int:
+    use_the_venv()
     parser = argparse.ArgumentParser(description="Build a Freya phone agent from a brief.")
     parser.add_argument("files", nargs="+", help="brief file(s), then the tool API file")
     parser.add_argument("--cases", choices=["A", "B"], default="", help="practice customers to test with (dev only)")
@@ -261,7 +301,7 @@ def main() -> int:
     deadline = int(os.environ.get("BUILD_DEADLINE_S", "1500"))
     trace = Trace(slot)
     start = time.time()
-    trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S"), "briefs:", briefs, "tool API:", api, "slot:", slot)
+    trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "briefs:", briefs, "tool API:", api, "slot:", slot)
     # every run starts with no work folders at all, as on a fresh clone: this slot's old one and every other
     # slot's (an agent copied another brief's generator) go where the agent cannot read; the state file stays
     stamp = time.strftime("%Y%m%d-%H%M%S")
@@ -275,10 +315,14 @@ def main() -> int:
     # the agent works on copies in its work folder, so an input kept anywhere (even under dev/) stays readable
     inputs = WORK / slot / "inputs"
     inputs.mkdir()
-    for source in briefs + [api]:
-        shutil.copyfile(source, inputs / pathlib.Path(source).name)
-    briefs = [str(inputs / pathlib.Path(b).name) for b in briefs]
-    api = str(inputs / pathlib.Path(api).name)
+    copies = []
+    for number, source in enumerate(briefs + [api], 1):
+        name = pathlib.Path(source).name
+        if blocked_name(name):
+            name = "input-" + str(number) + pathlib.Path(source).suffix
+        shutil.copyfile(source, inputs / name)
+        copies.append(str(inputs / name))
+    briefs, api = copies[:-1], copies[-1]
     trace("[inputs] copied to", inputs.relative_to(ROOT))
     before = saved_entry(slot)
     try:
@@ -293,8 +337,20 @@ def main() -> int:
     except Exception as error:  # noqa: BLE001 - the trace must still get its end line
         trace("[export] FAILED:", type(error).__name__, str(error)[:300])
     finally:
-        trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S"), f"build time {time.time() - start:.0f} s")
+        trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S %z"), f"build time {time.time() - start:.0f} s")
+        keep_trace(trace, slot)
     return 0 if ok else 1
+
+
+def keep_trace(trace: Trace, slot: str) -> None:
+    """Copy the (masked) trace to submission/<slot>.trace.log: traces/ is not committed, the submission is."""
+    try:
+        out = ROOT / "submission" / (slot + ".trace.log")
+        out.parent.mkdir(exist_ok=True)
+        shutil.copyfile(trace.path, out)
+        print("[trace] copied to", out.relative_to(ROOT), flush=True)
+    except OSError as error:
+        print("[trace] copy FAILED:", type(error).__name__, flush=True)
 
 
 if __name__ == "__main__":

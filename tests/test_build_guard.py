@@ -141,3 +141,23 @@ def test_the_builder_can_still_do_its_work(tool, tool_input):
 ])
 def test_the_builder_cannot_reach_other_briefs_or_practice_data(tool, tool_input):
     assert decide_tool(tool, tool_input) == "deny"
+
+
+def test_a_clone_under_a_folder_named_like_a_blocked_one_still_works():
+    import re
+    from builder.build import GENERIC, unrooted
+    root = "/tmp/out/results/environments/yc-builder"
+    text = json.dumps({"file_path": root + "/builder/work/brief-a/gen.py"})
+    assert GENERIC.search(text) and not GENERIC.search(unrooted(text, re.escape(root)))
+
+
+@pytest.mark.parametrize("name", ["out", "results", "environment-rules", "brief-x", "dev"])
+def test_a_brief_named_like_a_blocked_folder_gets_a_safe_slot(tmp_path, name):
+    from builder.build import BLOCKED, ROOT, slot_for
+    brief, api = tmp_path / (name + ".md"), tmp_path / "api.json"
+    brief.write_text("x"), api.write_text("{}")
+    slot = slot_for([str(brief)], str(api), tmp_path / "slots.json")
+    from builder.build import blocked_name
+    copy = (name + ".md") if not blocked_name(name + ".md") else "input-1.md"
+    folder = ROOT / "builder" / "work" / slot / "inputs" / copy
+    assert not BLOCKED.search(json.dumps({"file_path": str(folder)})), slot
