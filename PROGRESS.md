@@ -489,3 +489,10 @@ Prova ajanı `36742ca7…` `--brief A --reps 3`: **8/10** (koşular 10, 8, 10; 2
 ## 11 Ekim, 15:56–16:10: I (yeni build, donmuş skill) kendi vakalar 3/5 (13/15), iki kalma 1. koşuda ve kesinti kaynaklı
 
 I ajanı (`712a168e…`, 13:27 build'i, `4f64795` skill'i) `dev/cases/brief-i-cases.json --reps 3`: **3/5** (koşular 3, 5, 5; 13/15; 768 sn; üç koşuda da "phone agent was slow" uyarısı). 2. ve 3. koşu 5/5. 1. koşudaki iki kalma: PUB-01 kimlik doğrulama tool çağrıları teknik hatayla döndü (judge: "identity verification could not be completed due to technical errors"), söz ve `close_call` yok; PUB-07 müşteri çağrıyı kapattı (`customer-ended-call`), ajan Cumartesi'yi reddedip **önceki** iş günü Cuma 16'yı doğru önerdi ve kaydetti ama zorunlu SMS cümlesini söyleyemeden çağrı bitti. Brief I'nın A'dan ters kuralları (önce telefon, Cumartesi → önceki iş günü, servis hatasında tekrar yok, tam tutar fazla → yarısı) koşu 2–3'te 5/5. Gece build'i (`b8027be6…`) 4/5 idi (PUB-03 kapanış). G kaydı yeniden yapıldı (`resave brief-g ok`), G ölçümü 16:09'da başladı.
+
+## 11 Ekim, 16:09–16:36: G kendi vakalar 2/2 (6/6); G organizatör B'de ilk iki koşu 2/3, iki kalma da altyapı
+
+G ajanı (`7a31caf4…`, 13:50 build'i, 16:09'da `builder.save` ile yeniden kaydedildi) `dev/cases/brief-g-cases.json --reps 3`: **2/2** (koşular 2, 2, 2; 684 sn). Organizatör B (`--brief B`), ilk iki koşu `dev.rescore` ile: ikisinde de PUB-12 ve PUB-13 PASS, PUB-11 FAIL:
+- `b2d02d2f` (16:21): `verify_identity` üç kez "API request failed: <!DOCTYPE html>…" (banka mock'u, Cloudflare hata sayfası); ajan teknik sorun deyip devir önerdi; kapanış `not_verified/declined`.
+- `ca4c94ee` (16:26): müşteri "Yes, this is Sofia Almeida" dedikten sonra 316 sn hiçbir motor olayı yok (rota, LLM, tool), ajan sessiz; müşteri kapattı (`customer-ended-call`, 62 sn konuşma).
+İkisi de altyapı (banka mock'u, Freya motoru); ajanın davranışında hata görülmedi. Panelde G'nin 6 simülasyonu var çünkü iki ölçüm yapılıyor: G'nin 2 kendi vakası (3 koşu) ve organizatörün 3 B vakası (3 koşu); I'nın yalnız kendi vakaları vardı (3 koşu).
