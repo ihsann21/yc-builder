@@ -1,13 +1,19 @@
 {
   "team": "UstaTech",
   "members": [
-    {"name": "İhsan TANRIVERDİ", "email": "ihsantanrvrd@gmail.com"},
-    {"name": "Mehmet Akif VARDAR", "email": "mehmetakifvrdr@gmail.com"}
+    {
+      "name": "İhsan TANRIVERDİ",
+      "email": "ihsantanrvrd@gmail.com"
+    },
+    {
+      "name": "Mehmet Akif VARDAR",
+      "email": "mehmetakifvrdr@gmail.com"
+    }
   ],
   "repo": "https://github.com/ihsann21/yc-builder",
   "commit": "FILL: the commit that holds the final workflow and trace",
   "run_command": "python3 builder/build.py {case_folder} {mock_url}",
   "workflow": "submission/FILL.workflow.json",
   "trace": "submission/FILL.trace.log",
-  "mock_url": "FILL"
+  "mock_url": "https://yc-bank-mock.ustatech.workers.dev"
 }

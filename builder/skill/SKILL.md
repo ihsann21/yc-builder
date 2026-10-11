@@ -64,6 +64,16 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   contract writes them, the response fields in the description, and `servers[0].url` = the mock URL.
   Then call one read-only service on the mock with a test customer (`curl`) and compare the real response
   with the contract; fix the spec to the real field names. Load the spec with `tools.load_api` as usual.
+  A path that is not a plain name (`/v1/items.list`) needs an `operationId` with letters, digits and `_`
+  (it becomes the tool name). A request body that wraps the fields in an object goes in the spec as
+  written and is built with `envelope=` (below). Write the contract's error answers (HTTP status, code)
+  into each operation's `responses`.
+- HTTP errors: on a non-2xx answer the post hook does not run. The engine still sets
+  `<tool>_status_code` (and `<tool>_failure_count`); when the documents treat two error statuses
+  differently (e.g. "not found" is an ordinary answer, a 500 goes to an agent), route on
+  `<tool>_status_code` and say in the task message which sentence each status gets. When the documents
+  say an answer can be slow, set `timeout_ms` above that (the engine allows 30 s in all) and give the
+  waiting sentence they name.
 - Language: the phone agent speaks the language of the documents and the example conversations. Every
   fixed sentence (`wf.say`, `calc.wrap_code`, mandatory sentences in hook messages) is in that language,
   in the documents' own words where they give them. The `*_spoken` placeholders are English: in another
@@ -144,7 +154,11 @@ never a tool the brief forbids there.
 from builder.lib import calc, closing, hooks, tools, workflow as wf
 ops, warnings = tools.operations(tools.load_api(API)); op = ops["<tool>"]
 tools.api_tool(op, description=TEXT, bake={"<field>": "{{<call variable>}}"}, notes={"<field>": TEXT},
-               pre=CODE, post=CODE, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call")
+               pre=CODE, post=CODE, mapping=[("data.<field>", "<var>")], lifecycle="end_of_call",
+               timeout_ms=12000, envelope="", envelope_parts={})
+#   envelope: when the API wants its fields inside one body object ({"data": {...}, "meta": {...}}),
+#   envelope="data": the tool's fields are then the inner ones (bake/notes name them) and a pre hook step
+#   wraps them; envelope_parts gives fixed values for the other top-level objects (no placeholders)
 tools.end_call_tool(description=TEXT, trigger_phrase=[PHRASE, ...], polite_replies=[...])
 #   trigger_phrase: EVERY sentence the brief makes the last words of a call (the goodbye, an announcement
 #   after a transfer, ...): a call that ends on a sentence that is not listed stays open until the time

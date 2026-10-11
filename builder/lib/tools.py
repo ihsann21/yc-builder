@@ -10,7 +10,9 @@ import json
 import os
 import pathlib
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+
+from builder.lib import embed
 
 HTTP_METHODS = ("get", "post", "put", "patch", "delete")
 LIFECYCLES = ("start_of_call", "end_of_call")
@@ -41,7 +43,7 @@ class Field:
 class Operation:
     """One HTTP operation of the tool API."""
 
-    name: str  # the path without its leading slash
+    name: str  # the path without its leading slash (operationId or _ for a path that is no plain name)
     method: str  # upper case
     url: str  # servers[0].url without a trailing slash, plus the path; just the path if no servers
     summary: str
@@ -168,7 +170,12 @@ class _Reader:
             self.warn(f"{where}: path parameters are not filled in; the url keeps {path}")
         name = path.strip("/")
         if not _TOOL_NAME.fullmatch(name):
-            self.warn(f"{where}: {name!r} is not a plain tool name (letters, digits, _ and -); kept as is")
+            # A path such as /v1/items.list is no valid tool name: take the operationId, else
+            # the path with every other character turned into _.
+            op_id = op.get("operationId")
+            plain = op_id if isinstance(op_id, str) and _TOOL_NAME.fullmatch(op_id) else re.sub(r"[^A-Za-z0-9_-]+", "_", name)
+            self.warn(f"{where}: {name!r} is not a plain tool name (letters, digits, _ and -); named {plain!r}")
+            name = plain
         response, others = self.responses(op, where)
         return Operation(
             name=name,
@@ -478,6 +485,8 @@ def api_tool(
     timeout_ms: int = 12000,
     mapping: list[tuple[str, str]] | None = None,
     lifecycle: str = "",
+    envelope: str = "",
+    envelope_parts: dict | None = None,
 ) -> dict:
     """A Freya `__function__:api_call` tool for `op`, one body leaf per request field.
 
@@ -488,6 +497,12 @@ def api_tool(
     pre / post: hook code, written only when not blank.
     mapping: (path, variable) pairs for a tool-level response_mapping; every path starts with 'data.'.
     lifecycle: '' for a normal tool, or start_of_call / end_of_call for a lifecycle tool.
+    envelope: for an API whose fields sit inside one object of the body (e.g. {"data": {...},
+        "meta": {...}}), the name of that object ("data"). The tool's body leaves are then its inner
+        fields (bake, placeholders and notes name them), and an extra pre hook step, run after `pre`,
+        wraps them: body = {envelope: <leaves>, **envelope_parts}.
+    envelope_parts: fixed values of the body's other top-level fields (e.g. {"meta": {"source": "phone"}});
+        every other required top-level field must be given here. Literal JSON only, no placeholders.
     retries: config.maxRetries. Default 0 for a normal tool (the brief decides what happens after a
         failed write) and 2 for a lifecycle tool. Measured: the platform did not retry a create_promise
         that the bank answered with a 500 (the call ended in function_call_error), so do not count on it.
@@ -495,6 +510,12 @@ def api_tool(
     placeholder, an unknown lifecycle, or a mapping path outside 'data.'.
     """
     bake, placeholders, notes = dict(bake or {}), dict(placeholders or {}), dict(notes or {})
+    if envelope:
+        parts = dict(envelope_parts or {})
+        op, wrap = _enveloped(op, envelope, parts), _envelope_code(envelope, parts)
+        pre = pre.rstrip() + "\n" + wrap if pre.strip() else wrap
+    elif envelope_parts:
+        raise ValueError(f"{op.name}: envelope_parts needs envelope")
     _check_field_keys(op, bake=bake, placeholders=placeholders, notes=notes)
     both = [name for name in bake if name in placeholders]
     if both:
@@ -530,6 +551,42 @@ def api_tool(
     if entries:
         tool["response_mapping"] = entries
     return tool
+
+
+def _enveloped(op: Operation, envelope: str, parts: dict) -> Operation:
+    """`op` with the inner fields of the body object `envelope` as its request fields."""
+    outer = field(op, envelope)
+    if not outer.fields:
+        raise ValueError(f"{op.name}: request field {envelope!r} has no inner fields to use as the tool body")
+    others = [f.name for f in op.request if f.name != envelope]
+    unknown = [name for name in parts if name not in others]
+    if unknown:
+        raise ValueError(f"{op.name}: envelope_parts names {', '.join(unknown)}, not a top-level request field "
+                         f"besides {envelope!r}; known: {', '.join(others) or 'none'}")
+    missing = [f.name for f in op.request if f.required and f.name != envelope and f.name not in parts]
+    if missing:
+        raise ValueError(f"{op.name}: required top-level field(s) {', '.join(missing)} need a value in envelope_parts")
+    try:
+        text = json.dumps(parts)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{op.name}: envelope_parts must be plain JSON: {exc}") from exc
+    if "{{" in text:
+        raise ValueError(f"{op.name}: envelope_parts are sent as written; a {{{{var}}}} placeholder is not filled there")
+    return replace(op, request=outer.fields)
+
+
+def _envelope_code(envelope: str, parts: dict) -> str:
+    """Pre hook step: wrap the substituted body into {envelope: body, **parts}. Never raises."""
+    return (
+        "import json\n"
+        "try:\n"
+        f"    bb_envelope = {embed.literal(parts)}\n"
+        "    bb_inner = config.get('body')\n"
+        f"    bb_envelope[{envelope!r}] = bb_inner if isinstance(bb_inner, dict) else dict()\n"
+        "    config['body'] = bb_envelope\n"
+        "except Exception:\n"
+        "    pass\n"
+    )
 
 
 def _check_field_keys(op: Operation, **maps: dict[str, str]) -> None:

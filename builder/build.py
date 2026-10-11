@@ -76,15 +76,18 @@ class Trace:
         self.path = ROOT / "traces" / (slot + "-" + time.strftime("%Y%m%d-%H%M%S") + ".log")
         self.path.parent.mkdir(exist_ok=True)
         self.secrets = [os.environ[k] for k in SECRET_VARS if len(os.environ.get(k, "")) >= 8]
+        self.session_id = ""   # the builder agent's Claude Code session, whose log goes with the submission
+
+    def mask(self, line: str) -> str:
+        for secret in self.secrets:
+            line = line.replace(secret, "***")
+        line = re.sub(r"fak_[A-Za-z0-9_\-]{6,}", "fak_***", line)
+        return re.sub(r"sk-ant-[A-Za-z0-9_\-]{6,}", "sk-ant-***", line)
 
     def __call__(self, *parts: object) -> None:
         """Write one line. Never raises: a trace problem must not stop the build."""
         try:
-            line = " ".join(str(p) for p in parts)
-            for secret in self.secrets:
-                line = line.replace(secret, "***")
-            line = re.sub(r"fak_[A-Za-z0-9_\-]{6,}", "fak_***", line)
-            line = re.sub(r"sk-ant-[A-Za-z0-9_\-]{6,}", "sk-ant-***", line)
+            line = self.mask(" ".join(str(p) for p in parts))
             with self.path.open("a", encoding="utf-8") as out:
                 out.write(line + "\n")
             print(line, flush=True)
@@ -190,6 +193,11 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
     prompt = task_prompt(briefs, api, slot, cases, deadline // 60, case, mock_url)
     watched = {}   # tool_use_id -> command, for the checks and tests whose output belongs in the trace
     async for message in query(prompt=prompt, options=options):
+        data = getattr(message, "data", None)
+        session = getattr(message, "session_id", None) or (data.get("session_id") if isinstance(data, dict) else None)
+        if session and not trace.session_id:
+            trace.session_id = str(session)
+            trace("[session] Claude Code session", trace.session_id)
         if isinstance(message, AssistantMessage):
             trace("[model call]", (getattr(message, "model", "") or model) + ":", call_purpose(message.content))
             for block in message.content:
@@ -450,6 +458,26 @@ def keep_trace(trace: Trace, slot: str) -> None:
         print("[trace] copied to", out.relative_to(ROOT), flush=True)
     except OSError as error:
         print("[trace] copy FAILED:", type(error).__name__, flush=True)
+    keep_session(trace, slot)
+
+
+def keep_session(trace: Trace, slot: str) -> None:
+    """Copy the builder agent's Claude Code session log (masked) to submission/<slot>.session.jsonl."""
+    if not trace.session_id:
+        return
+    try:
+        home = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR") or pathlib.Path.home() / ".claude")
+        found = sorted((home / "projects").glob("*/" + trace.session_id + ".jsonl"))
+        if not found:
+            print("[session] log not found for", trace.session_id, flush=True)
+            return
+        out = ROOT / "submission" / (slot + ".session.jsonl")
+        with found[0].open(encoding="utf-8") as source, out.open("w", encoding="utf-8") as target:
+            for line in source:
+                target.write(trace.mask(line))
+        print("[session] copied to", out.relative_to(ROOT), flush=True)
+    except OSError as error:
+        print("[session] copy FAILED:", type(error).__name__, flush=True)
 
 
 if __name__ == "__main__":

@@ -435,7 +435,7 @@ def test_a_relative_server_url_warns():
 @pytest.mark.parametrize("path", ["/accounts/{id}/lookup", "/"])
 def test_names_that_are_not_tool_names_warn(path):
     ops, warnings = operations(_minimal_api({path: {"post": {}}}))
-    assert list(ops) == [path.strip("/")]
+    assert list(ops) == [{"/accounts/{id}/lookup": "accounts_id_lookup", "/": ""}[path]]
     assert any("tool name" in w for w in warnings)
 
 
@@ -738,3 +738,58 @@ def test_end_call_takes_every_closing_sentence():
     assert single["function"]["parameters"]["properties"]["trigger_pattern"]["default"] == "Bye|bye"
     with pytest.raises(ValueError):
         end_call_tool(description="d", trigger_phrase=["Bye", " "], polite_replies=["bye"])
+
+
+ENVELOPE_API = {
+    "openapi": "3.0.0",
+    "servers": [{"url": "https://mock.example"}],
+    "paths": {
+        "/svc/v1/items.list": {"post": {
+            "operationId": "items_list",
+            "requestBody": {"content": {"application/json": {"schema": {
+                "type": "object", "required": ["data"],
+                "properties": {
+                    "data": {"type": "object", "required": ["owner"],
+                             "properties": {"owner": {"type": "string"}, "flow": {"type": "string"}}},
+                    "meta": {"type": "object", "properties": {"lang": {"type": "string"}}},
+                }}}}},
+            "responses": {"200": {"description": "ok"}}}},
+        "/svc/v1/items.get": {"post": {"responses": {"200": {"description": "ok"}}}},
+    },
+}
+
+
+def test_a_path_that_is_no_tool_name_takes_the_operation_id_or_underscores():
+    ops, warnings = operations(ENVELOPE_API)
+    assert sorted(ops) == ["items_list", "svc_v1_items_get"]
+    assert ops["items_list"].url == "https://mock.example/svc/v1/items.list"
+    assert any("named 'items_list'" in w for w in warnings)
+
+
+def test_envelope_tool_has_the_inner_fields_and_its_pre_hook_wraps_them():
+    from builder.lib import embed
+
+    ops, _ = operations(ENVELOPE_API)
+    tool = api_tool(ops["items_list"], description="x", bake={"owner": "{{owner_id}}"},
+                    envelope="data", envelope_parts={"meta": {"lang": "xx"}}, pre="vars['seen'] = 1")
+    body = tool["function"]["parameters"]["properties"]["body"]
+    assert list(body["properties"]) == ["owner", "flow"] and body["properties"]["owner"]["default"] == "{{owner_id}}"
+    code = tool["pre_process_code"]
+    assert code.startswith("vars['seen'] = 1\n") and "{{" not in code and "}}" not in code
+    assert embed.check(code) == []
+    config, state = {"body": {"owner": "7", "flow": "f"}}, {}
+    exec(code, {"config": config, "vars": state})
+    assert config["body"] == {"meta": {"lang": "xx"}, "data": {"owner": "7", "flow": "f"}} and state == {"seen": 1}
+
+
+@pytest.mark.parametrize("kwargs", [
+    {"envelope": "nope"},
+    {"envelope": "data", "envelope_parts": {"other": 1}},
+    {"envelope": "data", "envelope_parts": {"meta": {"lang": "{{lang}}"}}},
+    {"envelope_parts": {"meta": {}}},
+    {"envelope": "data", "bake": {"data": "x"}},
+])
+def test_envelope_mistakes_are_refused(kwargs):
+    ops, _ = operations(ENVELOPE_API)
+    with pytest.raises((ValueError, KeyError)):
+        api_tool(ops["items_list"], description="x", **kwargs)

@@ -8,3 +8,5 @@ __pycache__/
 dev/out/
 builder/work/
 .venv/
+mock/.wrangler/
+.DS_Store
