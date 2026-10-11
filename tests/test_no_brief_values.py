@@ -53,9 +53,10 @@ def brief_tokens(kit):
 
 
 def builder_files():
-    """Code, prompts and skills under builder/ (the generated work folder is not ours)."""
+    """Code, prompts and skills under builder/ (the generated work folder is not ours, and vendor/ is the
+    organisers' Freya client and docs, copied unchanged from the kit)."""
     files = list(BUILDER.rglob("*.py")) + list(BUILDER.rglob("*.md"))
-    return sorted(f for f in files if "work" not in f.relative_to(BUILDER).parts)
+    return sorted(f for f in files if not {"work", "vendor"} & set(f.relative_to(BUILDER).parts))
 
 
 def test_there_are_builder_files_to_check():

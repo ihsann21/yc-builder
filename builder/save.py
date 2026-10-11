@@ -14,11 +14,11 @@ import json
 import pathlib
 import sys
 
-from builder.build import KIT, STATE_FILE
+from builder.build import STATE_FILE, VENDOR
 from builder.lib import workflow
 
-sys.path.insert(0, str(KIT))
-import freya  # noqa: E402  (the kit's client, standard library only)
+sys.path.insert(0, str(VENDOR))
+import freya  # noqa: E402  (the kit's client, copied to builder/vendor; standard library only)
 
 
 def shape(wf: dict) -> dict:

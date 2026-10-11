@@ -16,6 +16,10 @@ python3 builder/build.py <brief.md> <tool_api.openapi.json>
 `python3` may be any Python 3.10+: when it lacks the Agent SDK, `build.py` re-runs itself with
 `.venv/bin/python`.
 
+The builder needs only `builder/`: the organisers' Freya client and docs are copied unchanged into
+`builder/vendor/`. The kit folder `build-the-builder-v3/` is used only for practice (its briefs, tool API
+file and `tools/run_cases.py`) and by the tests.
+
 The builder runs Claude Opus 5.5 at effort `max` (`BUILDER_MODEL`, `BUILDER_EFFORT` override them). A run
 takes about 4 to 6 minutes (hard cap 25 minutes, `BUILD_DEADLINE_S`). It prints the trace and writes it
 to `traces/<slot>-<time>.log` (not committed) and `submission/<slot>.trace.log` (committed with the

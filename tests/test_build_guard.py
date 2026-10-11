@@ -1,5 +1,6 @@
 """The builder agent's PreToolUse guard: keys, practice answers, dev/ and tests/ stay out of reach."""
 import json
+import pathlib
 
 import pytest
 
@@ -111,7 +112,8 @@ def decide_tool(tool: str, tool_input: dict) -> str:
 @pytest.mark.parametrize("tool,tool_input", [
     ("Read", {"file_path": f"{ROOT_TEXT}/builder/work/brief-x/inputs/brief-x.md"}),
     ("Read", {"file_path": "builder/lib/calc.py"}),
-    ("Read", {"file_path": f"{ROOT_TEXT}/build-the-builder-v3/build-the-builder/docs/api.md"}),
+    ("Read", {"file_path": f"{ROOT_TEXT}/builder/vendor/docs/api.md"}),
+    ("Read", {"file_path": "builder/vendor/docs/workflow-format.md"}),
     ("Grep", {"pattern": "def products_code", "path": "builder/lib"}),
     ("Glob", {"pattern": "*.py", "path": f"{ROOT_TEXT}/builder/lib/runtime"}),
     ("Bash", {"command": f'cd "{ROOT_TEXT}" && python3 builder/work/brief-x/gen.py'}),
@@ -161,3 +163,19 @@ def test_a_brief_named_like_a_blocked_folder_gets_a_safe_slot(tmp_path, name):
     copy = (name + ".md") if not blocked_name(name + ".md") else "input-1.md"
     folder = ROOT / "builder" / "work" / slot / "inputs" / copy
     assert not BLOCKED.search(json.dumps({"file_path": str(folder)})), slot
+
+
+def test_vendored_freya_client_and_docs_match_the_kit(kit):
+    """builder/vendor is the kit's freya.py and docs/, copied unchanged: the builder runs without the kit."""
+    vendor = ROOT / "builder" / "vendor"
+    assert (vendor / "freya.py").read_bytes() == (kit / "freya.py").read_bytes()
+    kit_docs = sorted(p.name for p in (kit / "docs").glob("*.md"))
+    assert kit_docs and sorted(p.name for p in (vendor / "docs").glob("*.md")) == kit_docs
+    for name in kit_docs:
+        assert (vendor / "docs" / name).read_bytes() == (kit / "docs" / name).read_bytes(), name
+
+
+def test_save_and_export_use_the_vendored_client():
+    from builder import build, save
+    assert build.VENDOR == ROOT / "builder" / "vendor"
+    assert pathlib.Path(save.freya.__file__).resolve() == (build.VENDOR / "freya.py").resolve()

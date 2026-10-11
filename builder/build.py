@@ -25,7 +25,8 @@ import sys
 import time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-KIT = ROOT / "build-the-builder-v3" / "build-the-builder"
+KIT = ROOT / "build-the-builder-v3" / "build-the-builder"     # the organisers' kit: practice customers only (--cases)
+VENDOR = ROOT / "builder" / "vendor"     # the kit's Freya client and docs, copied unchanged: the builder runs without the kit
 SKILL = ROOT / "builder" / "skill" / "SKILL.md"
 WORK = ROOT / "builder" / "work"
 STATE_FILE = WORK / ".freya-agents.json"
@@ -65,7 +66,7 @@ class Blocked:
 
 BLOCKED = Blocked()
 # Read, Grep and Glob may only look under these (resolved) folders and files.
-READABLE = (ROOT / "builder", KIT / "docs", KIT / "freya.py", KIT / "tools")
+READABLE = (ROOT / "builder", KIT / "tools")        # builder/ holds vendor/docs; the kit's tools/ only for --cases
 
 
 class Trace:
@@ -139,8 +140,8 @@ async def guard(hook_input: dict, tool_use_id: str | None, context: object) -> d
     outside = outside_readable(hook_input.get("tool_name", ""), tool_input if isinstance(tool_input, dict) else {})
     if outside:
         return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
-                                       "permissionDecisionReason": "Read only your inputs, builder/ and the kit's "
-                                       "docs/ (not " + outside + ")."}}
+                                       "permissionDecisionReason": "Read only your inputs and builder/ (the Freya "
+                                       "docs are in builder/vendor/docs/) (not " + outside + ")."}}
     found = BLOCKED.search(json.dumps(fields))
     if found:
         return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
@@ -233,7 +234,7 @@ def export(slot: str, before: dict, trace: Trace) -> bool:
         trace("[export] FAILED: this run saved no new version (still", saved.get("workflow_id"),
               "version", str(saved.get("version")) + "); nothing exported")
         return False
-    sys.path.insert(0, str(KIT))
+    sys.path.insert(0, str(VENDOR))
     import freya
     out = ROOT / "submission" / (slot + ".workflow.json")
     out.parent.mkdir(exist_ok=True)

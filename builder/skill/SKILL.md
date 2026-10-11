@@ -15,7 +15,7 @@ write the prompts, and assemble the workflow.
   bands, limits, attempt counts, identity questions, outcome and reason names, queues, sentences the
   customer must hear, the closing phrase. Do not reuse values from any other brief or example.
 - Read only the brief and tool API files given to you (their copies in `WORK/inputs/`), `builder/`
-  and the kit's `docs/`. Do not open or search anything else: not `dev/`, `tests/`, `submission/`, other
+  and the Freya docs in `builder/vendor/docs/`. Do not open or search anything else: not `dev/`, `tests/`, `submission/`, other
   briefs, the kit's `briefs/`, `out/`, `examples/`, `public-test-set.json`, `results/`, `traces/` or the
   repo's notes. Do not search from the repo root. (Such tool calls are refused.)
 - Tool names, field names, types and enums come from the OpenAPI file through `builder.lib.tools`.
