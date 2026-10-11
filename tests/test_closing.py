@@ -187,3 +187,9 @@ def test_number_facts_refuse_presence_operators(op):
 def test_a_gave_up_count_of_zero_does_not_fire():
     body = close({}, "", "", rules=[{"if": [["gave_up:book", "gte", 1]], "outcome": "nobody", "reason": "gone"}])
     assert body["result"] != "nobody"
+
+
+def test_gave_up_counts_a_last_write_that_ended_in_an_engine_error():
+    rules = [{"if": [["gave_up:book", "gte", 1]], "outcome": "nobody", "reason": "gone"}]
+    assert close({"book_response.status": "error", "book_failure_count": 1}, "", "", rules=rules)["result"] == "nobody"
+    assert close({"book_response.status": "success", "book_failure_count": 1}, "", "", rules=rules)["result"] != "nobody"

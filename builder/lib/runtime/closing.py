@@ -10,7 +10,8 @@ model's memory of the conversation.
 Facts a rule can test ([fact, op, value]):
     count:<tool>              successful writes (bb_count__<tool>; the engine's <tool>_success_count
                               when no hook ever ran for that tool)
-    gave_up:<tool>            keys whose writes failed more often than the retries allow
+    gave_up:<tool>            keys whose writes failed more often than the retries allow; also 1 when
+                              the tool's last call ended in an engine error (an HTTP error skips the post hook)
     last:<tool>.<field>       an argument of the last successful write (engine <tool>_args.<field> as fallback)
     logged:<tool>.<field>     how many keys have a logged value
     all_logged:<tool>.<field> the value every product has logged, if they all logged the same one; '' otherwise
@@ -86,7 +87,10 @@ def fact_value(state, name, model, cfg):
         own = state.get("bb_count__" + rest)
         return to_int(own) if own is not None else to_int(lookup(state, rest + "_success_count"))
     if kind == "gave_up":
-        return len(split_csv(state.get("bb_failed_out__" + rest)))
+        failed = len(split_csv(state.get("bb_failed_out__" + rest)))
+        if failed == 0 and as_text(lookup(state, rest + "_response.status")) == "error":
+            failed = 1           # an HTTP error skips the post hook; the engine still records the last result
+        return failed
     if kind == "last":
         tool, field = tool_and_field(rest)
         own = state.get("bb_last__" + tool + "__" + var_key(field))

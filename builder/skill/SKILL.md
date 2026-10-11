@@ -219,7 +219,10 @@ yet -> "<the brief's first amount> on <date>?"; that amount refused as too much 
 amount; never an amount the customer already refused (measured: with the ban only, the agent asked
 "how much ... will you be paying?" and a lower figure was recorded). Also say: "A customer who says
 they will pay a product on a day and names no lower amount agrees to the amount on offer: go to the
-read-back." and, in the system prompt: "Never ask the same question a third time; if the customer's
+read-back." An offer the brief allows once is made once: if the day is still open, name the amount and
+ask for the day in the same sentence; after that only the day is discussed and the amount is not offered
+again (the read-back does not count) (measured: the floor offered "today", then again "on Friday", was
+judged as offered twice). And, in the system prompt: "Never ask the same question a third time; if the customer's
 answer has not changed, act on what they said." (measured: a fixed offer sentence asked 70 times in a
 row while the customer kept saying "I will pay the card tomorrow").
 
