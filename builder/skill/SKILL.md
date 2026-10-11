@@ -72,8 +72,10 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   list stayed unset, a mapped number arrived, and the model invented an id). To put a list in
   a later prompt, add a code node right after the api_request node:
   `wf.code_node(NAME, calc.list_code(node=API_NODE, tool=TOOL, list_path="data.<list>", id_field=F,
-  item_fields=[...], var=V, empty=TEXT), NEXT)`; the prompt then reads `{{V}}` (one line per item) and
-  `{{V_count}}`. Map only plain values (numbers, text) with `mapping=`.
+  item_fields=[...], var=V, empty=TEXT, same_fields=[...]), NEXT)`; the prompt then reads `{{V}}` (one
+  line per item) and `{{V_count}}`. same_fields: the fields a caller picks an item by (its name, its
+  short number); a line whose value other items share says so, and the task message tells the model to
+  ask the documents' disambiguation question for such items. Map only plain values with `mapping=`.
 - HTTP errors: on a non-2xx answer the post hook does not run. The engine still sets the status and
   the failure count: for a call in an api_request node's pre_actions they are named after the NODE
   (`<node>_status_code`, `<node>_failure_count`, `<node>_response.*`), for a tool in `tools` after the

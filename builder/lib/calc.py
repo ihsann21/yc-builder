@@ -271,7 +271,7 @@ def wrap_code(*, parts: list[dict], var: str = "bb_wrap") -> str:
 
 
 def list_code(*, node: str, tool: str, list_path: str, id_field: str, item_fields: list[str], var: str,
-              empty: str = "") -> str:
+              empty: str = "", same_fields: list[str] | tuple = ()) -> str:
     """Code node snippet: the list at `list_path` of api_request node `node` (tool `tool`) as plain lines
     in variable `var` ('1. field: value; field: value', one item per line) and its length in `var`_count.
 
@@ -280,6 +280,8 @@ def list_code(*, node: str, tool: str, list_path: str, id_field: str, item_field
     mapped number arrived), only as flattened keys, which this reads.
     list_path: the list's path inside the API body, dots for nesting (e.g. "data.items" for
         {"data": {"items": [...]}}). id_field: a field every item has. item_fields: the fields to write.
+    same_fields: fields the caller picks an item by (a name, a short number): a line whose value other
+        items share ends with ' (same F as items 2, 3)', so the model asks instead of picking one.
     """
     check_var(var)
     for name in (node, tool):
@@ -293,6 +295,9 @@ def list_code(*, node: str, tool: str, list_path: str, id_field: str, item_field
         fields.insert(0, id_field)
     path = ".".join(parts)
     cfg = {"sources": [node + "_response.data." + path, tool + "_response.data." + path],
-           "list_field": parts[-1], "id_field": id_field, "item_fields": fields, "var": var, "empty": empty}
+           "list_field": parts[-1], "id_field": id_field, "item_fields": fields, "var": var, "empty": empty,
+           "same_fields": [f for f in same_fields if f in fields]}
+    if len(cfg["same_fields"]) != len(list(same_fields)):
+        raise ValueError("every same_fields entry must be one of item_fields")
     check_no_double_braces(cfg)
     return embed.snippet(("common", "products", "lists"), "run_list", cfg, "code")

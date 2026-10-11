@@ -280,3 +280,18 @@ def test_list_code_refuses_bad_names():
         calc.list_code(node="a-b", tool="t", list_path="data.x", id_field="id", item_fields=[], var="v")
     with pytest.raises(ValueError):
         calc.list_code(node="n", tool="t", list_path="", id_field="id", item_fields=[], var="v")
+
+
+def test_list_code_marks_items_that_share_a_picking_field():
+    from builder.lib import calc, embed
+
+    code = calc.list_code(node="load", tool="items", list_path="data.items", id_field="ref",
+                          item_fields=["name", "short"], var="t", same_fields=["name", "short"])
+    state = {"load_response.data.data.items": [{"ref": "1", "name": "Alpha", "short": "42"},
+                                               {"ref": "2", "name": "alpha ", "short": "42"},
+                                               {"ref": "3", "name": "Beta", "short": "77"}]}
+    embed.run(code, state)
+    assert state["t"].splitlines() == [
+        "1. ref: 1; name: Alpha; short: 42 (same name as item 2) (same short as item 2)",
+        "2. ref: 2; name: alpha ; short: 42 (same name as item 1) (same short as item 1)",
+        "3. ref: 3; name: Beta; short: 77"]

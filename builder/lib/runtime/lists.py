@@ -18,12 +18,30 @@ def item_line(index, item, fields):
     return str(index) + ". " + "; ".join(parts)
 
 
+def shared_notes(items, fields):
+    """For each item, ' (same F as items 2, 3)' for every field in `fields` whose value other items share."""
+    notes = []
+    for i in range(len(items)):
+        parts = []
+        for name in fields:
+            value = as_text(items[i].get(name)).strip().lower()
+            if not value:
+                continue
+            others = [str(j + 1) for j in range(len(items))
+                      if j != i and as_text(items[j].get(name)).strip().lower() == value]
+            if others:
+                parts.append(" (same " + name + " as item" + ("s " if len(others) > 1 else " ") + ", ".join(others) + ")")
+        notes.append("".join(parts))
+    return notes
+
+
 def run_list(state, cfg):
     """Entry point of the list code node. Never raises: on failure it writes the empty text."""
     var = cfg.get("var", "bb_list")
     try:
         items = find_items(state, cfg)
-        lines = [item_line(i + 1, items[i], cfg.get("item_fields", [])) for i in range(len(items))]
+        notes = shared_notes(items, cfg.get("same_fields", []))
+        lines = [item_line(i + 1, items[i], cfg.get("item_fields", [])) + notes[i] for i in range(len(items))]
         state[var] = "\n".join(lines) if lines else cfg.get("empty", "")
         state[var + "_count"] = len(items)
     except Exception as error:
