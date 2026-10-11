@@ -350,3 +350,10 @@ A ajanı (v18) `dev/cases/own-a-1.json --reps 3`: **6/10** (koşular 7, 7, 9). 3
 - **PUB-05 (gerçek, 3/3 kaldı):** "konuşmak istemiyorum" ikinci kez söylenince ajan kapatmadı, ikinci teklifi (taban, son tarih) yaptı; A kural 45 iki kez söyleyince kapatmayı istiyor. Bir koşuda müşterinin ikinci cümlesi yarıda kesik geldi ("I told you, I don'"). Simüle müşterinin cümlesi zaman zaman yarıda kesiliyor (PUB-10'da da).
 - **PUB-10 (gerçek, 1 koşu):** "next Friday" → ajan "iş günü değil, Pazartesi 19" dedi (23 Ekim Cuma iş günü); müşteri düzeltti, ledger doğru, hakem gereksiz teklifi kaldırdı.
 Kuyruk: own-a-2 koşuyor; ardından `queue8` (B build `765fdd3` ile → own-b-1, own-b-2, `--brief B`; A build → `--brief A`).
+
+## 11 Ekim, 08:17–08:35: own-a-2 8/10 (26/30)
+
+A ajanı (v18) `dev/cases/own-a-2.json --reps 3`: **8/10** (koşular 8, 9, 9; 553 sn). 3/3: gün-ay ters doğum tarihi (ipucu → ay kelimeyle), güvenlik sorusu yerine "ne hakkında?" (declined), son tarihten sonra istek → son tarih, hastalık → destek devri, ödeme planı → yeniden yapılandırma, faiz sorusu + Cumartesi → Pazartesi, "geçen yıl kapattım" → itiraz, vefat, taban + banka hatası + tekrar (`corrects` stili).
+- **PUB-01 (gerçek, 0/3):** "Who is this?" → cevap + ikinci soru → "Go ahead, what do you want?" → ajan **üçüncü kez** sordu, sonra veda; kapanış `not_verified/declined` (beklenen `not_reached/unclear`). Builder kuralı prompt'a doğru yazmış ("That is the second ask. If it is still unclear after the second ask, say ..."); model saymadı. Kapanışta kapanış modeli `no_promise` seçti, builder'ın "kimlik doğrulanmadı + model promise/no_promise → not_verified/declined" kuralı çevirdi.
+- **PUB-02, 1. koşu (platform):** ajan doğru (söz, cümle, veda); çağrı bitti ama `end_of_call` `close_call` hiç başlamadı ("analysis never arrived"); yavaş koşu (364 sn). Ajan tarafında düzeltilecek bir şey yok.
+Toplam kendi A vakaları (eski ajan, düzeltmelerden önce): 14/20 vaka, 49/60 koşu. Açık ajan sorunları: tek adımda soru sayısı (PUB-01, A kural 3), "iki kez konuşmak istemiyorum" (own-a-1 PUB-05, kural 45), "next Friday" (1 koşu).
