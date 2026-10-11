@@ -86,6 +86,27 @@ Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olma
 
 - 2026-10-10: brief-a rebuilt from builder/work/brief-a/gen.py, saved (workflow c6a42d6d-1d07-45fc-b20a-e1397a49c55a, agent 9d00c85e-128a-463f-88a8-df1783a3f9b8, v2). run_cases blocked: practice server HTTP 500 on /v1/practice/sessions (3 tries).
 
+## Dondurma durumu ve açık ajan zayıflıkları (11 Ekim 12:30, `freeze-1230`, skill `4f64795`)
+
+Eski (A v22 / B v17) ve yeni (A v23 / B v18) sürüm, hepsi `--reps 3`:
+
+| Vaka dosyası | Eski sürüm | Yeni sürüm |
+|---|---|---|
+| Organizatör A | 9/10 (29/30) | **10/10** (30/30) |
+| own-a-1 | 7/10 (21/30) | 7/10 (24/30) |
+| own-a-2 | 10/10 | 10/10 |
+| Organizatör B | 2/3 (8/9) | 8/8 çağrı (1 çağrı kesintide kayıp) |
+| own-b-1 | 1/3 (7/9) | 1/3 (7/9) |
+| own-b-2 | 3/3 (9/9) | 2/3 (7/9), biraz düştü |
+
+Düzeltilen PUB-09 (geri arama alınmadan "geri arama alındı" yazılması) artık 3/3. own-b-2'deki düşüş tarih hatası: müşteri "bu Cumartesi" (17 Ekim) dedi; Brief A kural 19–20'ye göre ajan bir sonraki iş günü Pazartesi 19'u önerir, müşteri kart ve araba kredisi için kabul etti. Ajan kartı 19'a doğru, araba kredisini 16 Ekim Cuma'ya (kendi 1. deneme teklif tarihi, müşterinin kabul etmediği) kaydetti. Değişiklik yalnız kapanış korumasına dokunuyor, tarih hesabına değil; aynı skill'le kurulan iki build arasındaki oynama. Durma kuralı (A ≥ 9/10, B ≥ 2/3, gerileme yok) sağlandı.
+
+Açık zayıflıklar (kodda mekanizması yok, model kuralı bazen atlıyor):
+- birden çok üründe tarih karışması (bir ürünün tarihi başka üründen ya da konuşmadaki başka bir tekliften alınıyor);
+- ürün başına deneme sayısı (geç banttaki ürüne 2. deneme yapılmıyor ya da erken banttakine fazla);
+- "iki kez konuşmak istemiyorum" diyen müşteriyle görüşmeyi sürdürmek (own-a-1 PUB-05, 0/3);
+- bir koşuda servis hatasından sonra kaydı tekrar denememek (own-a-1 PUB-10, 1 koşu).
+
 ## 10 Ekim, 18:50: Mac'e geçiş, temiz çalışma klasörü
 
 Oturum İhsan'ın Mac'inde sürüyor (önceki koşular Windows'taydı). Python 3.14 (Homebrew); repo kökünde `.venv` açıldı (`claude-agent-sdk` 0.2.165, `pytest`), `.gitignore`'a eklendi. Testler venv'de: 429 yeşil. İnceleme bulgusu: 18:31 koşusu sıfırdan kurmadı; ajan önceki koşunun `builder/work/brief-a/gen.py`'sini bulup yeniden kullandı (trace'te yazıyor; dosyada Windows mutlak yolları var, Mac'te çalışmaz bile). Organizatör temiz klonda koşacağı için bu ölçümü şişirir. Düzeltme: `build.py` her koşuda dolu çalışma klasörünü ajanın okuyamadığı `dev/out/work-archive/<slot>-<zaman>/`'a taşıyor ve trace'e yazıyor; `.freya-agents.json` yerinde kalıyor (aynı workflow yerinde güncellenir). Ayrıca görüldü: üretilen `gen.py`'de `OUTCOME_EXTRACT` tanımlı ama hiçbir düğüme bağlı değil; sonuç ve nedeni yine çağrı bittikten sonra modelin doldurduğu alan belirliyor (PUB-05'in kaldığı yer). Ölçülmedi: Mac'te hiçbir build ya da simülasyon koşmadı; pratik sunucusunun 500'ü düzelip düzelmediği bilinmiyor.
