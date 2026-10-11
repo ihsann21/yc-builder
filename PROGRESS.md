@@ -284,3 +284,9 @@ A (max, teklif-bir-kez kuralıyla): build 311 sn, $1,53; `--brief A --reps 3` **
 **Risk (en önemli operasyonel risk):** builder Claude Code girişiyle (abonelik kotası) çalışıyor; bu oturum, alt ajanlar ve build'ler aynı kotayı tüketiyor. Pazar 20:00'de kota dolarsa gizli brief build'i düşer. Önlem: gizli brief build'leri için `ANTHROPIC_API_KEY` (İhsan'a soruldu); Pazar 18:00'den sonra bu hesapta yoğun iş yok. Organizatörün yeniden koşusundaki anahtar sorusu (açık soru 19) bununla bağlantılı.
 
 04:55: kota açıldı; G ve I yeniden build ediliyor (max).
+
+## 11 Ekim, 04:55–05:10: iCloud takılması, repo `~/code/yc-builder`'a taşındı (temiz klon provası)
+
+G build'i 04:55'te başladı ve 5 dk hiç ilerlemedi (trace'te `[builder]` satırı bile yok). `sample`: süreç bir import sırasında `read` sistem çağrısında asılı; okuduğu dosya `.venv/.../httpx2-2.13.1.dist-info/entry_points.txt`. Neden: repo iCloud ile eşitlenen Masaüstündeydi (`FXICloudDriveDesktop = 1`); macOS gece `.venv`'de 3.501, repo'nun geri kalanında 1.148 dosyayı iCloud'a boşaltmış ("dataless"); okuma indirmeyi bekleyip asılı kaldı. Pazar gizli brief build'inde olursa build hiç başlamaz.
+
+Çözüm (İhsan onayladı): GitHub'dan `~/code/yc-builder`'a temiz klon (iCloud dışı, dataless dosya yok); README'deki gibi `python3 -m venv .venv` + `pip install -r requirements.txt` (claude-agent-sdk 0.2.165 kuruldu), **512 test yeşil** (3,7 sn; eski klasörde 7 sn). Git dışı dosyalar elle kopyalandı: kit `env.sh`, `builder/work/.freya-agents.json` (10 slot, workflow'lar yerinde güncellenir), `.slot-inputs.json`, kit `.personas.json`. Eski klasör (`~/Desktop/yc-builder 2`) artık kullanılmıyor. Bu, planın temiz klon provasının ilk yarısı; build + ölçüm yeni klasörde koşuyor (G, max: `[builder]` satırı geldi, ilerliyor). Codex ve IDE yeni klasöre yönlendirilmeli.
