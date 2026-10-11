@@ -179,3 +179,25 @@ def test_save_and_export_use_the_vendored_client():
     from builder import build, save
     assert build.VENDOR == ROOT / "builder" / "vendor"
     assert pathlib.Path(save.freya.__file__).resolve() == (build.VENDOR / "freya.py").resolve()
+
+
+def test_case_folder_files_slot_and_prompt(tmp_path):
+    """The final's form: a case folder of bank documents and the team's mock URL."""
+    from builder.build import case_files, slot_for, task_prompt
+    case = tmp_path / "FreyaBank-Case"
+    (case / "docs").mkdir(parents=True)
+    (case / "BRIEF.md").write_text("brief", encoding="utf-8")
+    (case / "docs" / "contract.md").write_text("contract", encoding="utf-8")
+    (case / ".DS_Store").write_text("x", encoding="utf-8")
+    (case / "__MACOSX").mkdir()
+    (case / "__MACOSX" / "junk").write_text("x", encoding="utf-8")
+    files = case_files(case)
+    assert [pathlib.Path(f).name for f in files] == ["BRIEF.md", "contract.md"]
+    slots = tmp_path / "slots.json"
+    slot = slot_for(files, "https://mock.example.workers.dev", slots_file=slots, name=case.name)
+    assert slot == "FreyaBank-Case"
+    assert slot_for(files, "https://other.example.workers.dev", slots_file=slots, name=case.name).startswith(
+        "FreyaBank-Case-")
+    prompt = task_prompt(files, "https://mock.example.workers.dev", slot, "", 25, str(case),
+                         "https://mock.example.workers.dev")
+    assert "BRIEF.md" in prompt and "https://mock.example.workers.dev" in prompt and "case folder" in prompt

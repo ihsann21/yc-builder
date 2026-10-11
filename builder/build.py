@@ -151,8 +151,18 @@ async def guard(hook_input: dict, tool_use_id: str | None, context: object) -> d
     return {}
 
 
-def task_prompt(briefs: list[str], api: str, slot: str, cases: str, minutes: int) -> str:
+def task_prompt(briefs: list[str], api: str, slot: str, cases: str, minutes: int, case: str = "",
+                mock_url: str = "") -> str:
     """The first user message of the agent."""
+    if case:
+        return (f"Build the phone agent for the bank's case: the documents are in the folder {case} "
+                f"({len(briefs)} files). Read BRIEF.md first; README.md says what each document is; read every "
+                f"document. There is no OpenAPI file: the tools are the bank services in the service contract, "
+                f"served by the team's mock at {mock_url} (every tool URL starts with it).\n"
+                f"Slot: {slot}. Work folder: {WORK / slot}. You have {minutes} minutes in total: save a first "
+                f"complete version early, then improve it.\nThere are no practice customers in the simulator: test "
+                f"with the local checks and the mock calls the skill describes.\nFollow the skill in your system "
+                f"prompt, including its section on a case folder.")
     test = (f"Practice customers exist for this brief: test with `python3 {KIT / 'tools' / 'run_cases.py'} "
             f"<agent_id> --brief {cases}` (run it from {KIT}).") if cases else \
         "There are no practice customers for this brief: test with the local checks the skill describes."
@@ -161,7 +171,8 @@ def task_prompt(briefs: list[str], api: str, slot: str, cases: str, minutes: int
             f"complete version early, then improve it.\n{test}\nFollow the skill in your system prompt.")
 
 
-async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline: int, trace: Trace) -> None:
+async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline: int, trace: Trace,
+                    case: str = "", mock_url: str = "") -> None:
     """Run the agent; print every model call and tool use to the trace."""
     from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, HookMatcher, ResultMessage,
                                   ToolResultBlock, ToolUseBlock, UserMessage, query)
@@ -176,7 +187,7 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
         env={"BASH_DEFAULT_TIMEOUT_MS": "900000", "BASH_MAX_TIMEOUT_MS": "1200000",
              "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1", "PYTHONPATH": str(ROOT)},
     )
-    prompt = task_prompt(briefs, api, slot, cases, deadline // 60)
+    prompt = task_prompt(briefs, api, slot, cases, deadline // 60, case, mock_url)
     watched = {}   # tool_use_id -> command, for the checks and tests whose output belongs in the trace
     async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
@@ -252,11 +263,14 @@ def blocked_name(name: str) -> bool:
     return bool(GENERIC.search("/" + name + "/") or GENERIC.search(" " + name))
 
 
-def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE) -> str:
-    """The slot: the last brief's file name, made safe. A name already used for other inputs (two hidden
-    briefs both called brief.md) gets a short hash of the inputs, so one build never overwrites the other."""
-    digest = hashlib.sha256(b"".join(pathlib.Path(f).read_bytes() for f in briefs + [api])).hexdigest()[:6]
-    slot = re.sub(r"[^A-Za-z0-9_-]", "_", pathlib.Path(briefs[-1]).stem) or "brief"
+def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE, name: str = "") -> str:
+    """The slot: the last brief's file name (or the case folder's name), made safe. A name already used for
+    other inputs (two hidden briefs both called brief.md) gets a short hash of the inputs, so one build never
+    overwrites the other. In a case folder build `api` is the mock URL, hashed as text."""
+    parts = [pathlib.Path(f).read_bytes() for f in briefs]
+    parts.append(pathlib.Path(api).read_bytes() if pathlib.Path(api).is_file() else api.encode())
+    digest = hashlib.sha256(b"".join(parts)).hexdigest()[:6]
+    slot = re.sub(r"[^A-Za-z0-9_-]", "_", name or pathlib.Path(briefs[-1]).stem) or "brief"
     if blocked_name(slot):
         slot = "wf-" + digest        # a folder named like a blocked one (out, results, ...) would lock the agent out
     try:
@@ -269,6 +283,16 @@ def slot_for(briefs: list[str], api: str, slots_file: pathlib.Path = SLOTS_FILE)
     slots_file.parent.mkdir(parents=True, exist_ok=True)
     slots_file.write_text(json.dumps(known, indent=1), encoding="utf-8")
     return slot
+
+
+def case_files(folder: pathlib.Path) -> list[str]:
+    """Every file of a case folder (an unzipped bank case), sorted; hidden files and __MACOSX are skipped."""
+    out = []
+    for path in sorted(folder.resolve().rglob("*")):
+        parts = path.relative_to(folder.resolve()).parts
+        if path.is_file() and not any(p.startswith(".") or p == "__MACOSX" for p in parts):
+            out.append(str(path))
+    return out
 
 
 def use_the_venv() -> None:
@@ -290,7 +314,8 @@ def use_the_venv() -> None:
 def main() -> int:
     use_the_venv()
     parser = argparse.ArgumentParser(description="Build a Freya phone agent from a brief.")
-    parser.add_argument("files", nargs="+", help="brief file(s), then the tool API file")
+    parser.add_argument("files", nargs="+", help="a case folder and the mock URL, or brief file(s) and the "
+                                                 "tool API file")
     parser.add_argument("--cases", choices=["A", "B"], default="", help="practice customers to test with (dev only)")
     args = parser.parse_args()
     if len(args.files) < 2:
@@ -298,13 +323,30 @@ def main() -> int:
     for stream in (sys.stdout, sys.stderr):    # agent text holds characters a Windows console cannot show
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
-    briefs = [existing(f) for f in args.files[:-1]]
-    api = existing(args.files[-1])
-    slot = slot_for(briefs, api)
+    case_dir = pathlib.Path(args.files[0]) if len(args.files) == 2 else None
+    case_mode = bool(case_dir and case_dir.is_dir())
+    if case_mode:
+        mock_url = args.files[1].strip().rstrip("/")
+        if not re.match(r"https?://", mock_url):
+            parser.error("with a case folder, the second argument is the mock URL (https://...)")
+        briefs = case_files(case_dir)
+        if not briefs:
+            parser.error(f"no files in the case folder {case_dir}")
+        api = mock_url
+        slot = slot_for(briefs, api, name=case_dir.resolve().name)
+    else:
+        mock_url = ""
+        briefs = [existing(f) for f in args.files[:-1]]
+        api = existing(args.files[-1])
+        slot = slot_for(briefs, api)
     deadline = int(os.environ.get("BUILD_DEADLINE_S", "1500"))
     trace = Trace(slot)
     start = time.time()
-    trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "briefs:", briefs, "tool API:", api, "slot:", slot)
+    if case_mode:
+        trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "case folder:", str(case_dir.resolve()),
+              f"({len(briefs)} files)", "mock:", mock_url, "slot:", slot)
+    else:
+        trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "briefs:", briefs, "tool API:", api, "slot:", slot)
     if not os.environ.get("FREYA_API_KEY"):
         trace("[setup] FREYA_API_KEY is not set: nothing can be saved on Freya. Set it and run again.")
         trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "build time 0 s")
@@ -326,17 +368,30 @@ def main() -> int:
     inputs = WORK / slot / "inputs"
     inputs.mkdir()
     copies = []
-    for number, source in enumerate(briefs + [api], 1):
-        name = pathlib.Path(source).name
-        if blocked_name(name):
-            name = "input-" + str(number) + pathlib.Path(source).suffix
-        shutil.copyfile(source, inputs / name)
-        copies.append(str(inputs / name))
-    briefs, api = copies[:-1], copies[-1]
-    trace("[inputs] copied to", inputs.relative_to(ROOT))
+    if case_mode:
+        case = inputs / "case"
+        for source in briefs:      # the folder's layout is kept; a part named like a blocked folder is renamed
+            relative = pathlib.Path(source).resolve().relative_to(case_dir.resolve())
+            safe = pathlib.Path(*[("d-" + p if blocked_name(p) else p) for p in relative.parts])
+            (case / safe).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, case / safe)
+            copies.append(str(case / safe))
+        briefs = copies
+        trace("[inputs] case folder copied to", case.relative_to(ROOT), f"({len(copies)} files)")
+    else:
+        for number, source in enumerate(briefs + [api], 1):
+            name = pathlib.Path(source).name
+            if blocked_name(name):
+                name = "input-" + str(number) + pathlib.Path(source).suffix
+            shutil.copyfile(source, inputs / name)
+            copies.append(str(inputs / name))
+        briefs, api = copies[:-1], copies[-1]
+        trace("[inputs] copied to", inputs.relative_to(ROOT))
     before = saved_entry(slot)
     try:
-        asyncio.run(asyncio.wait_for(run_agent(briefs, api, slot, args.cases, deadline, trace), timeout=deadline))
+        asyncio.run(asyncio.wait_for(run_agent(briefs, api, slot, args.cases, deadline, trace,
+                                               str(inputs / "case") if case_mode else "", mock_url),
+                                     timeout=deadline))
     except asyncio.TimeoutError:
         stopped = stop_children()
         trace(f"[deadline] stopped the agent after {deadline} s ({stopped} processes ended); exporting what was saved")

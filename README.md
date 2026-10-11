@@ -30,19 +30,24 @@ workflow), saves and publishes the workflow on Freya (updated in place on later 
 state in `builder/work/.freya-agents.json`) and exports it to `submission/<slot>.workflow.json`, where the
 slot is the brief's file name. Exit code 0 only when this run saved and exported a workflow.
 
-## Final briefs
+## The final case
 
-Put each final brief and its tool API file in `final/`, then run the builder once per brief:
+Unzip the case into `final/<case>/` and deploy the team's mock of the bank's services (Cloudflare
+Workers, from the case's service contract and test customers). Then run the builder once:
 
 ```bash
 source env.sh
-python3 builder/build.py final/<brief>.md final/<tool_api>.json 2>&1 | tee traces/final-<brief>.log
+python3 builder/build.py final/<case>/ https://<mock>.workers.dev 2>&1 | tee traces/final.log
 ```
 
-A good run ends with `[export] wrote submission/<slot>.workflow.json`, `[trace] copied to
-submission/<slot>.trace.log` and exit code 0. If a run fails (for example Freya returns 5xx), run the
-builder again: the submission is the phone agent of one run with that run's trace. Never edit a workflow
-by hand. Practice outputs of earlier runs are in `dev/practice-submissions/`.
+With a folder and a URL the builder reads every document of the case, writes the tool API from the
+service contract against the mock URL, and builds the phone agent. A good run ends with
+`[export] wrote submission/<case>.workflow.json`, `[trace] copied to submission/<case>.trace.log` and exit
+code 0. If a run fails (for example Freya returns 5xx), run the builder again: the submission is the
+phone agent of one run with that run's trace. Never edit a workflow by hand. Fill in `submission.json`
+and send it. Practice outputs of earlier runs are in `dev/practice-submissions/`.
+
+The older form `python3 builder/build.py <brief.md>... <tool_api.openapi.json>` still works.
 
 ## Tests
 

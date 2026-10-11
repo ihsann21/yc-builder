@@ -51,6 +51,28 @@ write the prompts, and assemble the workflow.
    against `WORK/notes.md` and the prompts once, and fix what is missing.
 7. Finish with one line: workflow_id, agent_id, and the last test result.
 
+## A case folder (bank documents and a mock URL)
+
+When the task gives a folder of bank documents and a mock URL instead of a brief and a tool API file:
+- Read BRIEF.md first, then README.md (it says what each document is), then every document, images
+  included (a flow drawing is read as an image). Rules can be spread over several documents; an
+  announcement or a Q&A answer can change a rule, and the later or more specific one wins (list each
+  change in `WORK/notes.md`). Example conversations show the order and the wording; never copy a
+  customer's values from them.
+- There is no OpenAPI file. Write `WORK/tool-api.json` (OpenAPI 3) from the service contract: one path
+  per service, its method, every request field with its type, enum and required flag exactly as the
+  contract writes them, the response fields in the description, and `servers[0].url` = the mock URL.
+  Then call one read-only service on the mock with a test customer (`curl`) and compare the real response
+  with the contract; fix the spec to the real field names. Load the spec with `tools.load_api` as usual.
+- Language: the phone agent speaks the language of the documents and the example conversations. Every
+  fixed sentence (`wf.say`, `calc.wrap_code`, mandatory sentences in hook messages) is in that language,
+  in the documents' own words where they give them. The `*_spoken` placeholders are English: in another
+  language put `{date:N}`/`{deadline}` in fixed sentences only if the documents show dates that way,
+  otherwise leave the date to the model with "say the date in <language>". Task messages may stay in
+  English; they say which language to speak.
+- Test customers: use them for the local check of the code nodes and for mock calls only; never write
+  their values into prompts.
+
 ## How the workflow is built (the default for a brief with this flow)
 
 This is the default layout for a brief whose call goes: who is on the line, identity, the debt and the
