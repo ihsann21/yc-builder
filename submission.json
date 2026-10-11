@@ -11,10 +11,10 @@
     }
   ],
   "repo": "https://github.com/ihsann21/yc-builder",
-  "commit": "7d333ba249da517dbcd487225a65016664ac997a",
+  "commit": "6d4094c7cefc20eda2e473453c47a682353e097a",
   "run_command": "python3 builder/build.py {case_folder} {mock_url}",
-  "workflow": "submission/final-case.workflow.json",
-  "trace": "submission/final-case.session.jsonl",
+  "workflow": "submission/final-case-d.workflow.json",
+  "trace": "submission/final-case-d.session.jsonl",
   "mock_url": "https://yc-bank-mock.ustatech.workers.dev",
-  "trace_log": "submission/final-case.trace.log"
+  "trace_log": "submission/final-case-d.trace.log"
 }
