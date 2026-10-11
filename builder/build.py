@@ -30,7 +30,8 @@ SKILL = ROOT / "builder" / "skill" / "SKILL.md"
 WORK = ROOT / "builder" / "work"
 STATE_FILE = WORK / ".freya-agents.json"
 SLOTS_FILE = WORK / ".slot-inputs.json"      # slot -> hash of the inputs it was built from
-SECRET_VARS = ("FREYA_API_KEY", "FREYA_BANK_TEAM_KEY", "ANTHROPIC_API_KEY")
+SECRET_VARS = ("FREYA_API_KEY", "FREYA_BANK_TEAM_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+               "CLAUDE_CODE_OAUTH_TOKEN")
 # Any tool call whose input mentions one of these is refused: the agent never reads keys, and never
 # reads practice answers or practice-brief configs (dev/, tests/, the kit builder's out/, the test set).
 # The generic patterns are matched with the repo's own path replaced by "<repo>", so a clone under a
@@ -82,6 +83,7 @@ class Trace:
             for secret in self.secrets:
                 line = line.replace(secret, "***")
             line = re.sub(r"fak_[A-Za-z0-9_\-]{6,}", "fak_***", line)
+            line = re.sub(r"sk-ant-[A-Za-z0-9_\-]{6,}", "sk-ant-***", line)
             with self.path.open("a", encoding="utf-8") as out:
                 out.write(line + "\n")
             print(line, flush=True)
@@ -302,6 +304,13 @@ def main() -> int:
     trace = Trace(slot)
     start = time.time()
     trace("[start]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "briefs:", briefs, "tool API:", api, "slot:", slot)
+    if not os.environ.get("FREYA_API_KEY"):
+        trace("[setup] FREYA_API_KEY is not set: nothing can be saved on Freya. Set it and run again.")
+        trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S %z"), "build time 0 s")
+        keep_trace(trace, slot)
+        return 1
+    trace("[setup] Claude access:", "ANTHROPIC_API_KEY" if os.environ.get("ANTHROPIC_API_KEY") else
+          "no ANTHROPIC_API_KEY, using this machine's Claude Code login")
     # every run starts with no work folders at all, as on a fresh clone: this slot's old one and every other
     # slot's (an agent copied another brief's generator) go where the agent cannot read; the state file stays
     stamp = time.strftime("%Y%m%d-%H%M%S")
@@ -328,7 +337,8 @@ def main() -> int:
     try:
         asyncio.run(asyncio.wait_for(run_agent(briefs, api, slot, args.cases, deadline, trace), timeout=deadline))
     except asyncio.TimeoutError:
-        trace(f"[deadline] stopped the agent after {deadline} s; exporting what was saved")
+        stopped = stop_children()
+        trace(f"[deadline] stopped the agent after {deadline} s ({stopped} processes ended); exporting what was saved")
     except Exception as error:  # the agent failed: still export whatever it saved
         trace("[agent error]", type(error).__name__, str(error)[:300])
     ok = False
@@ -340,6 +350,39 @@ def main() -> int:
         trace("[end]", time.strftime("%Y-%m-%d %H:%M:%S %z"), f"build time {time.time() - start:.0f} s")
         keep_trace(trace, slot)
     return 0 if ok else 1
+
+
+def stop_children() -> int:
+    """End every process this one started (the Claude CLI and what it runs: a save, a test), so nothing
+    saves a newer version while the export reads the saved one. Returns how many were signalled."""
+    import signal
+    import subprocess
+    try:
+        table = subprocess.run(["ps", "-A", "-o", "pid=,ppid="], capture_output=True, text=True, timeout=10).stdout
+    except (OSError, subprocess.SubprocessError):
+        return 0
+    children: dict[int, list[int]] = {}
+    for row in table.splitlines():
+        parts = row.split()
+        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+            children.setdefault(int(parts[1]), []).append(int(parts[0]))
+    found, todo = [], [os.getpid()]
+    while todo:
+        for child in children.get(todo.pop(), []):
+            found.append(child)
+            todo.append(child)
+    for pid in reversed(found):
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            pass
+    time.sleep(3)
+    for pid in found:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except OSError:
+            pass
+    return len(found)
 
 
 def keep_trace(trace: Trace, slot: str) -> None:
