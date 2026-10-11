@@ -414,3 +414,7 @@ A build 11:01–11:08, çıkış 0 (v23). `--brief A --reps 3`: run_cases **6/10
 ## 11 Ekim, 11:24–11:45: B v18 build; Freya kesintisi (503/504), ölçümler çöktü
 
 B build (`4f64795` skill'i) 11:24–11:32, çıkış 0 (v18). `--brief B`: koşu 1 **3/3**, koşu 2 **3/3**; 3. koşuda `GET /api/v2/simulations/ebea0e47…` → 503 "API key validation is temporarily unavailable" ile çöktü. Ardından own-b-2, own-b-1, own-a-2 ve own-a-1 yeniden ölçümü `POST /api/v2/simulations` → 503/504 ile başlamadan düştü; 11:43'te `GET /api/v2/workspaces` da 504. Platform kesintisi, bizim kodla ilgisi yok. `queue15`: API cevap verene kadar bekler, B 3. koşuyu yeniden puanlar, çöken dört ölçümü sonuç satırı çıkana dek en çok 3 kez tekrarlar. Kesinti uzarsa 12:30 dondurma ölçümsüz kalır; karar o zaman: A v23 10/10 kanıtlı, değişiklik yalnız kapanış koruması.
+
+## 11 Ekim, 11:43–11:52: kesinti sonrası: takılan simülasyon silindi, yetim simülasyonlar; B v18 ara sonuçlar
+
+API 11:43'te geri geldi, `queue15` kendiliğinden devam etti. `ebea0e47` (B 3. koşu) "running"de takıldı (PUB-13 kaydı gelmedi; PUB-11, PUB-12 PASS); İhsan panelden sildi. Platform kesinti sırasında `POST /api/v2/simulations` hata dönerken simülasyonu yine yarattı: run_cases kendi açtığı simülasyonu "başka simülasyon çalışıyor" diye bekledi (`437e83a6` "cases 11:43:58", sonra `ffb81d49` "cases 11:47:40"). Bunlar tamamlanınca kuyruk ilerliyor. `437e83a6` yeniden puanlandı (own-b-2): **3/3**. B v18 şu ana kadar: `--brief B` koşu 1 3/3, koşu 2 3/3, koşu 3 2/2 (PUB-13 kayıp); own-b-2 ek koşu 3/3.
