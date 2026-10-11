@@ -98,11 +98,18 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   - A reading or answer whose documented order ends with an offer or a question is ONE message: the
     model calls every tool that the closing offer needs (e.g. the lookup that decides which options to
     offer) right after the main lookup, before it speaks, and ends the message with the offer. Otherwise
-    the caller's "thanks" comes first and the offer is never made.
+    the caller's "thanks" comes first and the offer is never made. Only that branch: a branch the
+    documents end differently (no offer, another question) keeps its own ending; write each branch's
+    ending next to it (measured: the offer leaked into a branch that has none).
+  - An answer the caller gives early (a choice before the options were read) does not skip the
+    documented steps before it: the model still says those steps' sentences (e.g. the current state and
+    the options), then uses the answer.
   - A clear yes that comes with another request in the same answer is still the yes: first call the
     confirmed action's tool and report its result, then answer the other request.
   - When the caller names something that several items of a list share, the model asks the documents'
-    disambiguation question; it never picks one of them.
+    disambiguation question; it never picks one of them. Each answer narrows the group; while two or
+    more items still fit, it asks the next question of the documents' chain (the list lines from
+    `list_code(same_fields=...)` say which items still match).
   - Every sentence that ends the call (main menu, transfer, hang-up) is said once, with end_call in
     the same message.
 

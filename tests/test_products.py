@@ -292,6 +292,8 @@ def test_list_code_marks_items_that_share_a_picking_field():
                                                {"ref": "3", "name": "Beta", "short": "77"}]}
     embed.run(code, state)
     assert state["t"].splitlines() == [
-        "1. ref: 1; name: Alpha; short: 42 (same name as item 2) (same short as item 2)",
-        "2. ref: 2; name: alpha ; short: 42 (same name as item 1) (same short as item 1)",
+        "1. ref: 1; name: Alpha; short: 42 (same name as item 2) (same short as item 2) (item 2 has the same name "
+        "and short: before choosing, ask the caller for more than these)",
+        "2. ref: 2; name: alpha ; short: 42 (same name as item 1) (same short as item 1) (item 1 has the same name "
+        "and short: before choosing, ask the caller for more than these)",
         "3. ref: 3; name: Beta; short: 77"]

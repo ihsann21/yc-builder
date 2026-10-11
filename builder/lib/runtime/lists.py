@@ -18,6 +18,14 @@ def item_line(index, item, fields):
     return str(index) + ". " + "; ".join(parts)
 
 
+def same_all(first, second, fields):
+    """True when the two items hold the same text in every one of `fields`."""
+    for name in fields:
+        if as_text(first.get(name)).strip().lower() != as_text(second.get(name)).strip().lower():
+            return False
+    return True
+
+
 def shared_notes(items, fields):
     """For each item, ' (same F as items 2, 3)' for every field in `fields` whose value other items share."""
     notes = []
@@ -31,6 +39,11 @@ def shared_notes(items, fields):
                       if j != i and as_text(items[j].get(name)).strip().lower() == value]
             if others:
                 parts.append(" (same " + name + " as item" + ("s " if len(others) > 1 else " ") + ", ".join(others) + ")")
+        if len(fields) > 1:
+            twins = [str(j + 1) for j in range(len(items)) if j != i and same_all(items[i], items[j], fields)]
+            if twins:
+                parts.append(" (item" + ("s " if len(twins) > 1 else " ") + ", ".join(twins) + " has the same " +
+                             " and ".join(fields) + ": before choosing, ask the caller for more than these)")
         notes.append("".join(parts))
     return notes
 
