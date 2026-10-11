@@ -38,6 +38,17 @@ def when_equals(var: str, *values: str) -> dict:
     return _or_group([{"variable": var, "operator": "equals", "operand": value} for value in values])
 
 
+def when_status(name: str, *codes: int) -> dict:
+    """True when the HTTP status of the last call of `name` is any of `codes`. `name` is the api_request
+    node's key for a call in its pre_actions (the engine names those results after the node), or the
+    tool name for a tool in `tools`. The status arrives as a number (measured), so both forms are tested."""
+    if not codes or not all(isinstance(code, int) and not isinstance(code, bool) for code in codes):
+        raise ValueError("when_status needs at least one integer status code")
+    var = name + "_status_code"
+    return _or_group([{"variable": var, "operator": "equals", "operand": form}
+                      for code in codes for form in (code, str(code))])
+
+
 def when_true(var: str) -> dict:
     """True when `var` holds a true boolean, which arrives as "true" or as "True"."""
     return when_equals(var, "true", "True")
@@ -435,7 +446,42 @@ def _node_problems(key: str, node: object, nodes: dict, global_nodes: dict, is_g
         problems += _end_call_problems(where, node)
     if isinstance(node.get("response_mapping"), list):
         problems += _mapping_problems(where, node["response_mapping"])
+    if node_type == "api_request":
+        problems += _result_name_problems(where, key, node)
     return problems
+
+
+RESULT_SUFFIXES = ("_status_code", "_failure_count", "_success_count", "_response")
+
+
+def _result_name_problems(where: str, key: str, node: dict) -> list[str]:
+    """An api_request node's call results are named after the node, not the tool (measured: a transition
+    on '<tool>_status_code' never fired while '<node>_status_code' held 404)."""
+    tools = {_get(t, "function", "name") for t in _list(node.get("pre_actions")) if isinstance(t, dict)}
+    tools.discard(None)
+    tools.discard(key)
+    problems = []
+    for variable in dict.fromkeys(_condition_variables(node.get("transitions"))):
+        for tool in tools:
+            for suffix in RESULT_SUFFIXES:
+                if variable.startswith(tool + suffix):
+                    problems.append(f"{where}: a transition reads {variable!r}, but the results of an api_request "
+                                    f"node are named after the node: use {key + variable[len(tool):]!r} "
+                                    f"(wf.when_status({key!r}, ...))")
+    return problems
+
+
+def _condition_variables(value: object) -> list[str]:
+    found = []
+    if isinstance(value, dict):
+        if isinstance(value.get("variable"), str):
+            found.append(value["variable"])
+        for item in value.values():
+            found += _condition_variables(item)
+    elif isinstance(value, list):
+        for item in value:
+            found += _condition_variables(item)
+    return found
 
 
 def _list_shape_problems(where: str, node: dict, key: str) -> list[str]:

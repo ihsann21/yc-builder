@@ -831,3 +831,26 @@ def test_check_lists_problems_before_warnings():
 def test_check_never_crashes(wf):
     problems = check(wf)
     assert isinstance(problems, list) and problems
+
+
+def test_when_status_tests_the_number_and_the_text():
+    from builder.lib import workflow as wf
+    group = wf.when_status("load", 404, 500)
+    assert [(c["variable"], c["operand"]) for c in group["conditions"]] == [
+        ("load_status_code", 404), ("load_status_code", "404"), ("load_status_code", 500), ("load_status_code", "500")]
+    import pytest
+    with pytest.raises(ValueError):
+        wf.when_status("load", "404")
+
+
+def test_check_refuses_tool_named_results_in_an_api_request_node():
+    from builder.lib import workflow as wf
+    tool = {"type": "function", "function": {"name": "items_list", "handler": "__function__:api_call",
+                                             "parameters": {"type": "object", "properties": {}}}}
+    def flow(var):
+        node = wf.api_request_node("load", tool, "main", transitions=[
+            wf.transition("fail", "failed", wf.when(var, "greater_than", 0))])
+        return {"initial_node": "load", "nodes": {"load": node, "main": wf.end_call_node("main", "end"),
+                                                  "fail": wf.end_call_node("fail", "end")}}
+    assert any("named after the node" in p for p in wf.check(flow("items_list_failure_count")))
+    assert not any("named after the node" in p for p in wf.check(flow("load_failure_count")))

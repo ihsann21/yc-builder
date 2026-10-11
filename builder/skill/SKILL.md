@@ -74,10 +74,13 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   `wf.code_node(NAME, calc.list_code(node=API_NODE, tool=TOOL, list_path="data.<list>", id_field=F,
   item_fields=[...], var=V, empty=TEXT), NEXT)`; the prompt then reads `{{V}}` (one line per item) and
   `{{V_count}}`. Map only plain values (numbers, text) with `mapping=`.
-- HTTP errors: on a non-2xx answer the post hook does not run. The engine still sets
-  `<tool>_status_code` (and `<tool>_failure_count`); when the documents treat two error statuses
-  differently (e.g. "not found" is an ordinary answer, a 500 goes to an agent), route on
-  `<tool>_status_code` and say in the task message which sentence each status gets. When the documents
+- HTTP errors: on a non-2xx answer the post hook does not run. The engine still sets the status and
+  the failure count: for a call in an api_request node's pre_actions they are named after the NODE
+  (`<node>_status_code`, `<node>_failure_count`, `<node>_response.*`), for a tool in `tools` after the
+  tool (`<tool>_status_code`). The status is a number. When the documents treat two error statuses
+  differently (e.g. "not found" is an ordinary answer, a 500 goes to an agent), route with
+  `wf.when_status(<node or tool>, 404)` (it tests both forms) and say in the task message which
+  sentence each status gets. `wf.check` refuses a transition on `<tool>_...` in an api_request node. When the documents
   say an answer can be slow, set `timeout_ms` above that (the engine allows 30 s in all) and give the
   waiting sentence they name.
 - Language: the phone agent speaks the language of the documents and the example conversations. Every
@@ -88,6 +91,18 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   English; they say which language to speak.
 - Test customers: use them for the local check of the code nodes and for mock calls only; never write
   their values into prompts.
+- What the phone agent's model gets wrong in a long task message (measured on the example calls), so
+  write these into it as plain rules:
+  - A reading or answer whose documented order ends with an offer or a question is ONE message: the
+    model calls every tool that the closing offer needs (e.g. the lookup that decides which options to
+    offer) right after the main lookup, before it speaks, and ends the message with the offer. Otherwise
+    the caller's "thanks" comes first and the offer is never made.
+  - A clear yes that comes with another request in the same answer is still the yes: first call the
+    confirmed action's tool and report its result, then answer the other request.
+  - When the caller names something that several items of a list share, the model asks the documents'
+    disambiguation question; it never picks one of them.
+  - Every sentence that ends the call (main menu, transfer, hang-up) is said once, with end_call in
+    the same message.
 
 ## How the workflow is built (the default for a brief with this flow)
 
