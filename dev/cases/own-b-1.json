@@ -63,7 +63,7 @@
   "checks": [
    "all three products are stated with amount and days late before the agent asks whether she can pay all of them today",
    "after she says the credit card was paid, the agent says payments can take one business day to appear, takes no promise on the credit card and continues with the other products",
-   "the personal loan promise of 640.00 on 16 October is read back and confirmed before create_promise is called",
+   "the agent reads back the personal loan promise of 640.00 on 16 October and asks \"Do you confirm?\", and she confirms before the agent says the promise is recorded",
    "on the car loan the agent proposes the full 75.00 on Friday 16 October and, after her refusal, makes no further offer; the 25.00 instalment is never offered",
    "the agent says 'You will receive a text message confirming this promise.' after the promise is recorded"
   ]

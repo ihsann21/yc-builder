@@ -70,7 +70,10 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
   literally: it must not appear in any turn before the write succeeds, the opening included. Where the
   brief does not dictate the exact words, say other things with another form (if the saved word were
   "logged", the opening would say "we log this call", not "this call is logged"; a failure, "I could not
-  log it"). Each node's task message covers only that step: its rules from the brief, with
+  log it"). Where a product is agreed before the read-back (several products, one read-back), the task
+  message gives the words for that moment, an acknowledgement in the agreed-not-yet-saved sense ("Thank
+  you, that is agreed: <amount> on <date> for <product>. I will read everything back at the end."):
+  measured, the model otherwise acknowledged an agreement with the saved word. Each node's task message covers only that step: its rules from the brief, with
   every sentence the brief makes mandatory quoted exactly, and which tool to call when. Never name
   other nodes or describe routing in a task message.
 - End the call with the end_call tool: the assistant says the closing phrase, which triggers it.
@@ -188,6 +191,11 @@ with `{open:<tool>:<tool>...}` (products none of those tools has written yet, or
 whose successful write completes a product under the brief, e.g. "Products not yet completed:
 {open:<tool A>:<tool B>}. If that is not none, call <the tool the brief requires for them> now for the
 first of them only, before you say anything; the result names the next. Then ...". Respect the brief's exceptions (e.g. a transfer that forbids them).
+Those hook messages only come after a write. When the brief requires a record per product even with no
+promise at all (a dispute, "already paid", refusals), nothing has been written yet when the call ends and
+no hook reminds the model (measured twice: goodbye with no record at all). So the task message's
+end-of-call rule names that case on its own: "If no promise was agreed, first call <the record tool> for
+every product, in order, with its reason, one call per message; only then the goodbye."
 Give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the

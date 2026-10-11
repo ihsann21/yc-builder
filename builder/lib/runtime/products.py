@@ -131,6 +131,7 @@ def item_values(item, cfg, state):
     values["deadline"] = as_text(lookup(state, "bb_date__" + deadline)) if deadline else ""
     values["deadline_spoken"] = as_text(lookup(state, "bb_date__" + deadline + "__spoken")) if deadline else ""
     values["deadline_shifts"] = as_text(lookup(state, "bb_shifts__" + deadline)) if deadline else ""
+    values["deadline_name"] = deadline or ""
     values["attempts"] = as_text(band.get("attempts"))
 
     def get(name):
@@ -149,17 +150,58 @@ def item_values(item, cfg, state):
     values["name"] = fill(tcfg.get("name", "{type_words}"), get)
     values["offers"] = fill(band.get("offers", ""), get)
     values["floor_raw"] = floor
+    values["item"] = item
     return values, get
 
 
+DAY_TABLE_HEAD = ("DAY TABLE for all products (each product has its own latest date). Find the day the customer "
+                  "names, then read the entry of the product being discussed on that line:")
+DAY_TABLE_POINTER = "see the DAY TABLE after the products (one line per day, every product on it)"
+
+
+def day_table(state, rows):
+    """One line per day with what that day means for every product, from each deadline's day guide
+    (bb_shiftmap__<deadline>); "" when a product has no guide. rows: [(label, deadline name)]."""
+    guides = []
+    heads = dict()
+    order = []
+    for label, deadline in rows:
+        entries = decode(state.get("bb_shiftmap__" + deadline)) if deadline else None
+        if not isinstance(entries, list) or not entries:
+            return ""
+        verdicts = dict()
+        if len(entries) > len(order):
+            order = [entry[0] for entry in entries]       # every guide starts today, day by day
+        for entry in entries:
+            heads[entry[0]] = entry[1]
+            verdicts[entry[0]] = entry[2]
+        last = as_text(lookup(state, "bb_date__" + deadline + "__spoken"))
+        guides.append((label, verdicts, last))
+    lines = [DAY_TABLE_HEAD]
+    for day in order:
+        parts = []
+        for label, verdicts, last in guides:
+            parts.append(label + ": " + (verdicts.get(day) or "AFTER the latest date " + last + "."))
+        lines.append("  " + heads[day] + ": " + " | ".join(parts))
+    return "\n".join(lines)
+
+
 def write_products(state, cfg):
-    """Find the products, write per-product variables and the facts text."""
+    """Find the products, write per-product variables and the facts text. With more than one product
+    the per-product day guides become one table (a day the customer names for all of them is read off
+    one line, not looked up in the wrong product's guide)."""
     ids = []
     lines = []
     said = []
-    for item in find_items(state, cfg):
-        values, get = item_values(item, cfg, state)
+    done = [item_values(item, cfg, state) for item in find_items(state, cfg)]
+    table = ""
+    if len(done) > 1:
+        table = day_table(state, [(values["id"] + " " + values["name"], values["deadline_name"]) for values, get in done])
+    for values, get in done:
+        item = values["item"]
         key = var_key(values["id"])
+        if table:
+            values["deadline_shifts"] = DAY_TABLE_POINTER
         ids.append(values["id"])
         state["bb_full__" + key] = item.get(cfg["amount_field"], "")
         state["bb_floor__" + key] = "" if values["floor_raw"] is None else values["floor_raw"]
@@ -186,7 +228,7 @@ def write_products(state, cfg):
         return len(ids) if name == "count" else None
 
     header = fill(cfg.get("header", ""), count)
-    state[facts_var] = (header + "\n" if header else "") + "\n".join(lines)
+    state[facts_var] = (header + "\n" if header else "") + "\n".join(lines) + ("\n" + table if table else "")
     state["bb_account_state"] = "ok"
 
 

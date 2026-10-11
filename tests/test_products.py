@@ -196,3 +196,51 @@ def test_say_line_gives_one_sentence_per_product_in_order():
     assert "debt_statement" not in run({"accounts": ITEMS})                 # only with a say_line
     with pytest.raises(ValueError):
         code(say_line="{nonsense}")
+
+
+# --- one day table for several products ------------------------------------------------------------
+
+DAY_CAL = {"workdays": [0, 1, 2, 3, 4], "holidays": ["2030-01-07"]}
+DAY_DATES = [{"name": "limit_soft", "rule": "business_days_after", "n": 8, "shifts": "forward"},
+             {"name": "limit_hard", "rule": "business_days_after", "n": 3, "shifts": "forward"}]
+
+
+def run_with_dates(items, line="{id}: {deadline_shifts}"):
+    state = embed.run(calc.dates_code(calendar=DAY_CAL, dates=DAY_DATES), state={"now": "2030-01-02T10:00"})
+    state["accounts"] = items
+    return embed.run(code(line=line), state=state)
+
+
+def test_several_products_share_one_day_table():
+    # Wed 2 Jan 2030, Mon 7 Jan a holiday: 3rd business day after today = Tue 8 Jan, 8th = Tue 15 Jan
+    state = run_with_dates(ITEMS)
+    soft, hard = state["bb_date__limit_soft"], state["bb_date__limit_hard"]
+    assert (soft, hard) == ("2030-01-15", "2030-01-08")
+    facts = state["account_facts"].splitlines()
+    assert facts[1] == "a1: " + products.DAY_TABLE_POINTER and facts[2] == "a2: " + products.DAY_TABLE_POINTER
+    assert facts[3] == products.DAY_TABLE_HEAD
+    rows = {line.split(" = ")[0].strip(): line for line in facts[4:]}
+    assert rows["the 10th"] == ("  the 10th = Thursday 10 January 2030 (2030-01-10): "
+                                "a1 store card ending 9911: business day, can be used. | "
+                                "a2 loan: AFTER the latest date Tuesday 8 January 2030.")
+    assert rows["the 5th"].endswith("a1 store card ending 9911: weekend, not a business day -> use Tuesday 8 January 2030 "
+                                    "(2030-01-08) instead. | a2 loan: weekend, not a business day -> use Tuesday 8 "
+                                    "January 2030 (2030-01-08) instead.")
+    # the table runs to a week past the latest deadline; days past the shorter guide are after its date
+    assert rows["the 22nd"].endswith("a2 loan: AFTER the latest date Tuesday 8 January 2030.")
+    assert len(facts[4:]) == (15 - 2) + 1 + 7
+
+
+def test_one_product_keeps_its_own_day_guide():
+    state = run_with_dates(ITEMS[:1])
+    facts = state["account_facts"]
+    assert "DAY TABLE" not in facts and "a1: Day guide up to Tuesday 15 January 2030 (2030-01-15)" in facts
+    assert facts.count("\n") == state["bb_shifts__limit_soft"].count("\n") + 1
+
+
+def test_without_a_structured_guide_each_product_keeps_its_text():
+    state = run_with_dates(ITEMS)
+    for name in ("bb_shiftmap__limit_soft", "bb_shiftmap__limit_hard"):
+        state.pop(name)
+    state = embed.run(code(line="{id}: {deadline_shifts}"), state=state)
+    assert "DAY TABLE" not in state["account_facts"] and "a2: Day guide up to Tuesday 8 January 2030" in state["account_facts"]

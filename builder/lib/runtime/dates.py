@@ -15,6 +15,7 @@ A date rule is a dict with "rule" and its parameters:
 Rules that land on a calendar day accept "roll": "forward" or "backward" to reach a business day.
 """
 import datetime
+import json
 import re
 
 from builder.lib.runtime.common import lookup, var_key  # embed: drop
@@ -215,31 +216,39 @@ def ordinal(n):
     return str(n) + ("st" if n % 10 == 1 else "nd" if n % 10 == 2 else "rd" if n % 10 == 3 else "th")
 
 
-def shifts_text(today, last, direction, cal, after_days=7):
-    """A day guide from today to a week past `last`: one line per day with what that day means for a promise.
+def shift_entries(today, last, direction, cal, after_days=7):
+    """The days from today to a week past `last`, each as [ISO date, "the 28th = <spoken> (<ISO>)", verdict].
 
     A business day up to `last` is fine; a weekend day or holiday up to `last` gives the business day to
-    use instead (`direction` forward or backward); a day after `last` is after it. The model looks the
-    customer's day up instead of working it out.
+    use instead (`direction` forward or backward); a day after `last` is after it.
     """
-    lines = ["Day guide up to " + spoken(last) + " (" + last.isoformat() + "), the latest date; look up the day the customer names:"]
+    entries = []
     span = [today + datetime.timedelta(days=offset) for offset in range((last - today).days + 1 + after_days)]
     numbers = [day.day for day in span]
     for day in span:
         name = ordinal(day.day) + (" of " + MONTH_NAMES[day.month - 1] if numbers.count(day.day) > 1 else "")
-        head = "  the " + name + " = " + spoken(day) + " (" + day.isoformat() + "): "
+        head = "the " + name + " = " + spoken(day) + " (" + day.isoformat() + ")"
         if day > last:
-            lines.append(head + "AFTER the latest date " + spoken(last) + ".")
-            continue
-        if is_business_day(day, cal):
-            lines.append(head + ("today, " if day == today else "") + "business day, can be used.")
-            continue
-        why = "holiday" if day.isoformat() in cal.get("holidays", []) else "weekend"
-        other = roll(day, direction, cal)
-        if other is None or other < today or other > last:
-            lines.append(head + why + ", not a business day, no business day to use instead.")
+            verdict = "AFTER the latest date " + spoken(last) + "."
+        elif is_business_day(day, cal):
+            verdict = ("today, " if day == today else "") + "business day, can be used."
         else:
-            lines.append(head + why + ", not a business day -> use " + spoken(other) + " (" + other.isoformat() + ") instead.")
+            why = "holiday" if day.isoformat() in cal.get("holidays", []) else "weekend"
+            other = roll(day, direction, cal)
+            if other is None or other < today or other > last:
+                verdict = why + ", not a business day, no business day to use instead."
+            else:
+                verdict = why + ", not a business day -> use " + spoken(other) + " (" + other.isoformat() + ") instead."
+        entries.append([day.isoformat(), head, verdict])
+    return entries
+
+
+def shifts_text(today, last, direction, cal, after_days=7):
+    """A day guide from today to a week past `last`: one line per day with what that day means for a
+    promise. The model looks the customer's day up instead of working it out."""
+    lines = ["Day guide up to " + spoken(last) + " (" + last.isoformat() + "), the latest date; look up the day the customer names:"]
+    for entry in shift_entries(today, last, direction, cal, after_days):
+        lines.append("  " + entry[1] + ": " + entry[2])
     return "\n".join(lines)
 
 
@@ -321,6 +330,7 @@ def write_dates(state, cfg):
             lines.append(item.get("label") + ": " + spoken(day) + " (" + day.isoformat() + ").")
         if day and item.get("shifts"):
             state["bb_shifts__" + var_key(item.get("name"))] = shifts_text(today, day, item.get("shifts"), cal)
+            state["bb_shiftmap__" + var_key(item.get("name"))] = json.dumps(shift_entries(today, day, item.get("shifts"), cal))
     if cfg.get("weekday_mode"):
         lines.extend(weekday_lines(today, cfg.get("weekday_mode"), week_start))
     count = int(cfg.get("calendar_days", 40))
