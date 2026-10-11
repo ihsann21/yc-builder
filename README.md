@@ -20,7 +20,7 @@ The builder needs only `builder/`: the organisers' Freya client and docs are cop
 `builder/vendor/`, and `builder/requirements.txt` lists its packages. The folder can be moved anywhere
 (keep its name `builder`); it writes `traces/`, `submission/` and `dev/out/work-archive/` next to itself.
 The kit folder `build-the-builder-v3/` is used only for practice (its briefs, tool API file and
-`tools/run_cases.py`) and by the tests. Keys: `env.sh` at the repo root (not committed), e.g.
+`tools/run_cases.py`) and by the tests. Keys: `env.sh` at the repo root (not committed; copy `env.sh.example`), e.g.
 `source env.sh && python3 builder/build.py <brief> <api>`.
 
 The builder runs Claude Opus 5.5 at effort `max` (`BUILDER_MODEL`, `BUILDER_EFFORT` override them). A run
