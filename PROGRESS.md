@@ -77,7 +77,7 @@ Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olma
 
 **Durma kuralı (11 Ekim 09:50, önerildi):** 12:30'da ajan davranışı (skill, prompt, runtime) donar; sonrası yalnız çökme düzeltmesi. "Yeterince iyi": organizatör A ≥ 9/10, B ≥ 2/3, kendi vakalarda sabah tabanına göre gerileme yok (hepsi `--reps 3`); bunu sağlayan en iyi sürümle gidilir.
 
-1. **~10:40:** kuyruk (`queue9` A build + `--brief A`; `queue10` B build + own-b-2, own-b-1, `--brief B`) biter; sürüm seçilir.
+1. **10:42:** B sürümü v17 (B 2/3, own-b-2 3/3, own-b-1 1/3). A v22 (`--brief A` 9/10) own-a-1, own-a-2 ölçülüyor (`queue12`).
 2. **10:40–12:30:** yalnız ölçümle kanıtlanmış hata. Tek yapısal istisna: B'de kapı yine model `end_call`'u yüzünden delinirse end_call aracı hiçbir adımda olmaz, bitişler rotayla `end_call` düğümüne.
 3. **12:30–16:00:** donmuş sürümle tam ölçüm (A, B, own-a-1/2, own-b-1/2, ham malzeme A, I).
 4. **16:00–18:00:** temiz klon provası `ANTHROPIC_API_KEY` ile, `python3 builder/build.py` (venv'siz kabuk), trace `submission/<slot>.trace.log`, export, `fak_`/`sk-ant` taraması.
@@ -386,3 +386,11 @@ Açık (kod dışı, 19:00'dan önce): **workspace 10/10 dolu** (`.freya-agents.
 A build (`fbd7838` skill'i): 337 sn, $1,68, v22; gen'de `bb_open` yok (A'da kapı kurulmadı, doğru). `--brief A`: **9/10** (koşular 10, 9, 10; 29/30; PUB-06 1 koşu taban çok kez). B build (v16, aynı skill): own-b-2 **1/3** ama ledger hatası **yok** (kayıtlar 9/9 doğru); kalmalar zorunlu cümle: PUB-12 0/3 "text message" cümlesi yok (`wrap_up` `on_enter=llm` koşullu cümleyi atladı: "I have recorded your promises. Thank you… Goodbye."), PUB-13 1 koşu "bir iş günü" cümlesi. own-b-1 **0/3**: PUB-11 "text message" cümlesi yok (aynı neden); PUB-13 kart yine 27 Ekim (3/3 koşu); PUB-12 devirden sonra wrap_up'ta model `add_note` ve `create_promise` çağırdı.
 **Platform bulgusu (olay kaydı):** devir post-kancası `bb_transferred=yes` yazdı, rota aynı turda `wrap_up`'a geçti (kanca değişkeniyle rota doğrulandı); ama `wrap_up`'ın tool listesinde yalnız end_call varken model `add_note`/`create_promise` çağırdı ve motor çalıştırdı. Motor, workflow'da tanımlı herhangi bir tool'u herhangi bir adımda çalıştırıyor; adımın tool listesi yalnız modele ipucu. Ayrıca model `add_note` ile `transfer_to_agent`'ı aynı mesajda paralel çağırdı (tek çağrı kuralına rağmen).
 Düzeltme (`364aff4`): `calc.wrap_code(parts=[{"when": [...], "say": TEXT}, ..., {"say": CLOSING}])` kapanış sözlerini koşullara göre kodda seçip `bb_wrap`'a yazar; skill: `negotiate` → `wrap_text` (kod düğümü) → `wrap_up` (`on_enter=wf.say("{{bb_wrap}}")`, model konuşmaz). Testler **546 yeşil**. Kuyruk (`queue11`): B build → own-b-1, own-b-2, `--brief B`.
+
+## 11 Ekim, 10:16–10:42: B v17 (`wrap_code`) B sürümü seçildi: `--brief B` 2/3, own-b-2 3/3, own-b-1 1/3 (7/9 koşu)
+
+B build (`364aff4` skill'i, `brief-b-run12`, çıkış 0; gen'de `wrap_code` var), v17, agent `19e0b5d6…`. Ölçümler, hepsi `--reps 3`:
+- own-b-1: **1/3** (koşular 3, 1, 3; 7/9). PUB-12 (devir) 3/3. PUB-11 2. koşu: araba kredisinde tam tutar reddedilince taksit yine önerildi (judge). PUB-13 2. koşu: kart yine 27 Ekim kaydedildi, beklenen 28 (ürünler arası tarih ailesi, bilinen).
+- own-b-2: **3/3** (koşular 3, 3, 3; 9/9; bu dosyada ilk tam sonuç). Panelin %100'ü yalnız judge; `dev/rescore.py` ile kayıt denetimi de 3/3.
+- `--brief B`: **2/3** (koşular 3, 2, 3; 8/9). PUB-12 2. koşu: erken banttaki krediye iki deneme (ürün başına deneme sayısı ailesi, bilinen). 2. ve 3. koşuda "phone agent was slow" uyarısı.
+v16'ya göre: own-b-1 0/9 → 7/9 koşu, own-b-2 4/9 → 9/9 koşu, B aynı (2/3). Kapanış metni kodda (`wrap_text` → `wrap_up` `say`) "text message" ve "bir iş günü" cümlesi kaybını bitirdi; üç dosyada kayıtsız veda **yok**. Durma kuralına göre B ≥ 2/3 ve gerileme yok: **B sürümü v17**. Kalan iki aile (deneme sayısı, ürünler arası tarih) prompt'la; mekanizması yok. Sıradaki: A v22 (`fbd7838` skill'i; `wrap_code` yalnız kapılı build'e dokunuyor) own-a-1, own-a-2 (`queue12`, 10:42).
