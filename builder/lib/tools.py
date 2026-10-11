@@ -616,7 +616,10 @@ def end_call_tool(
     call (the goodbye, a transfer announcement, ...): a call that ends on a sentence that is not a
     trigger stays open until the time limit. trigger_pattern holds each phrase without a trailing
     period, and its lower-case form when that differs. trigger_pattern_both lists the replies that do
-    not cancel the close.
+    not cancel the close. Only replies that contain "bye" are kept (Goodbye and Bye if none does):
+    the engine also matches that list against what the CUSTOMER says, as a substring and ignoring case,
+    and starts the hang-up timer on a match (measured: "ok" inside "it took me forever" ended a call in
+    the middle of the identity check). "OK", "Thanks" or "Thank you" mid-call would end it.
     Raises ValueError for an empty phrase, no replies, or a '|' inside a phrase or a reply.
     """
     phrases = [trigger_phrase] if isinstance(trigger_phrase, str) else list(trigger_phrase)
@@ -628,6 +631,7 @@ def end_call_tool(
         raise ValueError("polite_replies needs at least one reply and no empty one")
     if any("|" in text for text in [*phrases, *replies]):
         raise ValueError("'|' separates the patterns; it cannot appear inside a phrase or a reply")
+    replies = [reply for reply in replies if "bye" in reply.lower()] or ["Goodbye", "Bye"]
     variants = []
     for phrase in phrases:
         for form in (phrase, phrase.lower()):

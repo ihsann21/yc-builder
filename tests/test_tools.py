@@ -692,6 +692,8 @@ def test_end_call_tool_matches_the_known_good_one(kit):
         trigger_phrase="Have a good day.",
         polite_replies=_props(known)["trigger_pattern_both"]["default"].split("|"),
     )
+    assert _props(built)["trigger_pattern_both"]["default"] == "goodbye|bye"      # the kit's list minus the risky ones
+    _props(built)["trigger_pattern_both"] = _props(known)["trigger_pattern_both"]
     assert built == known
 
 
@@ -702,9 +704,15 @@ def test_end_call_tool_trigger_pattern():
     assert _props(tool)["trigger_pattern"]["default"] == "goodbye now"
     assert _props(tool)["trigger_timeout"]["default"] == 2
     assert tool["config"] == {"timeoutMs": 5000}
-    tool = end_call_tool(description="d", trigger_phrase="  See You  ", polite_replies=["bye", "ok"])
+    tool = end_call_tool(description="d", trigger_phrase="  See You  ", polite_replies=["bye", "ok", "Bye now"])
     assert _props(tool)["trigger_pattern"]["default"] == "See You|see you"
-    assert _props(tool)["trigger_pattern_both"]["default"] == "bye|ok"
+    assert _props(tool)["trigger_pattern_both"]["default"] == "bye|Bye now"
+
+
+def test_end_call_keeps_only_farewells_the_customer_cannot_say_by_accident():
+    # the engine matches these against the customer's words too: "ok" inside "took" ended a call
+    tool = end_call_tool(description="d", trigger_phrase="Goodbye.", polite_replies=["OK", "Okay", "Thanks", "Thank you"])
+    assert _props(tool)["trigger_pattern_both"]["default"] == "Goodbye|Bye"
 
 
 @pytest.mark.parametrize(
