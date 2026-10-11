@@ -1,4 +1,5 @@
-"""Run the kit's tools/run_cases.py with GET requests retried on a passing Freya 502/503/504.
+"""Run the kit's tools/run_cases.py with GET requests retried on a passing Freya 502/503/504 and
+bank-mock connection errors retried.
 
 During the outages of 11 October a status poll that got one 503 crashed run_cases while its simulation
 kept running on Freya. Only GET is retried: a POST that failed may still have created the simulation.
@@ -26,5 +27,25 @@ def api(method, path, body=None, **params):
 
 
 freya.api = api
+
+import score  # noqa: E402  (the kit's bank-mock client)
+import urllib.error  # noqa: E402
+
+_http = score.http
+
+
+def http(path, body=None):
+    """The bank mock's TLS connection failed now and then on 11 October (URLError, SSL); retry those."""
+    for wait in (10, 20, 40, 0):
+        try:
+            return _http(path, body)
+        except urllib.error.URLError as e:
+            if isinstance(e, urllib.error.HTTPError) or not wait:
+                raise
+            print(f"bank mock {str(e)[:60]}; retry in {wait} s", flush=True)
+            time.sleep(wait)
+
+
+score.http = http
 sys.argv[0] = str(KIT / "tools" / "run_cases.py")
 runpy.run_path(sys.argv[0], run_name="__main__")
