@@ -5,13 +5,16 @@ message come from CFG, which the builder fills from the tool API file and the br
 
 Pre hook (run_pre, names: vars, config): normalise body fields the model filled (dates, digits,
 times, amounts), repair a reference to a known product, keep a date inside its allowed range, and
-remember the request (bb_key__<tool>, bb_arg__<tool>__<field>) for the post hook.
+remember the request (bb_key__<tool>, bb_arg__<tool>__<field>, and a queue bb_queue__<tool>) for
+the post hook.
 
-Post hook (run_post, names: vars, result): drop the response headers, decide whether a write
+Post hook (run_post, names: vars, result): take its own request from the queue (the model may call
+a tool several times in one message; the calls run side by side), drop the response headers, decide whether a write
 succeeded, count successes and failures per key, choose the next-step sentence the model must
 follow and put it into the result, and record facts for the close hook.
 """
 import datetime
+import json
 import re
 
 from builder.lib.runtime.common import (  # embed: drop
@@ -400,7 +403,59 @@ def run_pre(state, request, cfg):
         state[prefix + var_key(name)] = body[name]
     state["bb_adjusted__" + tool] = "; ".join(notes)
     state["bb_key__" + tool] = key
+    try:
+        enqueue(state, tool, key, body, "; ".join(notes))
+    except Exception as error:
+        errors.append("queue: " + str(error))
     state["bb_pre_error__" + tool] = "; ".join(errors)
+
+
+def ended_calls(state, tool):
+    """Calls of the tool that have ended: post hooks that ran, plus calls the engine failed (a call
+    that ends in an engine error gets no post hook)."""
+    return to_int(state.get("bb_finished__" + tool)) + to_int(lookup(state, tool + "_failure_count"))
+
+
+def enqueue(state, tool, key, body, adjusted):
+    """Queue this request for its post hook, first in first out. The bb_key/bb_arg slots hold only
+    the newest request, which is wrong for calls that run side by side. With no call in flight a
+    queued entry is stale (its call got no post hook) and is dropped; so is an entry with this key."""
+    name = "bb_queue__" + tool
+    queue = decode(state.get(name))
+    started = to_int(state.get("bb_started__" + tool))
+    if not isinstance(queue, list) or ended_calls(state, tool) >= started:
+        queue = []
+    queue = [entry for entry in queue if isinstance(entry, dict) and entry.get("key") != key]
+    args = dict()
+    for field in body:
+        args[var_key(field)] = body[field]
+    queue.append({"key": key, "args": args, "adjusted": adjusted})
+    state[name] = json.dumps(queue)
+    state["bb_started__" + tool] = started + 1
+
+
+def dequeue(state, tool):
+    """Give this post hook the oldest queued request: its key, arguments and date note go back into
+    the bb_key/bb_arg/bb_adjusted slots. No queue (no pre hook): the slots stay as they are."""
+    state["bb_finished__" + tool] = to_int(state.get("bb_finished__" + tool)) + 1
+    name = "bb_queue__" + tool
+    queue = decode(state.get(name))
+    if not isinstance(queue, list) or not queue:
+        return
+    entry = queue[0]
+    state[name] = json.dumps(queue[1:])
+    if not isinstance(entry, dict):
+        return
+    prefix = "bb_arg__" + tool + "__"
+    for field in list(state.keys()):
+        if str(field).startswith(prefix):
+            state.pop(field, None)
+    args = entry.get("args")
+    if isinstance(args, dict):
+        for field in args:
+            state[prefix + field] = args[field]
+    state["bb_key__" + tool] = as_text(entry.get("key"))
+    state["bb_adjusted__" + tool] = as_text(entry.get("adjusted"))
 
 
 # --- post hook -----------------------------------------------------------------------------------
@@ -482,6 +537,7 @@ def run_post(state, result, cfg):
     """Entry point of a post hook. Never raises; an error is kept in bb_post_error__<tool>."""
     tool = cfg.get("tool", "tool")
     try:
+        dequeue(state, tool)
         if not isinstance(result, dict):
             return
         if cfg.get("strip_header", True):

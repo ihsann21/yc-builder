@@ -354,3 +354,49 @@ def test_hook_fields_are_checked_against_the_tool_api(kit_api):
 @pytest.mark.parametrize("text", ["AB1234", "SW1A 2AA", "company 12345678X", "4821b"])
 def test_digits_leave_codes_with_letters_alone(text):
     assert rt.normalize_digits(text, 0) is None and rt.normalize_digits(text, 4) is None
+
+
+# --- calls that run side by side ------------------------------------------------------------------
+
+def test_side_by_side_calls_each_get_their_own_key_and_arguments():
+    msgs = {"ok": "Booked {key}. Open: {open:book}.", "retry": "Failed for {key}.", "give_up": "Gave up {key}."}
+    cfg = dict(WRITE, messages=msgs)
+    state = {"bb_products": "a1,a2,a3"}
+    for account in ("a1", "a2", "a3"):                              # one model message, three calls
+        state, _ = pre(state, {"account": account, "why": "w-" + account}, key_field="account")
+    said = []
+    for _ in range(3):                                              # the results come back afterwards
+        state, result = post(state, {"done": "true", "ref": "r"}, **cfg)
+        said.append(result["data"]["what_to_do_next"])
+    assert said == ["Booked a1. Open: a2, a3.", "Booked a2. Open: a3.", "Booked a3. Open: none."]
+    assert state["bb_done__book"] == "a1,a2,a3" and state["bb_log__book__why"] == "a1:w-a1,a2:w-a2,a3:w-a3"
+
+
+def test_a_call_that_got_no_post_hook_does_not_shift_the_next_one():
+    state = {"bb_products": "a1,a2"}
+    state, _ = pre(state, {"account": "a1"}, key_field="account")
+    state["book_failure_count"] = 1                                 # engine error: no post hook ran
+    state, _ = pre(state, {"account": "a2"}, key_field="account")
+    state, result = post(state, {"done": "true", "ref": "r"}, **WRITE)
+    assert result["data"]["what_to_do_next"] == "Booked a2." and state["bb_done__book"] == "a2"
+
+
+def test_a_retry_of_the_same_key_replaces_its_stale_entry():
+    state = {}
+    state, _ = pre(state, {"account": "a1", "why": "first"}, key_field="account")
+    state, _ = pre(state, {"account": "a1", "why": "again"}, key_field="account")   # in flight: kept apart by key
+    state, result = post(state, {"done": "true", "ref": "r"}, **WRITE)
+    assert result["data"]["what_to_do_next"] == "Booked a1." and state["bb_last__book__why"] == "again"
+    assert state["bb_queue__book"] == "[]"
+
+
+def test_a_changed_date_note_stays_with_its_own_call():
+    state = {"now": "2030-01-02T10:00", "bb_products": "a1,a2", "bb_deadline__a1": "2030-01-10",
+             "bb_deadline__a2": "2030-01-20"}
+    guard = {"when": {"min": "today", "max_var": "bb_deadline__{key}", "calendar": CAL}}
+    state, _ = pre(state, {"account": "a1", "when": "2030-01-15"}, key_field="account", guard=guard)
+    state, _ = pre(state, {"account": "a2", "when": "2030-01-15"}, key_field="account", guard=guard)
+    state, first = post(state, {"done": True, "ref": "r"}, **WRITE)
+    state, second = post(state, {"done": True, "ref": "r"}, **WRITE)
+    assert "changed from 2030-01-15" in first["data"]["what_to_do_next"]
+    assert second["data"]["what_to_do_next"] == "Booked a2."

@@ -63,7 +63,9 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
 - The close tool is a workflow-level `end_of_call` lifecycle tool whose pre hook is `closing.close_hook`.
 - Prompts: the system prompt holds the identity, tone, hard rules that hold in every step, and
   `{{date_facts}}`. It must say: obey the `what_to_do_next` field of every tool result; after every
-  tool result speak or call the next tool; never say something is recorded unless the tool result
+  tool result speak or call the next tool; call one tool per message and wait for its result before
+  the next call, even when several products need the same tool (calls sent together run side by side,
+  and a result can then be read as another product's); never say something is recorded unless the tool result
   says it worked. The judge reads the word the brief uses for a successful write (its "saved" word)
   literally: it must not appear in any turn before the write succeeds, the opening included. Where the
   brief does not dictate the exact words, say other things with another form (if the saved word were
@@ -184,8 +186,8 @@ happen (measured). So in every message that can come before the end, put the too
 first and the words to the customer last, never the other way round, and name the products still due
 with `{open:<tool>:<tool>...}` (products none of those tools has written yet, or "none"): list the tools
 whose successful write completes a product under the brief, e.g. "Products not yet completed:
-{open:<tool A>:<tool B>}. If that is not none, call <the tool the brief requires for them> for each now,
-before you say anything. Then ...". Respect the brief's exceptions (e.g. a transfer that forbids them).
+{open:<tool A>:<tool B>}. If that is not none, call <the tool the brief requires for them> now for the
+first of them only, before you say anything; the result names the next. Then ...". Respect the brief's exceptions (e.g. a transfer that forbids them).
 Give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the

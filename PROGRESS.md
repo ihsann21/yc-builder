@@ -290,3 +290,25 @@ A (max, teklif-bir-kez kuralıyla): build 311 sn, $1,53; `--brief A --reps 3` **
 G build'i 04:55'te başladı ve 5 dk hiç ilerlemedi (trace'te `[builder]` satırı bile yok). `sample`: süreç bir import sırasında `read` sistem çağrısında asılı; okuduğu dosya `.venv/.../httpx2-2.13.1.dist-info/entry_points.txt`. Neden: repo iCloud ile eşitlenen Masaüstündeydi (`FXICloudDriveDesktop = 1`); macOS gece `.venv`'de 3.501, repo'nun geri kalanında 1.148 dosyayı iCloud'a boşaltmış ("dataless"); okuma indirmeyi bekleyip asılı kaldı. Pazar gizli brief build'inde olursa build hiç başlamaz.
 
 Çözüm (İhsan onayladı): GitHub'dan `~/code/yc-builder`'a temiz klon (iCloud dışı, dataless dosya yok); README'deki gibi `python3 -m venv .venv` + `pip install -r requirements.txt` (claude-agent-sdk 0.2.165 kuruldu), **512 test yeşil** (3,7 sn; eski klasörde 7 sn). Git dışı dosyalar elle kopyalandı: kit `env.sh`, `builder/work/.freya-agents.json` (10 slot, workflow'lar yerinde güncellenir), `.slot-inputs.json`, kit `.personas.json`. Eski klasör (`~/Desktop/yc-builder 2`) artık kullanılmıyor. Bu, planın temiz klon provasının ilk yarısı; build + ölçüm yeni klasörde koşuyor (G, max: `[builder]` satırı geldi, ilerliyor). Codex ve IDE yeni klasöre yönlendirilmeli.
+
+## 11 Ekim, 05:07: G build'i (run4) yarıda öldü, kuyruk yeniden kuruluyor
+
+Yeni oturum başında görüldü: 05:03'te başlayan G build'i (`dev/out/build-brief-g-run4.out`) 05:05'te, 36 satırda, `[end]` satırı olmadan kesilmiş; süreç yok (büyük olasılıkla önceki oturum kapanınca öldü). Yani 05:10 kaydındaki "ilerliyor" geçersiz; devir sonrası kapanış düzeltmesi (`trigger_phrase` listesi) hâlâ **ölçülmedi**. Ayrıca eski kuyruğun vaka yolları iCloud klasörünü gösteriyordu; yeni kuyruk `~/code/yc-builder/dev/cases/` kullanıyor. Kit'in `results/` klasörü (gitignore'da) yeni klonda yok; eski sonuç dosyaları eski klasörde duruyor. Sıradaki: G build (max) → G kendi vakaları ve `--brief B`, ikisi de `--reps 3`.
+
+## 11 Ekim, 05:10–05:56: G (max, yeni klasör): kendi vakaları 2/2, B 0/3 (6/9 koşu)
+
+G build'i (max, `trigger_phrase` listesiyle): 398 sn, $1,69, 15 tur; aynı workflow `2879165a…`, agent `1232dcdb…`, v4, 6 düğüm, 11 tool; dry run geçti, export yazıldı. `dev/cases/brief-g-cases.json --reps 3`: **2/2** (koşular 2, 2, 2; 169 sn; `dev/out/q-G5-own-reps3.out`). PUB-11 (dört insan isteği, çok ürün) artık 3/3: devir duyurusundan sonra çağrı kapanıyor; önceki build'de 1/3'tü (`exceeded`). Devir sonrası kapanış düzeltmesi tuttu.
+
+Aynı ajan `--brief B --reps 3`: koşular **2, 3, 1** (6/9; pass^3 **0/3**). 3. tekrarda `run_cases.py` Freya'nın simülasyon durumunu yoklarken 120 sn okuma zaman aşımıyla çöktü (`TimeoutError`, ağ/platform); simülasyon `2b59dffc` Freya'da tamamlanmıştı, `dev/rescore.py` ile puanlandı (1/3). Kalmalar:
+- PUB-11, 1. koşu: beş `create_promise` çağrısı ve `add_note` p1 `service_error` (beklenen not yok). Nedeni incelenmedi; banka kesintisi ya da yanlış hata yolu olabilir.
+- PUB-12, 3. koşu: hiç teklif yok, `no_promise/refused` ile kapandı (beklenen p1 sözü ve p2/p3 için `refused` notu).
+- PUB-13, 3. koşu: kredi 23 Ekim yerine 16 Ekim'e kaydedildi (geri okuma doğruydu, kayıt yanlış).
+
+Okuma: G'nin insan sayacı ve devir kapanışı B'nin çok ürün akışını bozmuyor gibi (2. koşu 3/3), ama B'de koşudan koşuya oynama sürüyor; ortak payda çok ürün kayıt/deneme sırası. B ölçümünde kit'in `results/q-G5-B-reps3.json`'u yazılmadı (çökme). Sıradaki: PUB-11 1. koşu ve PUB-12/13 3. koşu dökümleri (salt okuma), sonra PUB-06.
+
+## 11 Ekim, 06:00–06:20: G'nin B kalmaları, teşhis (salt okuma döküm)
+
+Dökümler `scratchpad/dump.py` ile (simülasyon + vaka → mesajlar, tool çağrıları ve sonuçları).
+- **PUB-11, 1. koşu (kitaplık hatası):** onaydan sonra model üç `create_promise`'ı **aynı mesajda, paralel** çağırdı. Post-kanca ürünü `bb_key__create_promise` / `<tool>_args`'tan okuyor; paralel çağrılar bunu eziyor. p1'in sonucu "p2 kaydedildi; p1, p3 açık" dedi → model p1'i yeniden çağırdı → banka `ok:false` "this product already has a promise" → kanca başarısızlık sayıp bir tekrar daha, sonra vazgeçip `service_error` notu → ajan müşteriye "kredi kartı sözünüz kaydedilmedi" dedi (kaydedilmişti). Hakem geçirdi, ledger fazladan not yüzünden kaldırdı. Platformda paralel çağrıyı kapatan ayar yok (kit `docs/`); kanca yalnız `result` ve ortak değişken tablosunu görüyor; bankanın yanıtında ürün kimliği yok. Skill'de "mesaj başına tek tool çağrısı" kuralı yok (kit builder'ı böyle yapıyor).
+- **PUB-13, 3. koşu (model):** aynı paralel çağrı (iki sonuç da "p2 kaydedildi" dedi; ikisi başarılı olduğu için zararsız kaldı). Asıl kalma: müşteri iki ürün için 30 Ekim istedi; kredi için ajan "en geç tarih 23 Ekim" deyip **16 Ekim**'i önerdi ve kaydetti (beklenen 23 Ekim).
+- **PUB-12, 3. koşu (model):** müşteri "kartı yarın öderim, krediyi ve arabayı ödemiyorum" dedi; ajan "yarın için notunu aldım" deyip kart için geri okuma, onay ve `create_promise` yapmadı, p2/p3 için `add_note` da yok; denemeler bitince doğrudan veda (`no_promise/refused`). Hiç yazma olmadığı için çağrı sonu `{open:…}` mesajları hiç devreye girmedi.
