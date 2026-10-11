@@ -80,7 +80,7 @@ Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olma
 1. **12:30 donuldu** (`4f64795` skill'i; A v23 10/10, B v18 8/8). Genelleme kuyruğu `queue16`: ham A, I, G, H, C, D; E ve F yalnız build (~15:00). Sonra pratik workflow'lar panelden silinir.
 2. **10:40–12:30:** yalnız ölçümle kanıtlanmış hata. Tek yapısal istisna: B'de kapı yine model `end_call`'u yüzünden delinirse end_call aracı hiçbir adımda olmaz, bitişler rotayla `end_call` düğümüne.
 3. **12:30–16:00:** donmuş sürümle tam ölçüm (A, B, own-a-1/2, own-b-1/2, ham malzeme A, I).
-4. **16:00–18:00:** temiz klon provası `ANTHROPIC_API_KEY` ile, `python3 builder/build.py` (venv'siz kabuk), trace `submission/<slot>.trace.log`, export, `fak_`/`sk-ant` taraması.
+4. **15:32 yapıldı:** temiz klon provası key ile geçti (429 sn, export ve trace yerinde, sızıntı 0).
 5. **19:00** kod dondurma, etiketli commit; **20:00** gizli brief'ler: `python3 builder/build.py <brief> <api> 2>&1 | tee traces/hidden-N.log`; **23:00'ten önce** form (team, repo, commit, run_command, workflows, traces).
 6. Açık sorular: destek kanalına 19, 23, 24 (workspace'te 11 workflow görüldü; sınır 10 değil gibi).
 
@@ -477,3 +477,7 @@ Kökteki `brief-d.md` slotu `brief-d` değil `brief-d-518c5c` (aynı ad, farklı
 ## 11 Ekim, 15:21: karar değişti: akşam build'leri `ANTHROPIC_API_KEY` ile; prova key ile
 
 İhsan bir `ANTHROPIC_API_KEY` verecek; sohbete yazılmayacak, kendisi kit'in `env.sh`'ine (`export ANTHROPIC_API_KEY=...`) ekleyecek; env.sh yalnız komut içinde `source` edilir, okunmaz, yazdırılmaz. Kod değişmedi: `build.py` anahtar ortamdaysa onu kullanır (`build.py:312`, trace `[setup] Claude access: ANTHROPIC_API_KEY`), `SECRET_VARS` ve `sk-ant-` maskesi var. 15:05 kaydındaki "key'siz" kararının yerine geçer. Plan (İhsan onayladı): 15:25'te I'nın 2. koşusu (`f3d4b5ce`, 2 çağrı Freya hatasıyla düştü) biter ya da silinir, genelleme kuyruğu (`queue18`) durur; sonra temiz klon provası key ile, venv'siz `python3 builder/build.py`, trace ve export yolu, `fak_`/`sk-ant` taraması.
+
+## 11 Ekim, 15:23–15:32: temiz klon provası `ANTHROPIC_API_KEY` ile geçti
+
+GitHub'dan sıfırdan klon (`df4d897`, scratchpad'de): env.sh yok, `builder/work` yok. README kurulumu (`python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`, Python 3.14, `claude-agent-sdk` 0.2.165) sorunsuz; klonda testler **546 yeşil**. Organizatör komutu venv'siz sistem `python3` (`/opt/homebrew/bin/python3`) ile, Freya ve Anthropic anahtarları yalnız komut içinde `source` edilerek: `python3 builder/build.py <kit>/briefs/brief-a.md <kit>/tools/openapi.json`. Sonuç: SDK yokken `.venv`'e kendiliğinden geçti; trace `[setup] Claude access: ANTHROPIC_API_KEY`; Opus 5.5 effort max; 20 tur, **429 sn, $1,44**; dry run ok; `[export] wrote submission/brief-a.workflow.json`, trace `submission/brief-a.trace.log`'a kopyalandı; çıkış 0. Erişim kancası farklı kök yolunda hiçbir okumayı reddetmedi. Trace, build günlüğü ve `traces/` içinde `fak_`/`sk-ant-` taraması **0**. Klonun ajanı Freya'da yeni workflow (`2c11c0b7…`, agent `36742ca7…`; panelde bir workflow daha). Kuyruk `queue19` (15:32): bu ajanı `--brief A --reps 3` ölçer, sonra I, G (+B), H (+B), C, D. Ham A, E, F zaman kalırsa.
