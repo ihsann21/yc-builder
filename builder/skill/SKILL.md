@@ -209,6 +209,12 @@ customer refused up front still gets all its attempts; write: "A product the cus
 you reached it still gets its attempts: your first message about it is its attempt 1 offer. Never end a
 product as refused before its listed attempts are used."
 
+A day the customer named, for one product or for all, beats the attempt 1 date (measured: the agent
+offered and recorded its attempt 1 date for a second product the customer had already named a day for).
+Write in the task message: "If the customer named a day for this product or for all products, offer
+that day for it, checked in the day guide; use the attempt 1 date only for a product with no day named."
+With several products the day guide is the DAY TABLE: name it so.
+
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
 applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
