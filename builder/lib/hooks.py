@@ -82,7 +82,8 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
               ok_when: list | None = None, key_field: str = "", retries: int = 0,
               log_fields: list[str] | tuple = (), fail_mark: list | None = None,
               next_key: str = "what_to_do_next", strip_header: bool = True,
-              adjusted_note: str = ADJUSTED_NOTE, op=None) -> str:
+              adjusted_note: str = ADJUSTED_NOTE, open_var: str = "", open_tools: list[str] | tuple = (),
+              op=None) -> str:
     """Snippet of a post hook.
 
     rules      [{"when": [[field, op, value?], ...], "say": template, "set": {var: value}}]: the first
@@ -98,6 +99,9 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
     log_fields request fields to keep as 'key:value' for each successful write.
     fail_mark  [field, value] written into a failed response so the model cannot read it as success.
     next_key   the result field that carries the message; the system prompt must tell the model to obey it.
+    open_var   a variable that gets, after every result, the products none of `open_tools` has written yet
+               ("none" when all are done; same as {open:...}). A route on it ("equals none") can gate the
+               goodbye: the model cannot end the call before every product has its record.
     op         the tool's tools.Operation: rule, ok_when and fail_mark fields must be response fields,
                key_field and log_fields request fields.
     """
@@ -118,6 +122,10 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
         raise ValueError("fail_mark must be [field, value]")
     if isinstance(log_fields, str) or not isinstance(next_key, str) or not next_key:
         raise ValueError("log_fields must be a list of field names and next_key a field name")
+    if bool(open_var) != bool(open_tools) or isinstance(open_tools, str):
+        raise ValueError("open_var and open_tools go together: a variable name and a list of tool names")
+    if open_var:
+        check_var(open_var)
     response = [c[0] for c in list(ok_when or []) if isinstance(c, (list, tuple)) and c]
     response += [c[0] for r in rules for c in r.get("when", []) if isinstance(c, (list, tuple)) and c]
     response += [fail_mark[0]] if fail_mark else []
@@ -125,7 +133,8 @@ def post_hook(tool: str, *, rules: list[dict] | tuple = (), messages: dict | Non
     cfg = {"tool": tool, "rules": [dict(r) for r in rules], "messages": messages, "ok_when": list(ok_when or []),
            "key_field": key_field, "retries": retries, "log_fields": list(log_fields),
            "fail_mark": list(fail_mark) if fail_mark else [], "next_key": next_key,
-           "strip_header": strip_header, "adjusted_note": adjusted_note}
+           "strip_header": strip_header, "adjusted_note": adjusted_note,
+           "open_var": open_var, "open_tools": list(open_tools)}
     check_no_double_braces(cfg)
     return embed.snippet(("common", "hooks"), "run_post", cfg, "post")
 

@@ -586,5 +586,7 @@ def run_post(state, result, cfg):
             target = data if isinstance(data, dict) else result
             target[cfg.get("next_key", "what_to_do_next")] = message
         state["bb_adjusted__" + tool] = ""
+        if cfg.get("open_var"):
+            state[cfg.get("open_var")] = open_items(state, cfg.get("open_tools", []))
     except Exception as error:
         state["bb_post_error__" + tool] = str(error)

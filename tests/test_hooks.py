@@ -400,3 +400,22 @@ def test_a_changed_date_note_stays_with_its_own_call():
     state, second = post(state, {"done": True, "ref": "r"}, **WRITE)
     assert "changed from 2030-01-15" in first["data"]["what_to_do_next"]
     assert second["data"]["what_to_do_next"] == "Booked a2."
+
+
+def test_open_var_tracks_the_products_still_without_a_record():
+    cfg = dict(WRITE, open_var="bb_open", open_tools=["book", "mark"])
+    state = {"bb_products": "a1,a2", "bb_key__book": "a1"}
+    state, _ = post(state, {"done": "true", "ref": "r"}, **cfg)
+    assert state["bb_open"] == "a2"
+    state["bb_key__book"] = "a2"
+    state, _ = post(state, {"done": False}, **cfg)                       # a failed write leaves it open
+    assert state["bb_open"] == "a2"
+    state["bb_done__mark"] = "a2"                                        # e.g. a note written by another tool
+    state, _ = post(state, {"done": False}, **cfg)
+    assert state["bb_open"] == "none"
+
+
+@pytest.mark.parametrize("bad", [dict(open_var="bb_open"), dict(open_tools=["book"]), dict(open_var="bb_open", open_tools="book")])
+def test_open_var_needs_its_tools(bad):
+    with pytest.raises(ValueError):
+        hooks.post_hook("book", **bad)

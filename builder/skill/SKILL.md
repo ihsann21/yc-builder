@@ -60,6 +60,19 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
 - `load_account` (api_request): the account lookup, mapping `data.<list field>` to a variable.
 - `account_facts` (code node): product facts (`calc.products_code`).
 - `negotiate` (conversation): state the debt, get promises, notes, transfers; write tools + end_call.
+- When the brief requires a record for EVERY product (a promise or a note with a reason, even when no
+  promise is made), the goodbye is gated in code, not left to the prompt (measured four times: the
+  model said goodbye with no record, the brief's rule written correctly in its task message):
+  give each post hook of the tools that complete a product `open_var="bb_open", open_tools=[those
+  tools]`; `negotiate` gets NO end_call; its transitions go to a `wrap_up` conversation node when
+  `wf.when_equals("bb_open", "none")`, and when the brief's call-ending event happened without records
+  (e.g. a transfer: let that tool's post hook `set` a flag such as `{"bb_transferred": "yes"}` and route
+  on it). `wrap_up`: `on_enter=wf.llm()`, tools=[end_call] only, no transitions; its task message says
+  what to say there, from the brief, for each way the call can end (the sentence after a recorded promise,
+  what was not recorded, the transfer announcement, then the closing phrase). The negotiate task message
+  says the call ends by itself once every product has its record, and the hook messages stop telling the
+  model to say goodbye; they say which product is next. A brief that never records per product (e.g. only
+  a promise or nothing) keeps end_call in `negotiate`.
 - The close tool is a workflow-level `end_of_call` lifecycle tool whose pre hook is `closing.close_hook`.
 - Prompts: the system prompt holds the identity, tone, hard rules that hold in every step, and
   `{{date_facts}}`. It must say: obey the `what_to_do_next` field of every tool result; after every
@@ -122,9 +135,11 @@ hooks.pre_hook(TOOL, normalize={FIELD: {"kind": "date", "order": ORDER} | {"kind
 hooks.post_hook(TOOL, rules=[{"when": [[F, "true"|"false"|"missing"|"present"|"equals"|"lte"|..., V]],
                 "say": TEXT, "set": {"bb_identity": "verified"}}], messages={"ok", "retry", "give_up",
                 "error", "default": TEXT}, ok_when=[[F, "true"], ...], key_field=F, retries=N,
-                fail_mark=[F, False], log_fields=[F], op=ops[TOOL])
+                fail_mark=[F, False], log_fields=[F], open_var="bb_open", open_tools=[TOOL, TOOL],
+                op=ops[TOOL])
 #   message placeholders: {key} {tries} {retries_left} {adjusted} {open:TOOL:TOOL} (products not yet
 #   written by any of those tools, or "none") and any response field or variable
+#   open_var: after every result the variable holds the same list as {open:...}; route on it
 closing.close_hook(outcome_field=F, reason_field=F, outcomes={OUTCOME: [REASONS] or []},
                    rules=[{"if": [[FACT, OP, V]], "outcome": O, "reason": R | {"fact": FACT, "map": {...}}
                           | {"first_logged": "TOOL.FIELD", "skip": [...]} | {"model": True}}, {"keep_model": True}],
