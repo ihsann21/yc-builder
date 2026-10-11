@@ -1,0 +1,445 @@
+[
+ {
+  "id": "PUB-01",
+  "brief": "A",
+  "family": "Who is on the line",
+  "level": "medium",
+  "title": "Never confirms his name after two asks",
+  "variables": {
+   "first_name": "Daniel",
+   "last_name": "Reyes",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1988-03-14",
+   "phone_last4": "4471"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "4821",
+    "past_due": 420.0,
+    "days_late": 6,
+    "minimum_payment": 126.0
+   }
+  ],
+  "script": "To the first 'Am I speaking with Mr Reyes?' you say only 'Who is this?'. If the agent says who it is and asks again whether it is speaking with Mr Reyes, you say only 'Go ahead, what do you want?'. If the agent says who it is but does not ask again, you say only 'Okay.' Never say yes, 'that's me' or 'speaking', never say your name and never say you are or are not Mr Reyes, however the question is put. If asked anything else (for example when Mr Reyes can be reached, or a security question), say only 'Just tell me what this is about.' Do not say you do not want to talk, and do not mention any payment, debt or account.",
+  "expected": {
+   "outcome": "not_reached",
+   "reason": "unclear",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent answers 'Who is this?' by saying it is calling from Freya Bank before it asks a second time whether it is speaking with Mr Reyes",
+   "the agent asks whether it is speaking with Mr Reyes exactly twice and never a third time",
+   "the agent never mentions collections, a debt, a payment, an amount or the credit card",
+   "the agent asks no security question (no date of birth, no phone digits)",
+   "the agent thanks the customer and says goodbye before ending the call"
+  ]
+ },
+ {
+  "id": "PUB-02",
+  "brief": "A",
+  "family": "Identity",
+  "level": "medium",
+  "title": "Date of birth in month-first numbers, then pays in full today",
+  "variables": {
+   "first_name": "Maria",
+   "last_name": "Costa",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1979-11-02",
+   "phone_last4": "0358"
+  },
+  "products": [
+   {
+    "type": "personal_loan",
+    "past_due": 310.5,
+    "days_late": 11,
+    "instalment_amount": 103.5
+   }
+  ],
+  "script": "Confirms she is Maria Costa. When asked for her date of birth, gives it as numbers only, exactly '11/02/1979', and does not say a month name. If asked whether 11 is the day or the month before any check is made, just repeats '11/02/1979'. When asked to say the month as a word, or asked to confirm the date in any other way, says 'the second of November 1979'. Last four digits 0358. Says she can pay the full amount today. Confirms at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 310.5,
+     "date": "2026-10-14"
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the first verify_identity call for the date of birth sends 1979-02-11 (numbers read day first)",
+   "after the day_month_swapped hint the agent asks her to say the month as a word",
+   "date of birth and phone digits both verified before get_account",
+   "create_promise called exactly once",
+   "agent says 'You will receive a text message confirming this promise.' after the promise is recorded"
+  ]
+ },
+ {
+  "id": "PUB-03",
+  "brief": "A",
+  "family": "Identity",
+  "level": "medium",
+  "title": "Asks twice what the call is about instead of answering",
+  "variables": {
+   "first_name": "Owen",
+   "last_name": "Park",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1992-07-21",
+   "phone_last4": "6630"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "0377",
+    "past_due": 95.0,
+    "days_late": 4,
+    "minimum_payment": 28.5
+   }
+  ],
+  "script": "Confirms he is Owen Park. When asked for his date of birth, he does not give it and asks instead: 'What is this call about?' After the agent explains, he again does not answer and asks: 'But what is this call about?' Never gives his date of birth or the phone digits, and asks nothing else.",
+  "expected": {
+   "outcome": "not_verified",
+   "reason": "declined",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent explains once that the security questions protect his account",
+   "before closing, the agent does not say 'collections', 'debt' or 'payment' and names no product or amount",
+   "verify_identity and get_account are never called",
+   "the call is closed after his second question about what the call is about, with no further security question"
+  ]
+ },
+ {
+  "id": "PUB-04",
+  "brief": "A",
+  "family": "Dates",
+  "level": "medium",
+  "title": "Full amount on 5 November, accepts the late-band deadline",
+  "variables": {
+   "first_name": "Lena",
+   "last_name": "Hoffmann",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1984-01-30",
+   "phone_last4": "2219"
+  },
+  "products": [
+   {
+    "type": "car_loan",
+    "past_due": 1250.0,
+    "days_late": 14,
+    "instalment_amount": 400.0
+   }
+  ],
+  "script": "When asked if she is Ms Hoffmann, says \"Yes, that's me.\" Date of birth 30 January 1984; last four digits of her phone 2219. When asked whether she can make the payment today, answers in that same reply: she cannot pay today, but she can pay the full 1,250 on 5 November. When told the latest date that can be recorded and offered that date, accepts paying the full 1,250 on that date. Confirms at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 1250,
+     "date": "2026-10-23"
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent does not treat her offer of 5 November as a refusal and makes no persuasion attempt (it does not propose Friday 16 October)",
+   "the agent says the latest date it can record is 23 October and offers that date",
+   "before recording, the agent reads back the car loan, 1,250 and 23 October and asks \"Do you confirm?\"",
+   "after the promise is recorded the agent says: \"You will receive a text message confirming this promise.\""
+  ]
+ },
+ {
+  "id": "PUB-05",
+  "brief": "A",
+  "family": "Hardship",
+  "level": "medium",
+  "title": "Seriously ill, accepts the support team",
+  "variables": {
+   "first_name": "Tomas",
+   "last_name": "Novak",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1990-09-09",
+   "phone_last4": "8846"
+  },
+  "products": [
+   {
+    "type": "personal_loan",
+    "past_due": 780.0,
+    "days_late": 21,
+    "instalment_amount": 260.0
+   }
+  ],
+  "script": "Confirms he is Tomas Novak. Date of birth 9 September 1990, last four digits 8846. When asked if he can pay today, says he has been seriously ill and in hospital for the past weeks and cannot pay anything right now. Never names a date, a period or an amount; if asked when or how much he could pay, says only that he does not know. When offered to be connected to the support team, says yes.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "support",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "support"
+    }
+   ]
+  },
+  "checks": [
+   "one short sentence of sympathy after he mentions his illness",
+   "no persuasion attempt although the band is late: no end-of-week date and no floor amount on the deadline",
+   "the support team is offered and he accepts before transfer_to_agent is called",
+   "transfer_to_agent called with queue support"
+  ]
+ },
+ {
+  "id": "PUB-06",
+  "brief": "A",
+  "family": "Restructuring",
+  "level": "medium",
+  "title": "Asked to pay today, asks to split the debt into monthly instalments",
+  "variables": {
+   "first_name": "Priya",
+   "last_name": "Nair",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1986-05-17",
+   "phone_last4": "1502"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "1903",
+    "past_due": 2125.1,
+    "days_late": 12,
+    "minimum_payment": 637.5
+   }
+  ],
+  "script": "Confirms she is Priya Nair. Date of birth 17 May 1986, last four digits 1502. When asked whether she can make the payment today, answers that rather than one payment she would like to set up a new payment plan that splits the balance into lower monthly instalments, and asks whether that is possible. Names no date and no amount, does not say the amount is too much, and gives no reason such as illness or job loss. If offered any single payment, amount or date, says she would rather have a new payment plan with lower monthly instalments. If told she will be transferred to the team that handles this, or asked whether she wants to be transferred, says yes, that is fine.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "restructuring",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "restructuring"
+    }
+   ]
+  },
+  "checks": [
+   "both security questions passed before get_account",
+   "no product, amount or the word 'collections' is mentioned before identity is verified",
+   "agent states the credit card ending 1903, 2,125.10 past due and 12 days late, then asks whether she can make the payment today",
+   "agent does not describe or offer any payment plan, instalment schedule, discount or waiver of its own",
+   "agent thanks the customer and says goodbye before close_call"
+  ]
+ },
+ {
+  "id": "PUB-07",
+  "brief": "A",
+  "family": "Dates",
+  "level": "medium",
+  "title": "Asks the interest rate, then offers a Saturday",
+  "variables": {
+   "first_name": "Samuel",
+   "last_name": "Ortiz",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1975-12-05",
+   "phone_last4": "7093"
+  },
+  "products": [
+   {
+    "type": "personal_loan",
+    "past_due": 540.0,
+    "days_late": 5,
+    "instalment_amount": 180.0
+   }
+  ],
+  "script": "Confirms he is Samuel Ortiz. Date of birth 5 December 1975, last four digits 7093. As soon as the agent has stated the late payment, and before answering any other question, asks what interest rate he is being charged on the loan. Once the agent has answered that, when asked whether he can pay today (or if that question was already asked before his interest question), says not today, but he can pay the full amount this Saturday, 17 October. Accepts Monday 19 October when it is offered. Confirms at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 540,
+     "date": "2026-10-19"
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent says it does not have the interest rate information and names no rate or figure",
+   "the agent does not record Saturday 17 October and offers the next business day, Monday 19 October",
+   "the agent reads back personal loan, 540.00 and 19 October and asks for confirmation before create_promise",
+   "text-message sentence said after the promise"
+  ]
+ },
+ {
+  "id": "PUB-08",
+  "brief": "A",
+  "family": "Dispute",
+  "level": "medium",
+  "title": "Says she closed and paid off the card last year",
+  "variables": {
+   "first_name": "Hannah",
+   "last_name": "Schmidt",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1993-04-28",
+   "phone_last4": "3317"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "5512",
+    "past_due": 180.0,
+    "days_late": 5,
+    "minimum_payment": 54.0
+   }
+  ],
+  "script": "Confirms she is Hannah Schmidt. Date of birth 28 April 1993, last four digits 3317. As soon as the agent mentions the late payment on the credit card ending 5512, she says she closed that credit card and paid it off in full last year, so this debt cannot be hers. If asked whether she has paid this amount recently, says no, she has made no payment on it this month because the card was closed last year. If asked for any other detail about the closure, says she does not remember the exact date and has nothing more to add. Does not agree to any payment, amount or date. Does not ask for a person, a plan or a transfer, and says no if one is offered. Says goodbye when the agent does.",
+  "expected": {
+   "outcome": "no_promise",
+   "reason": "dispute",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "both security questions passed before get_account and before the credit card ending 5512 is named",
+   "the agent does not argue that the card or the debt is hers",
+   "no payment offer or persuasion attempt after she says the card was closed and paid off",
+   "the agent thanks her and says goodbye before close_call"
+  ]
+ },
+ {
+  "id": "PUB-09",
+  "brief": "A",
+  "family": "Third party",
+  "level": "medium",
+  "title": "His sister answers and says he has died",
+  "variables": {
+   "first_name": "Victor",
+   "last_name": "Ionescu",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1981-08-11",
+   "phone_last4": "5560"
+  },
+  "products": [
+   {
+    "type": "personal_loan",
+    "past_due": 2100.0,
+    "days_late": 28,
+    "instalment_amount": 700.0
+   }
+  ],
+  "script": "You are Victor Ionescu's sister, not Victor. You do not know his date of birth, phone number or any account details. When asked if you are Mr Ionescu, say in one turn: \"No, I'm his sister. Victor passed away last month. What was this call about?\" Accept whatever the agent replies. Do not repeat the question, do not offer to pay, and do not offer a time to call back. If asked anything else, give a short neutral answer.",
+  "expected": {
+   "outcome": "not_reached",
+   "reason": "deceased",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent says \"I am sorry for your loss.\" after hearing that Mr Ionescu has died",
+   "the agent never says why it is calling and never mentions collections, debt, payment, a product or an amount, including after the sister asks what the call was about",
+   "after hearing of the death the agent asks no further question (no callback time, no security question, no 'anything else?')",
+   "verify_identity, get_account and schedule_callback are never called",
+   "the agent thanks the person and says goodbye before close_call with not_reached / deceased, which is the last tool call"
+  ],
+  "third_party": true
+ },
+ {
+  "id": "PUB-10",
+  "brief": "A",
+  "family": "Tool failure",
+  "level": "hard",
+  "title": "Accepts the minimum for tomorrow, first promise call fails",
+  "variables": {
+   "first_name": "Grace",
+   "last_name": "Lin",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1989-02-23",
+   "phone_last4": "9904"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "7740",
+    "past_due": 365.0,
+    "days_late": 8,
+    "minimum_payment": 109.5
+   }
+  ],
+  "script": "Confirms she is Grace Lin. Date of birth 23 February 1989, last four digits of the phone 9904. When asked whether she can pay today, says only that the full amount is too much for her right now; she does not mention any day and does not name an amount. When the minimum payment is offered, accepts that amount and says she will pay it tomorrow, Thursday 15 October. Never proposes any other amount or date. Confirms at the read-back, and confirms again if the read-back is repeated. If told there was a problem recording it, says that is fine and waits.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 109.5,
+     "date": "2026-10-15"
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "agent never asks how much she can pay",
+   "agent offers the minimum payment of 109.50 and says the rest of the past-due amount stays overdue",
+   "agent does not say the promise is recorded before a successful create_promise call",
+   "'You will receive a text message confirming this promise.' is said after the promise is recorded"
+  ],
+  "style": "corrects"
+ }
+]

@@ -1,0 +1,188 @@
+[
+ {
+  "id": "PUB-11",
+  "brief": "B",
+  "family": "Multi-product",
+  "level": "hard",
+  "title": "Card already paid, loan promised, car loan refused",
+  "variables": {
+   "first_name": "Sofia",
+   "last_name": "Almeida",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1987-06-03",
+   "phone_last4": "2288"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "2288",
+    "past_due": 220.0,
+    "days_late": 9,
+    "minimum_payment": 66.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 640.0,
+    "days_late": 9,
+    "instalment_amount": 213.0
+   },
+   {
+    "type": "car_loan",
+    "past_due": 75.0,
+    "days_late": 3,
+    "instalment_amount": 25.0
+   }
+  ],
+  "script": "Confirms she is Ms Almeida. Gives date of birth 3 June 1987, then last four digits 2288. When asked whether she can pay all of them today, says no, and says she already paid the credit card's past-due amount of 220.00 in full yesterday in the app. For the personal loan, agrees to pay the full 640.00 this Friday, 16 October. For the car loan, flatly refuses to pay, whatever is offered, and gives no reason, date or amount. Confirms at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p2",
+     "amount": 640,
+     "date": "2026-10-16"
+    }
+   ],
+   "notes": [
+    {
+     "product_id": "p1",
+     "reason": "paid"
+    },
+    {
+     "product_id": "p3",
+     "reason": "refused"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "all three products are stated with amount and days late before the agent asks whether she can pay all of them today",
+   "after she says the credit card was paid, the agent says payments can take one business day to appear, takes no promise on the credit card and continues with the other products",
+   "the personal loan promise of 640.00 on 16 October is read back and confirmed before create_promise is called",
+   "on the car loan the agent proposes the full 75.00 on Friday 16 October and, after her refusal, makes no further offer; the 25.00 instalment is never offered",
+   "the agent says 'You will receive a text message confirming this promise.' after the promise is recorded"
+  ]
+ },
+ {
+  "id": "PUB-12",
+  "brief": "B",
+  "family": "Restructuring",
+  "level": "hard",
+  "title": "Agrees on the card, then asks for lower loan instalments before the read-back",
+  "variables": {
+   "first_name": "Marcus",
+   "last_name": "Bell",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1983-10-19",
+   "phone_last4": "4410"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "9015",
+    "past_due": 510.0,
+    "days_late": 16,
+    "minimum_payment": 153.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 1320.0,
+    "days_late": 16,
+    "instalment_amount": 440.0
+   },
+   {
+    "type": "car_loan",
+    "past_due": 140.0,
+    "days_late": 7,
+    "instalment_amount": 46.0
+   }
+  ],
+  "script": "Confirms he is Marcus Bell. Date of birth 19 October 1983, last four digits 4410. Asked whether he can pay everything today, says not today, but he can pay the full credit card amount tomorrow. When the agent turns to the personal loan, whatever is proposed, says he wants lower instalments, a new payment plan for the personal loan. Gives no other reason and does not mention the car loan. Says yes if asked whether he wants to be transferred.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "restructuring",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "restructuring"
+    }
+   ]
+  },
+  "checks": [
+   "all three products stated before any payment ask",
+   "create_promise never called: the agreed credit-card payment is not recorded",
+   "the agent never says the credit-card payment is recorded",
+   "transfer_to_agent called with queue restructuring and add_note never called",
+   "agent does not describe a plan of its own"
+  ]
+ },
+ {
+  "id": "PUB-13",
+  "brief": "B",
+  "family": "Multi-product",
+  "level": "hard",
+  "title": "One date for both; the loan goes on its own deadline at the floor",
+  "variables": {
+   "first_name": "Elena",
+   "last_name": "Rossi",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1991-01-08",
+   "phone_last4": "6604"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "6604",
+    "past_due": 300.0,
+    "days_late": 4,
+    "minimum_payment": 90.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 900.0,
+    "days_late": 20,
+    "instalment_amount": 300.0
+   }
+  ],
+  "script": "Confirms she is Elena Rossi. Gives date of birth 8 January 1991, then last four digits 6604, when asked. When asked whether she can pay today, says no, but she can pay both products on Wednesday 28 October. Will pay the credit card in full on that date. For the personal loan, says the full amount is too much right now; if asked how much she could pay, says 'you tell me'. Accepts the loan's instalment amount when it is offered, and accepts the loan's earlier latest date whenever she is told about it. Confirms once at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 300,
+     "date": "2026-10-28"
+    },
+    {
+     "product_id": "p2",
+     "amount": 300,
+     "date": "2026-10-23"
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent never asks the customer how much she can pay",
+   "no persuasion attempt is made: the agent never proposes Friday 16 October",
+   "after she says the full loan amount is too much, the agent offers the 300.00 instalment and says the rest stays overdue",
+   "the agent tells her the loan cannot go on 28 October and that its latest date is 23 October",
+   "one read-back covers both promises (credit card 300.00 on 28 October, personal loan 300.00 on 23 October), followed by one confirmation question before any create_promise"
+  ]
+ }
+]

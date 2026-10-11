@@ -1,0 +1,196 @@
+[
+ {
+  "id": "PUB-11",
+  "brief": "B",
+  "family": "Hardship",
+  "level": "hard",
+  "title": "Three products, lost her job, declines the support team",
+  "variables": {
+   "first_name": "Sofia",
+   "last_name": "Almeida",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1987-06-03",
+   "phone_last4": "2288"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "2288",
+    "past_due": 220.0,
+    "days_late": 9,
+    "minimum_payment": 66.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 640.0,
+    "days_late": 9,
+    "instalment_amount": 213.0
+   },
+   {
+    "type": "car_loan",
+    "past_due": 75.0,
+    "days_late": 3,
+    "instalment_amount": 25.0
+   }
+  ],
+  "script": "Confirms she is Sofia Almeida. Date of birth 3 June 1987, last four digits 2288. As soon as the agent has stated the late payments, whether or not it has also asked if she can pay today, she says: \"I lost my job last week. I cannot pay anything on any of these three right now.\" When offered a connection to the customer support team, she says: \"No, thank you, I don't want to be transferred.\" She never names a payment date or amount. If asked again about paying anything, she says she cannot pay anything on any of them. She does not ask for a payment plan, does not dispute the debt and does not say she has already paid.",
+  "expected": {
+   "outcome": "no_promise",
+   "reason": "hardship",
+   "promises": [],
+   "notes": [
+    {
+     "product_id": "p1",
+     "reason": "hardship"
+    },
+    {
+     "product_id": "p2",
+     "reason": "hardship"
+    },
+    {
+     "product_id": "p3",
+     "reason": "hardship"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "Before asking for any payment, the agent states all three products (credit card ending 2288, personal loan, car loan), each with its past-due amount and days late",
+   "The agent expresses sympathy for the job loss",
+   "After she mentions the job loss, the agent proposes no payment date, amount, minimum or deadline for any product",
+   "The agent offers to connect her with the customer support team and does not transfer the call after she declines",
+   "The agent offers no discount, waiver or payment plan"
+  ]
+ },
+ {
+  "id": "PUB-12",
+  "brief": "B",
+  "family": "Multi-product",
+  "level": "hard",
+  "title": "Saturday for everything, refuses the personal loan",
+  "variables": {
+   "first_name": "Marcus",
+   "last_name": "Bell",
+   "title": "Mr",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1983-10-19",
+   "phone_last4": "4410"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "9015",
+    "past_due": 510.0,
+    "days_late": 16,
+    "minimum_payment": 153.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 1320.0,
+    "days_late": 16,
+    "instalment_amount": 440.0
+   },
+   {
+    "type": "car_loan",
+    "past_due": 140.0,
+    "days_late": 7,
+    "instalment_amount": 46.0
+   }
+  ],
+  "script": "Confirms he is Marcus Bell. Date of birth 19 October 1983, last four digits 4410. Cannot pay any of them today; says he will pay all three in full this Saturday. When the agent offers the next business day instead, accepts it for the credit card and the car loan, but says no to it for the personal loan. Refuses every further offer on the personal loan, whatever the amount or date, and gives no reason. Confirms once at the read-back.",
+  "expected": {
+   "outcome": "promise",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "p1",
+     "amount": 510,
+     "date": "2026-10-19"
+    },
+    {
+     "product_id": "p3",
+     "amount": 140,
+     "date": "2026-10-19"
+    }
+   ],
+   "notes": [
+    {
+     "product_id": "p2",
+     "reason": "refused"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "all three products stated, one sentence each, before any payment is asked for",
+   "the agent does not accept Saturday 17 October and offers Monday 19 October, the next business day",
+   "the personal loan instalment of 440.00 is offered on its deadline, 23 October, before the agent stops on the loan",
+   "one read-back covering the credit card and the car loan, with one confirmation",
+   "the text-message sentence is said after the promises are recorded"
+  ],
+  "style": "pieces"
+ },
+ {
+  "id": "PUB-13",
+  "brief": "B",
+  "family": "Multi-product",
+  "level": "medium",
+  "title": "Disputes the card, already paid the loan",
+  "variables": {
+   "first_name": "Elena",
+   "last_name": "Rossi",
+   "title": "Ms",
+   "now": "2026-10-14T11:00"
+  },
+  "identity": {
+   "date_of_birth": "1991-01-08",
+   "phone_last4": "6604"
+  },
+  "products": [
+   {
+    "type": "credit_card",
+    "card_last4": "6604",
+    "past_due": 300.0,
+    "days_late": 4,
+    "minimum_payment": 90.0
+   },
+   {
+    "type": "personal_loan",
+    "past_due": 900.0,
+    "days_late": 20,
+    "instalment_amount": 300.0
+   }
+  ],
+  "script": "Confirms she is Elena Rossi. Date of birth 8 January 1991, last four digits 6604. When asked whether she can pay today, says in one answer: the credit card is not hers, she never had a credit card with Freya Bank; and she already paid the full overdue amount of the personal loan yesterday, in the app. Offers no date or amount for either product. If asked anything more about either product, repeats these two points politely; she has nothing else to add and does not refuse to talk.",
+  "expected": {
+   "outcome": "no_promise",
+   "reason": "dispute",
+   "promises": [],
+   "notes": [
+    {
+     "product_id": "p1",
+     "reason": "dispute"
+    },
+    {
+     "product_id": "p2",
+     "reason": "paid"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "both late products stated, one sentence each, before the agent asks about paying today",
+   "agent does not argue that the credit card is hers",
+   "agent says payments can take one business day to appear",
+   "no persuasion attempt and no promise taken on either product"
+  ]
+ }
+]
