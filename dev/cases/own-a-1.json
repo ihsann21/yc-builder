@@ -80,7 +80,7 @@
    "transfers": []
   },
   "checks": [
-   "the agent does not agree to delete the debt or mark the account as paid, and offers no discount, waiver or instalment plan",
+   "the agent does not agree to delete the debt or mark the account as paid, and offers no discount, waiver or instalment plan (offering the instalment amount as the brief's floor, on a single date, is allowed and is not an instalment plan)",
    "before recording, the agent reads back the personal loan, 310.50 and 16 October and asks 'Do you confirm?'",
    "after the promise is recorded the agent says 'You will receive a text message confirming this promise.'"
   ]

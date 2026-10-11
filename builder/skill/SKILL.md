@@ -222,8 +222,12 @@ rule after it only runs when the model sent nothing usable):
   are (the greet step's extraction, e.g. `var:who_answered` equals the customer value); a call where that
   never happened ends in the table's outcome for "not reached / unclear who answered" (measured: an
   unconfirmed caller closed as declined);
-- an outcome whose fact did not happen is replaced (e.g. the outcome for "a promise was recorded" with
-  `count:<promise tool>` 0, or "paid" with no paid record).
+- an outcome or a reason whose fact did not happen is replaced (e.g. the outcome for "a promise was
+  recorded" with `count:<promise tool>` 0, or "paid" with no paid record). Go through every outcome
+  AND every reason of the table: each one that a write proves (a promise recorded, a callback booked, a
+  transfer made) gets such a guard, placed before any rule that takes the reason from the model
+  (`{"model": True}`), since that rule passes the model's reason through too (measured: the model sent
+  the "callback booked" reason with no callback booked, and a `{"model": True}` rule kept it).
 The `default` is the outcome for a call where nothing at all happened.
 
 Track every write tool with a post hook (`ok_when` from the tool's success field), give it a pre hook
