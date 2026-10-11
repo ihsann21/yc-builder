@@ -1,7 +1,8 @@
 {
-  "team": "FILL",
+  "team": "UstaTech",
   "members": [
-    {"name": "FILL", "email": "FILL"}
+    {"name": "İhsan TANRIVERDİ", "email": "ihsantanrvrd@gmail.com"},
+    {"name": "Mehmet Akif VARDAR", "email": "mehmetakifvrdr@gmail.com"}
   ],
   "repo": "https://github.com/ihsann21/yc-builder",
   "commit": "FILL: the commit that holds the final workflow and trace",
