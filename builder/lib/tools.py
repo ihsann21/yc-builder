@@ -173,9 +173,13 @@ class _Reader:
             # A path such as /v1/items.list is no valid tool name: take the operationId, else
             # the path with every other character turned into _.
             op_id = op.get("operationId")
-            plain = op_id if isinstance(op_id, str) and _TOOL_NAME.fullmatch(op_id) else re.sub(r"[^A-Za-z0-9_-]+", "_", name)
-            self.warn(f"{where}: {name!r} is not a plain tool name (letters, digits, _ and -); named {plain!r}")
-            name = plain
+            if isinstance(op_id, str) and _TOOL_NAME.fullmatch(op_id):
+                name = op_id
+            else:
+                plain = re.sub(r"[^A-Za-z0-9_-]+", "_", name)
+                self.warn(f"{where}: {name!r} is not a plain tool name (letters, digits, _ and -) and there is "
+                          f"no plain operationId; named {plain!r}")
+                name = plain
         response, others = self.responses(op, where)
         return Operation(
             name=name,

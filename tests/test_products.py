@@ -252,3 +252,31 @@ def test_a_broken_day_guide_drops_the_table_not_the_facts():
     state["accounts"] = ITEMS
     state = embed.run(code(line="{id}: {deadline_shifts}"), state=state)
     assert state["bb_account_state"] == "ok" and "DAY TABLE" not in state["account_facts"]
+
+
+def test_list_code_writes_a_list_from_flattened_keys_as_plain_lines():
+    from builder.lib import calc, embed
+
+    code = calc.list_code(node="load_items", tool="items_list", list_path="data.items", id_field="ref",
+                          item_fields=["name", "flag"], var="items_text", empty="none")
+    assert "{{" not in code and "}}" not in code
+    state = {"load_items_response.data.data.items.0.ref": "A1", "load_items_response.data.data.items.0.name": "Alpha",
+             "load_items_response.data.data.items.0.flag": True, "load_items_response.data.data.items.1.ref": "B2"}
+    embed.run(code, state)
+    assert state["items_text"] == "1. ref: A1; name: Alpha; flag: true\n2. ref: B2" and state["items_text_count"] == 2
+    empty = {}
+    embed.run(code, empty)
+    assert empty["items_text"] == "none" and empty["items_text_count"] == 0
+    as_json = {"items_list_response.data.data.items": '[{"ref": "Z", "name": "Zed"}]'}
+    embed.run(code, as_json)
+    assert as_json["items_text"] == "1. ref: Z; name: Zed"
+
+
+def test_list_code_refuses_bad_names():
+    import pytest
+    from builder.lib import calc
+
+    with pytest.raises(ValueError):
+        calc.list_code(node="a-b", tool="t", list_path="data.x", id_field="id", item_fields=[], var="v")
+    with pytest.raises(ValueError):
+        calc.list_code(node="n", tool="t", list_path="", id_field="id", item_fields=[], var="v")

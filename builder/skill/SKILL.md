@@ -68,6 +68,12 @@ When the task gives a folder of bank documents and a mock URL instead of a brief
   (it becomes the tool name). A request body that wraps the fields in an object goes in the spec as
   written and is built with `envelope=` (below). Write the contract's error answers (HTTP status, code)
   into each operation's `responses`.
+- A list or object from a result never arrives in a `response_mapping` variable (measured: the mapped
+  list stayed unset, a mapped number arrived, and the model invented an id). To put a list in
+  a later prompt, add a code node right after the api_request node:
+  `wf.code_node(NAME, calc.list_code(node=API_NODE, tool=TOOL, list_path="data.<list>", id_field=F,
+  item_fields=[...], var=V, empty=TEXT), NEXT)`; the prompt then reads `{{V}}` (one line per item) and
+  `{{V_count}}`. Map only plain values (numbers, text) with `mapping=`.
 - HTTP errors: on a non-2xx answer the post hook does not run. The engine still sets
   `<tool>_status_code` (and `<tool>_failure_count`); when the documents treat two error statuses
   differently (e.g. "not found" is an ordinary answer, a 500 goes to an agent), route on

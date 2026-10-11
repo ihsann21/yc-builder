@@ -763,7 +763,8 @@ def test_a_path_that_is_no_tool_name_takes_the_operation_id_or_underscores():
     ops, warnings = operations(ENVELOPE_API)
     assert sorted(ops) == ["items_list", "svc_v1_items_get"]
     assert ops["items_list"].url == "https://mock.example/svc/v1/items.list"
-    assert any("named 'items_list'" in w for w in warnings)
+    assert not any("items.list" in w for w in warnings)   # an operationId is the intended name: no warning
+    assert any("named 'svc_v1_items_get'" in w for w in warnings)
 
 
 def test_envelope_tool_has_the_inner_fields_and_its_pre_hook_wraps_them():

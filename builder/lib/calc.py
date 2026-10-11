@@ -268,3 +268,31 @@ def wrap_code(*, parts: list[dict], var: str = "bb_wrap") -> str:
            "fallback": parts[-1]["say"]}
     check_no_double_braces(cfg)
     return embed.snippet(("common", "wrap"), "run_wrap", cfg, "code")
+
+
+def list_code(*, node: str, tool: str, list_path: str, id_field: str, item_fields: list[str], var: str,
+              empty: str = "") -> str:
+    """Code node snippet: the list at `list_path` of api_request node `node` (tool `tool`) as plain lines
+    in variable `var` ('1. field: value; field: value', one item per line) and its length in `var`_count.
+
+    Use it right after the api_request node whenever a later prompt needs a list or an object: the engine
+    does not store a list under a response_mapping variable (measured: a mapped list stayed unset while a
+    mapped number arrived), only as flattened keys, which this reads.
+    list_path: the list's path inside the API body, dots for nesting (e.g. "data.items" for
+        {"data": {"items": [...]}}). id_field: a field every item has. item_fields: the fields to write.
+    """
+    check_var(var)
+    for name in (node, tool):
+        if not NAME.match(name or ""):
+            raise ValueError(f"node and tool must be plain names, not {name!r}")
+    parts = [p for p in str(list_path).split(".") if p]
+    if not parts:
+        raise ValueError("list_path names the list inside the API body, e.g. 'data.items'")
+    fields = list(item_fields)
+    if id_field not in fields:
+        fields.insert(0, id_field)
+    path = ".".join(parts)
+    cfg = {"sources": [node + "_response.data." + path, tool + "_response.data." + path],
+           "list_field": parts[-1], "id_field": id_field, "item_fields": fields, "var": var, "empty": empty}
+    check_no_double_braces(cfg)
+    return embed.snippet(("common", "products", "lists"), "run_list", cfg, "code")
