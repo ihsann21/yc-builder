@@ -50,4 +50,4 @@ by hand. Practice outputs of earlier runs are in `dev/practice-submissions/`.
 .venv/bin/python -m pytest -q        # offline, a few seconds
 ```
 
-Design and decisions: `PROGRESS.md` and `build_the_builder_final_plan.md`.
+Design, measurements and decisions: `PROGRESS.md`.
