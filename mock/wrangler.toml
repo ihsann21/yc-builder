@@ -1,0 +1,4 @@
+# The team's mock of the bank's services (Cloudflare Workers). Deploy: cd mock && npx wrangler deploy
+name = "yc-bank-mock"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
