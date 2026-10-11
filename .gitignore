@@ -10,3 +10,5 @@ builder/work/
 .venv/
 mock/.wrangler/
 .DS_Store
+final/final-case*/
+final/backups/
