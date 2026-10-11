@@ -77,7 +77,7 @@ Kural: aynı anda tek simülasyon; her ölçüm `--reps 3`; build `--cases` olma
 
 **Durma kuralı (11 Ekim 09:50, önerildi):** 12:30'da ajan davranışı (skill, prompt, runtime) donar; sonrası yalnız çökme düzeltmesi. "Yeterince iyi": organizatör A ≥ 9/10, B ≥ 2/3, kendi vakalarda sabah tabanına göre gerileme yok (hepsi `--reps 3`); bunu sağlayan en iyi sürümle gidilir.
 
-1. **10:42:** B sürümü v17 (B 2/3, own-b-2 3/3, own-b-1 1/3). A v22 (`--brief A` 9/10) own-a-1, own-a-2 ölçülüyor (`queue12`).
+1. **12:30 donuldu** (`4f64795` skill'i; A v23 10/10, B v18 8/8). Genelleme kuyruğu `queue16`: ham A, I, G, H, C, D; E ve F yalnız build (~15:00). Sonra pratik workflow'lar panelden silinir.
 2. **10:40–12:30:** yalnız ölçümle kanıtlanmış hata. Tek yapısal istisna: B'de kapı yine model `end_call`'u yüzünden delinirse end_call aracı hiçbir adımda olmaz, bitişler rotayla `end_call` düğümüne.
 3. **12:30–16:00:** donmuş sürümle tam ölçüm (A, B, own-a-1/2, own-b-1/2, ham malzeme A, I).
 4. **16:00–18:00:** temiz klon provası `ANTHROPIC_API_KEY` ile, `python3 builder/build.py` (venv'siz kabuk), trace `submission/<slot>.trace.log`, export, `fak_`/`sk-ant` taraması.
@@ -418,3 +418,13 @@ B build (`4f64795` skill'i) 11:24–11:32, çıkış 0 (v18). `--brief B`: koşu
 ## 11 Ekim, 11:43–11:52: kesinti sonrası: takılan simülasyon silindi, yetim simülasyonlar; B v18 ara sonuçlar
 
 API 11:43'te geri geldi, `queue15` kendiliğinden devam etti. `ebea0e47` (B 3. koşu) "running"de takıldı (PUB-13 kaydı gelmedi; PUB-11, PUB-12 PASS); İhsan panelden sildi. Platform kesinti sırasında `POST /api/v2/simulations` hata dönerken simülasyonu yine yarattı: run_cases kendi açtığı simülasyonu "başka simülasyon çalışıyor" diye bekledi (`437e83a6` "cases 11:43:58", sonra `ffb81d49` "cases 11:47:40"). Bunlar tamamlanınca kuyruk ilerliyor. `437e83a6` yeniden puanlandı (own-b-2): **3/3**. B v18 şu ana kadar: `--brief B` koşu 1 3/3, koşu 2 3/3, koşu 3 2/2 (PUB-13 kayıp); own-b-2 ek koşu 3/3.
+
+## 11 Ekim, 11:43–12:27: kendi vakalar A v23 / B v18; **12:30 dondurma: `4f64795` skill'i**
+
+Hepsi `--reps 3` (kesinti sonrası `queue15`; own-b-2 ve own-a-1 ilk denemeleri 502 ile çöktü, yeniden koşuldu):
+- own-a-2 (A v23): **10/10** (10, 10, 10). v22: 10/10.
+- own-a-1 (A v23): **7/10** (koşular 7, 9, 8; 24/30). v22: 7/10 (21/30). PUB-09 (geri arama koruması) **3/3** (v22 0/3). PUB-02 1/3: düzeltilmiş kontrolle judge tabanı kabul etti; kalmalar söz kaydedilmemesi (kesik müşteri cümleleri). PUB-05 0/3 (bilinen, "iki kez konuşmak istemiyorum"). PUB-10 1. koşu: `create_promise` servis hatasından sonra tekrar denenmedi (yavaş koşu, 478 sn); 2/3. Çöken ilk denemenin tek koşusu (`6970a1ac`) 9/10.
+- own-b-2 (B v18): **2/3** (koşular 2, 3, 2; 7/9) + yetim simülasyon `437e83a6` 3/3. PUB-12 2 koşu: müşterinin "bu Cumartesi"si için araba kredisi 16 Ekim (Cuma) kaydedildi, beklenen 19 Ekim (Pazartesi). v17: 3/3 (9/9).
+- own-b-1 (B v18): **1/3** (koşular 2, 2, 3; 7/9). v17 aynı (7/9). PUB-11 1 koşu ret sonrası taksit teklifi, PUB-13 1 koşu ürünler arası tarih (27/16 yerine 28/23).
+- Organizatör: A v23 **10/10** (30/30, yeniden puanla), B v18 koşular 3/3, 3/3, 2/2 (PUB-13 kesintide kayıp; 8/8).
+Karşılaştırma (skill farkı yalnız kapanış koruması): A tarafında her dosya eşit ya da daha iyi; B'de organizatör 8/9 → 8/8, own-b-1 aynı, own-b-2 9/9 → 7/9 (tarih ailesi; skill değişikliği tarihe dokunmuyor, build'den build'e oynama). **Karar: `4f64795` skill'i ile donuldu** (durma kuralı: A ≥ 9/10, B ≥ 2/3, gerileme yok). Açık aileler, mekanizmasız: ürünler arası tarih, ürün başına deneme sayısı, "iki kez konuşmak istemiyorum", servis hatası sonrası tekrar deneme (1 koşu). `queue16` (genelleme: ham A, I, G, H, C, D; E ve F yalnız build) başlatıldı.
