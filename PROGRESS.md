@@ -547,3 +547,8 @@ Skill (yalnız kimlik adımı): task message ve yanlış-cevap kanca mesajı "Ca
 ## 11 Ekim, 18:49–19:00: A (kimlik kuralı) `--brief A` 10/10 (30/30)
 
 Freya ajan modeli 18:44'te döndü (`queue24` chat testi). A (18:29 build'i, `32a16c9` skill'i) `--brief A --reps 3`: **10/10**, koşular 10, 10, 10 (30/30). PUB-03 üç koşuda da `verify > verify > verify > close_call` (üçüncü cevap gönderildi, döngü yok). Yalnız-builder ajanında (aynı skill, kural yok) 8/10 idi; dondurulmuş v23 10/10. B build'i 19:00'da başladı.
+
+## 11 Ekim, 19:00–19:22: B (kimlik kuralı) 2/3; karar: kimlik kuralı kalır; son durum
+
+B build 19:00–19:11 (630 sn, $2,05; kural gen'de 3 yerde). `--brief B` ölçümü bizim taraftaki ağ hatasıyla (`URLError SSL: WRONG_VERSION_NUMBER`, run_cases POST/GET) üç kez düştü; Freya'da tamamlanan dört B simülasyonu `dev.rescore` ile puanlandı: `517421c7` 2/3, `2f1d4707` 2/3, `03d96fd6` 3/3, `029cea64` 2/3. PUB-11 4/4, PUB-13 4/4, PUB-12 1/4 (araba kredisine, erken bant, iki teklif: bilinen deneme sayısı ailesi; 17:05 build'inde de, v14–v17'de de vardı; v18'in 8/8'i büyük olasılıkla şanslı build). Organizatör sayımıyla B **2/3**. own-a-2 tek koşu (`1c9da70f`, durdurulan kuyruktan): **8/10** (PUB-01 karşılamada "Am I speaking with" üç kez, PUB-06 devirden sonra veda yok; kimlik adımıyla ilgisiz; tek koşu).
+**Karar:** A 10/10 (30/30), B 2/3: karar kuralı sağlandı, **skill `32a16c9` (12:30 + belge yolu + kimlik kuralı) ile gidilir.** Son build'lerin export'ları `dev/practice-submissions/final-skill/`'a taşındı; `submission/` yine boş. Testler 549 yeşil. Açık kalan aileler (finalde risk): ürün başına deneme sayısı (B PUB-12), ürünler arası tarih, karşılamada üçüncü soru, devir sonrası veda.
