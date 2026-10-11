@@ -406,3 +406,7 @@ A v22 (`fbd7838` skill'i), `--reps 3`: own-a-2 **10/10** (koşular 10, 10, 10; v
 - **PUB-02 (vaka ve platform):** simüle müşterinin cümleleri kesik geldi ("No, I cannot pay today, but"); ajan "Cuma öderim"i hiç duymadı, iki deneme yapıp kapattı. Judge tabanı (taksit tutarı 103.50, deadline'da 2. deneme, brief'e uygun) "taksit planı" saydı (3. koşuda söz kaydedildiği halde kaldı). Vaka kontrolü netleştirildi (taban teklifi taksit planı değil).
 - **PUB-05 (bilinen, 0/3):** "iki kez konuşmak istemiyorum" sonrası üçüncü teklif.
 Kuyruk `queue13` (11:01): A build → own-a-1, `--brief A`; B build → `--brief B`, own-b-2, own-b-1; own-a-2. Sonuç v22/v17'den kötüyse 12:30 dondurması bu skill'i geri alır.
+
+## 11 Ekim, 11:01–11:30: A v23 (`4f64795` skill'i) `--brief A` 10/10 (30/30, yeniden puanla); own-a-1 1 koşu 9/10
+
+A build 11:01–11:08, çıkış 0 (v23). `--brief A --reps 3`: run_cases **6/10** yazdı (koşular 10, 10, 6); 3. koşunun 4 kalması da "Call ended but analysis never arrived (300s)" (platform). `dev.rescore 423d426f` ile 3. koşu **10/10** → A v23 **10/10, 30/30**. own-a-1 ölçümü 1. koşudan sonra Freya GET 502 ile çöktü (`run_simulation`); `dev.rescore 6970a1ac --cases own-a-1.json`: **9/10** (tek koşu). PUB-09 (geri arama koruması) geçti, PUB-05 ve PUB-02 de geçti. PUB-07 kaldı: judge "create_promise onaydan önce" dedi, döküm tersini gösteriyor (geri okuma → "Yes, I confirm" → create_promise); ledger doğru, judge hatası. Müşteri cümleleri yine kesik geliyor. own-a-1 `--reps 3` yeniden kuyrukta (`queue14`, queue13'ten sonra).
