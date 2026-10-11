@@ -87,10 +87,6 @@ never a tool the brief forbids there.
   time when it says so); tools: the identity tool, any tool the brief allows here (e.g. a transfer
   for a human request), end_call. Leave on the identity result:
   `wf.any_of(wf.when_true("<identity tool>_response.data.<all-verified field>"), wf.when_equals("bb_identity", "verified"))`.
-  The model holds back the last try (measured: it asked for the date of birth again and again and never
-  sent the answer, 160 turns). So the task message and the wrong-answer hook message say: "Call <identity
-  tool> with every answer as soon as it is given, also on the last try and also if it may be wrong; never
-  ask for it again before calling the tool, unless it could not be read."
 - `load_account` (api_request): the account lookup, mapping `data.<list field>` to a variable.
 - `account_facts` (code node): product facts (`calc.products_code`).
 - `negotiate` (conversation): state the debt, get promises, notes, transfers; write tools + end_call
