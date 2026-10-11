@@ -73,19 +73,25 @@ never a tool the brief forbids there.
   promise is made), the goodbye is gated in code, not left to the prompt (measured four times: the
   model said goodbye with no record, the brief's rule written correctly in its task message):
   give each post hook of the tools that complete a product `open_var="bb_open", open_tools=[those
-  tools]`; `negotiate` gets NO end_call; its transitions go to a `wrap_up` conversation node when
+  tools]`; `negotiate` gets NO end_call; its transitions go to a `wrap_text` code node, then `wrap_up`, when
   `wf.when_equals("bb_open", "none")`, and when the brief's call-ending event happened without records
   (e.g. a transfer: let that tool's post hook `set` a flag such as `{"bb_transferred": "yes"}` and route
   on it). Set such a flag only in a rule on the tool's success field (`[["ok", "true"]]`), never on a
   field that is present either way (`ok: false` is present too). Give `negotiate` `max_turns` and
-  `max_turn_transition="wrap_up"` as a last exit. Every way a product can end in `negotiate` must either
-  write a record or set a flag that routes to `wrap_up`; if the brief has an ending with no record and no
-  tool call, do not gate. `wrap_up`: `on_enter=wf.llm()`, tools=[end_call] only, no transitions; its task
-  message quotes, from the brief, what to say for each way the call can end (the sentence after a
-  recorded promise, what was not recorded, the brief's transfer sentence, then the closing phrase); list
-  each of those last sentences in end_call's `trigger_phrase`. Under the gate the closing phrase and
-  "call end_call" appear ONLY in `wrap_up`'s task message: not in the system prompt, not in `negotiate`,
-  not in hook messages (in `negotiate` the model has no end_call; a goodbye there leaves the call open).
+  `max_turn_transition="wrap_text"` as a last exit. Every way a product can end in `negotiate` must either
+  write a record or set a flag that routes on; if the brief has an ending with no record and no tool
+  call, do not gate. The words of the end are chosen in code, not by the model (measured: a model asked
+  to pick them skipped the brief's sentence after a recorded promise in 3 of 3 runs):
+  `wrap_text` = `wf.code_node("wrap_text", calc.wrap_code(parts=[{"when": [["bb_count__<promise tool>",
+  "gte", 1]], "say": <the brief's sentence after a recorded promise>}, {"when": [["bb_failed_out__<promise
+  tool>", "present"]], "say": <what the brief says for a failed one>}, {"when": [["bb_transferred",
+  "equals", "yes"]], "say": <the brief's transfer sentence>}, {"say": <the closing phrase>}]), "wrap_up")`,
+  only the parts the brief has, in the brief's order. `wrap_up`: `on_enter=wf.say("{{bb_wrap}}")`,
+  tools=[end_call] only, no transitions, task message "The call is over. Say nothing more."; end_call's
+  `trigger_phrase` lists the closing phrase (and the transfer sentence if a call can end on it). Under the
+  gate the closing phrase and "call end_call" appear ONLY in `wrap_text`: not in the system prompt, not in
+  `negotiate`, not in hook messages (measured: a model that knew the goodbye said it in `negotiate` and
+  called end_call there, although that step did not list it; the engine runs end_call from any step).
   The negotiate task message says the call ends by itself once every product has its record; hook
   messages say which product is next and nothing about goodbye. A brief that never records per product
   (e.g. only a promise or nothing) keeps end_call in `negotiate`.
@@ -138,6 +144,8 @@ calc.products_code(sources=calc.product_sources(NODE, LOOKUP_TOOL, LIST_FIELD, M
                    "attempts": N, "offers": TEMPLATE}], line=TEMPLATE, header="...{count}...",
                    known_dates=(...DATE_NAMEs), band_field=F, default_type={...},
                    say_line=TEMPLATE)   # say_line: what is said about one product -> {{debt_statement}}
+calc.wrap_code(parts=[{"when": [[VAR, OP, V]], "say": TEXT}, ..., {"say": CLOSING_PHRASE}])
+#   the words that end a gated call, chosen in code -> {{bb_wrap}}; the last part holds always
 #   band_field: the item field the brief's band table is keyed on (days_field by default);
 #   default_type: the spec for a product type the brief names that the API enum does not list
 #   placeholders: {id} {name} {full} {floor} {floor_label} {days} {band} {deadline} {deadline_spoken}
@@ -222,7 +230,7 @@ Track every write tool with a post hook (`ok_when` from the tool's success field
 too (the pre hook records the request the post hook and the close hook read). Retries: what the
 brief allows after a failed write. The hook messages are the next step the brief prescribes after
 that result, including any sentence the customer must hear (when the goodbye is gated, the sentences
-of the call's end are in `wrap_up` instead).
+of the call's end are in `wrap_text` instead).
 
 The end of a call with several steps left (the writes the brief requires per product, in its order,
 then the goodbye) is where the model drops tool calls: it says goodbye and the remaining calls never
@@ -257,8 +265,7 @@ debt says `{{debt_statement}}` from `products_code(say_line=...)`: one sentence 
 the brief says must be stated (e.g. "Your {name} is {full} past due and {days} days late."), so no
 product is skipped. Use `wf.llm` only when the words cannot be fixed: the model that writes them does not
 see the brief (measured: it invented a security question; it stated three products without amounts).
-`wrap_up` is such a case (what to say depends on how the call went); its task message must therefore
-quote every sentence it may say.
+(The end of a gated call is not such a case: `calc.wrap_code` picks its words.)
 
 Customers give answers in pieces over several turns (the day and month, then the year; two digits, then
 two more) and correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in

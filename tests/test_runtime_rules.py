@@ -10,7 +10,7 @@ TOP_LEVEL = (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.Assign)
 
 
 def test_all_runtime_modules_are_listed():
-    assert MODULES == ["closing", "common", "dates", "hooks", "products"]
+    assert MODULES == ["closing", "common", "dates", "hooks", "products", "wrap"]
 
 
 @pytest.mark.parametrize("name", MODULES)

@@ -245,3 +245,26 @@ def check_no_double_braces(value: object, path: str = "config") -> None:
     elif isinstance(value, (list, tuple)):
         for index, item in enumerate(value):
             check_no_double_braces(item, path + "[" + str(index) + "]")
+
+
+def wrap_code(*, parts: list[dict], var: str = "bb_wrap") -> str:
+    """Snippet of the code node that chooses the words ending a call: each part is {"when": [[VAR, OP,
+    VALUE?], ...], "say": TEXT}; the texts of the parts whose conditions hold are joined, in order, into
+    `var` (say it with on_enter=wf.say("{{" + var + "}}")). The last part must hold always ("when": [])
+    and carry the closing phrase; that text is also the fallback."""
+    from builder.lib.hooks import check_conditions
+    check_var(var)
+    if not isinstance(parts, (list, tuple)) or not parts:
+        raise ValueError("parts must be a non-empty list of {'when': [...], 'say': TEXT}")
+    for index, part in enumerate(parts):
+        if not isinstance(part, dict) or set(part) - {"when", "say"} or not isinstance(part.get("say"), str) \
+                or not part.get("say").strip():
+            raise ValueError("parts[" + str(index) + "] needs 'say' (a sentence) and may have 'when'")
+        if part.get("when"):
+            check_conditions(part["when"], "parts[" + str(index) + "].when")
+    if parts[-1].get("when"):
+        raise ValueError("the last part must hold always (no 'when'): the closing phrase")
+    cfg = {"parts": [{"when": list(p.get("when") or []), "say": p["say"]} for p in parts], "var": var,
+           "fallback": parts[-1]["say"]}
+    check_no_double_braces(cfg)
+    return embed.snippet(("common", "wrap"), "run_wrap", cfg, "code")
