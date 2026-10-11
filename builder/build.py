@@ -9,7 +9,7 @@ masked, and exports the saved workflow to submission/<slot>.workflow.json.
 --cases A|B runs the kit's practice customers as the agent's test (development only; hidden briefs
 have no practice customers). Needs FREYA_API_KEY (and FREYA_BANK_TEAM_KEY for --cases) and a Claude
 login or ANTHROPIC_API_KEY. BUILD_DEADLINE_S (default 1500) caps the run. BUILDER_MODEL (default
-claude-opus-5-5) and BUILDER_EFFORT (low|medium|high|xhigh|max; default: the model's own) choose the model.
+claude-opus-5-5) and BUILDER_EFFORT (low|medium|high|xhigh|max; default max) choose the model.
 """
 from __future__ import annotations
 
@@ -147,7 +147,7 @@ async def run_agent(briefs: list[str], api: str, slot: str, cases: str, deadline
     from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, HookMatcher, ResultMessage,
                                   ToolResultBlock, ToolUseBlock, UserMessage, query)
     model = os.environ.get("BUILDER_MODEL", "claude-opus-5-5")
-    effort = os.environ.get("BUILDER_EFFORT") or None      # unset: the model's default effort
+    effort = os.environ.get("BUILDER_EFFORT") or "max"     # measured: max 50/54 vs the default (medium) 46/54
     trace("[builder]", "model:", model, "effort:", effort or "default")
     options = ClaudeAgentOptions(
         cwd=str(ROOT), model=model, setting_sources=[], effort=effort,

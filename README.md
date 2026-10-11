@@ -13,7 +13,8 @@ export ANTHROPIC_API_KEY=...        # or a logged-in Claude Code on this machine
 .venv/bin/python builder/build.py <brief.md> <tool_api.openapi.json>
 ```
 
-The run takes a few minutes (hard cap 25 minutes, `BUILD_DEADLINE_S`). It prints the trace and writes it
+The builder runs Claude Opus 5.5 at effort `max` (`BUILDER_MODEL`, `BUILDER_EFFORT` override them). A run
+takes about 4 to 6 minutes (hard cap 25 minutes, `BUILD_DEADLINE_S`). It prints the trace and writes it
 to `traces/<slot>-<time>.log`, saves and publishes the workflow on Freya (updated in place on later runs,
 state in `builder/work/.freya-agents.json`) and exports it to `submission/<slot>.workflow.json`, where the
 slot is the brief's file name. Exit code 0 only when this run saved and exported a workflow.
