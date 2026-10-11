@@ -24,6 +24,13 @@ write the prompts, and assemble the workflow.
   material (mail, policy extract, memo, code list), the memo's change wins over the older text and
   the code list gives the outcome and reason names. Where the tool API file lists enum values, its
   spelling wins: map the code list onto the enum (close_hook with op= refuses names outside it).
+  With several dated changes, the latest one in force on the calls' date (`now` in the brief's example)
+  wins; a change with a later effective date or a narrower scope (one product, one band) applies only
+  there. In `WORK/notes.md`, list each replaced rule with its replacement, and a table code -> enum value
+  (split combined outcome/reason codes; a code with no enum match goes to the value whose "when" text
+  fits, noted). A field with no enum (free text) gets the code list's name as written, not its number,
+  unless the brief says the system expects the code. The closing table is the code list's "when" column
+  with the memo's changes applied.
 
 ## Steps
 
@@ -48,7 +55,8 @@ write the prompts, and assemble the workflow.
 
 This is the default layout for a brief whose call goes: who is on the line, identity, the debt and the
 promises, closing. Add, drop or reorder steps when the brief's flow differs. Give each step every tool
-the brief allows in that step (from `WORK/notes.md`), plus end_call; never a tool the brief forbids there.
+the brief allows in that step (from `WORK/notes.md`), plus end_call (except a gated `negotiate`, below);
+never a tool the brief forbids there.
 
 - `setup` (code node, initial): date facts from `now` for the whole call (`calc.dates_code`).
 - `greet` (conversation): the brief's opening; who is on the line (extraction enum); what the brief
@@ -59,7 +67,8 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
   `wf.any_of(wf.when_true("<identity tool>_response.data.<all-verified field>"), wf.when_equals("bb_identity", "verified"))`.
 - `load_account` (api_request): the account lookup, mapping `data.<list field>` to a variable.
 - `account_facts` (code node): product facts (`calc.products_code`).
-- `negotiate` (conversation): state the debt, get promises, notes, transfers; write tools + end_call.
+- `negotiate` (conversation): state the debt, get promises, notes, transfers; write tools + end_call
+  (no end_call when the goodbye is gated, next item).
 - When the brief requires a record for EVERY product (a promise or a note with a reason, even when no
   promise is made), the goodbye is gated in code, not left to the prompt (measured four times: the
   model said goodbye with no record, the brief's rule written correctly in its task message):
@@ -67,12 +76,19 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
   tools]`; `negotiate` gets NO end_call; its transitions go to a `wrap_up` conversation node when
   `wf.when_equals("bb_open", "none")`, and when the brief's call-ending event happened without records
   (e.g. a transfer: let that tool's post hook `set` a flag such as `{"bb_transferred": "yes"}` and route
-  on it). `wrap_up`: `on_enter=wf.llm()`, tools=[end_call] only, no transitions; its task message says
-  what to say there, from the brief, for each way the call can end (the sentence after a recorded promise,
-  what was not recorded, the transfer announcement, then the closing phrase). The negotiate task message
-  says the call ends by itself once every product has its record, and the hook messages stop telling the
-  model to say goodbye; they say which product is next. A brief that never records per product (e.g. only
-  a promise or nothing) keeps end_call in `negotiate`.
+  on it). Set such a flag only in a rule on the tool's success field (`[["ok", "true"]]`), never on a
+  field that is present either way (`ok: false` is present too). Give `negotiate` `max_turns` and
+  `max_turn_transition="wrap_up"` as a last exit. Every way a product can end in `negotiate` must either
+  write a record or set a flag that routes to `wrap_up`; if the brief has an ending with no record and no
+  tool call, do not gate. `wrap_up`: `on_enter=wf.llm()`, tools=[end_call] only, no transitions; its task
+  message quotes, from the brief, what to say for each way the call can end (the sentence after a
+  recorded promise, what was not recorded, the brief's transfer sentence, then the closing phrase); list
+  each of those last sentences in end_call's `trigger_phrase`. Under the gate the closing phrase and
+  "call end_call" appear ONLY in `wrap_up`'s task message: not in the system prompt, not in `negotiate`,
+  not in hook messages (in `negotiate` the model has no end_call; a goodbye there leaves the call open).
+  The negotiate task message says the call ends by itself once every product has its record; hook
+  messages say which product is next and nothing about goodbye. A brief that never records per product
+  (e.g. only a promise or nothing) keeps end_call in `negotiate`.
 - The close tool is a workflow-level `end_of_call` lifecycle tool whose pre hook is `closing.close_hook`.
 - Prompts: the system prompt holds the identity, tone, hard rules that hold in every step, and
   `{{date_facts}}`. It must say: obey the `what_to_do_next` field of every tool result; after every
@@ -83,13 +99,15 @@ the brief allows in that step (from `WORK/notes.md`), plus end_call; never a too
   literally: it must not appear in any turn before the write succeeds, the opening included. Where the
   brief does not dictate the exact words, say other things with another form (if the saved word were
   "logged", the opening would say "we log this call", not "this call is logged"; a failure, "I could not
-  log it"). Where a product is agreed before the read-back (several products, one read-back), the task
+  log it"). Where a product is agreed before the read-back (several products and the brief has one
+  read-back for all), the task
   message gives the words for that moment, an acknowledgement in the agreed-not-yet-saved sense ("Thank
   you, that is agreed: <amount> on <date> for <product>. I will read everything back at the end."):
   measured, the model otherwise acknowledged an agreement with the saved word. Each node's task message covers only that step: its rules from the brief, with
   every sentence the brief makes mandatory quoted exactly, and which tool to call when. Never name
   other nodes or describe routing in a task message.
-- End the call with the end_call tool: the assistant says the closing phrase, which triggers it.
+- End the call with the end_call tool: the assistant says the closing phrase, which triggers it, in the
+  step that has end_call (`wrap_up` when the goodbye is gated).
 - Route on tool results and code flags, never on what the customer says, except who answered the phone.
 
 ## builder/lib in one page
@@ -186,17 +204,25 @@ product as refused before its listed attempts are used."
 The close tool is filled by a model after the call ends; it sees only the tool and the transcript.
 Its description must carry the brief's whole closing table: every outcome and reason with when it
 applies, in the brief's words. Say that the outcome field takes the outcome name only and the reason
-field the reason name only. The close rules decide everything the tool results can decide; after
-`{"keep_model": True}` add rules keyed on the identity state (`var:bb_identity`), so that a call
-with a verified customer never ends in an outcome the brief's table reserves for calls where the
-customer was not reached or not verified, whatever the model sent; build these rules from the table's
-own conditions. The `default` is the outcome for a call where
-nothing at all happened.
+field the reason name only. The close rules decide everything the tool results can decide. Rules are
+tried in order and the first that applies wins, so every guard goes BEFORE `{"keep_model": True}` (a
+rule after it only runs when the model sent nothing usable):
+- rules keyed on the identity state (`var:bb_identity`), so that a call with a verified customer never
+  ends in an outcome the brief's table reserves for calls where the customer was not reached or not
+  verified, whatever the model sent; build these rules from the table's own conditions;
+- an outcome for refusing the identity check (e.g. "declined") only when the person confirmed who they
+  are (the greet step's extraction, e.g. `var:who_answered` equals the customer value); a call where that
+  never happened ends in the table's outcome for "not reached / unclear who answered" (measured: an
+  unconfirmed caller closed as declined);
+- an outcome whose fact did not happen is replaced (e.g. the outcome for "a promise was recorded" with
+  `count:<promise tool>` 0, or "paid" with no paid record).
+The `default` is the outcome for a call where nothing at all happened.
 
 Track every write tool with a post hook (`ok_when` from the tool's success field), give it a pre hook
 too (the pre hook records the request the post hook and the close hook read). Retries: what the
 brief allows after a failed write. The hook messages are the next step the brief prescribes after
-that result, including any sentence the customer must hear.
+that result, including any sentence the customer must hear (when the goodbye is gated, the sentences
+of the call's end are in `wrap_up` instead).
 
 The end of a call with several steps left (the writes the brief requires per product, in its order,
 then the goodbye) is where the model drops tool calls: it says goodbye and the remaining calls never
@@ -205,13 +231,16 @@ first and the words to the customer last, never the other way round, and name th
 with `{open:<tool>:<tool>...}` (products none of those tools has written yet, or "none"): list the tools
 whose successful write completes a product under the brief, e.g. "Products not yet completed:
 {open:<tool A>:<tool B>}. If that is not none, call <the tool the brief requires for them> now for the
-first of them only, before you say anything; the result names the next. Then ...". Respect the brief's exceptions (e.g. a transfer that forbids them).
+first of them only, before you say anything; the result names the next. Then ..." (gated: "If that is
+none, say nothing more: the call goes on by itself."). Respect the brief's exceptions (e.g. a transfer
+that forbids them).
 Those hook messages only come after a write. When the brief requires a record per product even with no
 promise at all (a dispute, "already paid", refusals), nothing has been written yet when the call ends and
 no hook reminds the model (measured twice: goodbye with no record at all). So the task message's
 end-of-call rule names that case on its own: "If no promise was agreed, first call <the record tool> for
-every product, in order, with its reason, one call per message; only then the goodbye."
-Give the end_call tool a description that it is only for after the closing phrase, never while an
+every product, in order, with its reason, one call per message; only then the goodbye." (gated: "...
+one call per message; the call ends by itself after the last one.")
+Without the gate, give the end_call tool a description that it is only for after the closing phrase, never while an
 agreed promise is not yet read back and recorded or a required record is missing, and never in the same
 turn as another tool call (measured: a transfer and end_call called together closed the call before the
 sentence the brief requires after a transfer was said).
@@ -228,6 +257,8 @@ debt says `{{debt_statement}}` from `products_code(say_line=...)`: one sentence 
 the brief says must be stated (e.g. "Your {name} is {full} past due and {days} days late."), so no
 product is skipped. Use `wf.llm` only when the words cannot be fixed: the model that writes them does not
 see the brief (measured: it invented a security question; it stated three products without amounts).
+`wrap_up` is such a case (what to say depends on how the call went); its task message must therefore
+quote every sentence it may say.
 
 Customers give answers in pieces over several turns (the day and month, then the year; two digits, then
 two more) and correct themselves. Every task message that collects an answer for a tool says: "If the answer comes in
@@ -247,9 +278,11 @@ they will pay a product on a day and names no lower amount agrees to the amount 
 read-back." An offer the brief allows once is made once: if the day is still open, name the amount and
 ask for the day in the same sentence; after that only the day is discussed and the amount is not offered
 again (the read-back does not count) (measured: the floor offered "today", then again "on Friday", was
-judged as offered twice). And, in the system prompt: "Never ask the same question a third time; if the customer's
-answer has not changed, act on what they said." (measured: a fixed offer sentence asked 70 times in a
-row while the customer kept saying "I will pay the card tomorrow").
+judged as offered twice). And, in the system prompt: "Never ask the same question a third time, unless
+the brief allows more tries (e.g. security answers: send every answer to the identity tool until the
+brief's limit); if the customer's answer has not changed, act on what they said. A question whose answer
+changed is not the same question." (measured: a fixed offer sentence asked 70 times in a row while the
+customer kept saying "I will pay the card tomorrow").
 
 A failed HTTP call (e.g. a 500 from the bank) reaches the model as a plain error, and the post hook
 does not run on it (measured: "API request failed: {...}" with no what_to_do_next; the model said
